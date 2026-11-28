@@ -151,7 +151,15 @@ export async function open(
   await page.goto(withQuery(url, recipe.query));
   await followRedirect(page);
   // A screen that sent the browser to sign-in is not measured, so there is nothing to wait for.
-  if (!recipe.loading && !sentToSignIn(page, url)) await waitReady(page);
+  if (!recipe.loading && !sentToSignIn(page, url)) {
+    try {
+      await waitReady(page);
+    } catch (err) {
+      // The redirect to sign-in landed while the screen was awaited, so what was awaited (its region) never comes:
+      // the screen is handed over like one that redirected at once (S4-r2 of row 3h, G-2811-106).
+      if (!sentToSignIn(page, url)) throw err;
+    }
+  }
   return ctx;
 }
 
