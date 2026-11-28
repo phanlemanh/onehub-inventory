@@ -40,11 +40,25 @@ export interface ImportTable {
   rows: string[][];
 }
 
+/**
+ * A cell kept as written on the import: its place in the file, its text as written and why it was kept. `value` is
+ * what the preview showed for it when it showed one (read by the machine, or the person's answer), so nothing the
+ * preview promised is lost even where the cell has no place on the listing (ruling G-2811-78, after VP11 S4-r8 t7).
+ * An asked cell has none. Added beside `raw`, never instead of it.
+ */
 export interface Kept {
   row: number;
   header: string;
   raw: string;
   why: string;
+  value?: string | number | boolean;
+}
+
+/** A kept cell, with the preview's value when the cell has one. */
+function keptCell(row: number, header: string, raw: string, why: string, cell: CellMark): Kept {
+  return cell.value === null
+    ? { row, header, raw, why }
+    : { row, header, raw, why, value: cell.value };
 }
 
 export interface StoredLearned extends LearnedIds {
@@ -362,7 +376,7 @@ export async function writeBatch(
         (cell.mark === "ask" && !(place && "unit" in place && place.unit === "code")) ||
         (keptAs && raw.trim() !== "")
       )
-        kept.push({ row: input.rowOffset + r, header: col.header, raw, why: keptAs ?? cell.why });
+        kept.push(keptCell(input.rowOffset + r, col.header, raw, keptAs ?? cell.why, cell));
     });
     // The tower text has a place only on a pending unit this row creates; any other row keeps it as written, like the
     // unit attributes (VP11 S4-r7 t4: a unit that already exists took nothing of it, and the cell was lost).
@@ -373,12 +387,15 @@ export async function writeBatch(
         buildingRaw.trim() !== "" &&
         cells[buildingAt]!.mark !== "ask"
       )
-        kept.push({
-          row: input.rowOffset + r,
-          header: marked.columns[buildingAt]!.header,
-          raw: buildingRaw,
-          why: "unit-attribute",
-        });
+        kept.push(
+          keptCell(
+            input.rowOffset + r,
+            marked.columns[buildingAt]!.header,
+            buildingRaw,
+            "unit-attribute",
+            cells[buildingAt]!,
+          ),
+        );
     };
     if (outcome.fate !== "create" || !outcome.unit) {
       keepBuilding();

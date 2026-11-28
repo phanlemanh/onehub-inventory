@@ -1694,7 +1694,7 @@ function lostCells(
   raw: readonly string[],
   written: {
     listing: Record<string, unknown>;
-    kept: { row: number; header: string; raw: string }[];
+    kept: { row: number; header: string; raw: string; value?: unknown }[];
     newCode: string;
     unitOk: boolean;
     pendingBuilding: string | null;
@@ -1703,7 +1703,13 @@ function lostCells(
   const same = (a: unknown, b: unknown) => String(a) === String(b);
   const custom = (written.listing.custom_fields ?? {}) as Record<string, unknown>;
   const keptHere = (j: number) =>
-    written.kept.some((k) => k.row === r && k.header === headers[j] && k.raw === raw[j]);
+    written.kept.some(
+      (k) =>
+        k.row === r &&
+        k.header === headers[j] &&
+        k.raw === raw[j] &&
+        String(k.value) === String(promised.cells[r]![j]!.value),
+    );
   return promised.columns.flatMap((col, j) => {
     const cell = promised.cells[r]!.at(j)!;
     if (!col.target || cell.value === null) return [];
@@ -1988,7 +1994,7 @@ function outcomeOf(
 
 interface Written {
   listing: Record<string, unknown> | null;
-  kept: { row: number; header: string; raw: string; why: string }[];
+  kept: { row: number; header: string; raw: string; why: string; value?: unknown }[];
   unitOk: boolean;
   pendingBuilding: string | null;
   newCode: string;
@@ -2009,13 +2015,19 @@ function matrixFaults(
       const w = written[r]!;
       const raw = row.raw[j]!;
       const name = `${r}:${col.header}`;
+      // Kept as written AND with the value the preview showed, when it showed one (G-2811-78).
       const keptHere = (why: string) =>
         w.kept.some(
-          (k) => k.row === r && k.header === col.header && k.raw === raw && k.why === why,
+          (k) =>
+            k.row === r &&
+            k.header === col.header &&
+            k.raw === raw &&
+            k.why === why &&
+            (cell.value === null ? k.value === undefined : String(k.value) === String(cell.value)),
         );
       if ("na" in o) out.push(`${name}: no outcome`);
       else if ("kept" in o) {
-        if (!keptHere(o.kept)) out.push(`${name}: not kept (${o.kept})`);
+        if (!keptHere(o.kept)) out.push(`${name}: not kept with its value (${o.kept})`);
       } else if ("none" in o) {
         if (w.listing !== null) out.push(`${name}: a listing exists for a ${o.none} row`);
       } else if (o.write === "listing") {
@@ -2310,16 +2322,36 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
           kept: w.kept.filter((x) => !(x.row === 0 && x.header === "Block")),
         })),
       ),
-    ).toEqual(["0:Block: not kept (unit-attribute)"]);
+    ).toEqual(["0:Block: not kept with its value (unit-attribute)"]);
     expect(matrixFaults(promised, rows, [{ ...r0, unitOk: false }, ...written.slice(1)])).toEqual([
       "0:Mã căn: listing not on its unit",
     ]);
+    // A listed row that got a listing is named on its unit code (S4-r8 t9: the message is pinned, not just counted).
     const lastListed = rows.length - 1;
     expect(
       matrixFaults(promised, rows, [
         ...written.slice(0, lastListed),
         { ...written[lastListed]!, listing: r0.listing },
-      ]).filter((f) => f.startsWith(`${lastListed}:`)).length,
-    ).toBeGreaterThan(0);
+      ]),
+    ).toEqual([`${lastListed}:Mã căn: a listing exists for a row-listed row`]);
+    // An answer the person typed for a column kept as written, lost from the record, is named (G-2811-78): the cell
+    // «chưa bán 2» of the catalog row answered without «remember» shows 4000000000 on the preview.
+    const answeredRow = rows.findIndex(
+      (x) => x.situation === "catalog" && x.mark === "chosen-no-remember",
+    );
+    const SALE = MATRIX.findIndex((c) => c.header === "Giá bán");
+    expect(promised.cells[answeredRow]![SALE]!.value).toBe(4000000000);
+    const lostAnswer = kept.map((k) =>
+      k.row === answeredRow && k.header === "Giá bán"
+        ? { row: k.row, header: k.header, raw: k.raw, why: k.why }
+        : k,
+    );
+    expect(
+      matrixFaults(
+        promised,
+        rows,
+        written.map((w) => ({ ...w, kept: lostAnswer })),
+      ),
+    ).toEqual([`${answeredRow}:Giá bán: not kept with its value (close-field)`]);
   });
 });

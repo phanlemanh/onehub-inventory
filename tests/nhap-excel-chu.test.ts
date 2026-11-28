@@ -19,7 +19,7 @@ describe("chu-man-nap-tep", () => {
 
   it("an undo that kept edited units names each of them", () => {
     expect(C.undoneKept(["S1 01-0905", "S2 02-1101"])).toBe(
-      "Đã hoàn tác lần nhập. Còn 2 căn chưa gỡ vì đã có người sửa sau lần nhập: S1 01-0905, S2 02-1101.",
+      "Đã hoàn tác lần nạp tệp. Còn 2 căn chưa gỡ vì đã có người sửa sau lần nạp tệp: S1 01-0905, S2 02-1101.",
     );
   });
 });
