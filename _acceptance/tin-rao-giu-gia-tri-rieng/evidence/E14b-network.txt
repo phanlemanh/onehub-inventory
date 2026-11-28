@@ -1,0 +1,1 @@
+E14b: driver is Playwright spec via chay.sh; no browser-tool network reader used. WebServer log only: idle DB connection closed notices (not requests).
