@@ -26,12 +26,19 @@ export async function pageReady(
   const deadline = Date.now() + timeout;
   let last = { mark: false, pending: 0, regions: 0, el: true };
   while (Date.now() < deadline) {
-    last = await page.evaluate(() => ({
-      mark: document.documentElement.hasAttribute("data-hydrated"),
-      pending: document.querySelectorAll('[hidden][id^="S:"]').length,
-      regions: document.querySelectorAll('[data-slot="data-region"]:not([data-hydrated])').length,
-      el: true,
-    }));
+    // A redirect can land mid-read (sign-in, late on a loaded machine): the page is then between two documents, with no
+    // root yet or its context gone. That is «not ready», read again until the deadline (S4-r2 of row 3h, G-2811-106).
+    try {
+      last = await page.evaluate(() => ({
+        mark: document.documentElement?.hasAttribute("data-hydrated") === true,
+        pending: document.querySelectorAll('[hidden][id^="S:"]').length,
+        regions: document.querySelectorAll('[data-slot="data-region"]:not([data-hydrated])').length,
+        el: true,
+      }));
+    } catch (err) {
+      if (!String(err).includes("Execution context was destroyed")) throw err;
+      last = { mark: false, pending: 0, regions: 0, el: true };
+    }
     if (opts.el) {
       last.el = await opts.el
         .first()
