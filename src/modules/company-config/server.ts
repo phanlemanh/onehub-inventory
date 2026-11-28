@@ -54,6 +54,9 @@ export {
 
 export { createFeeScheduleHandlers, type FeeScheduleHandlers } from "./fee-schedule-http";
 
+// Row 11 (nhap-excel): what one import teaches the company layer, and its undo.
+export { learnFromImport, retireLearned, type LearnInput, type LearnedIds } from "./import-learn";
+
 export {
   createCompanyLayerHandlers,
   type CompanyLayerDeps,

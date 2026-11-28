@@ -13,6 +13,8 @@ import type {
   Unit,
 } from "../../generated/ontology";
 
+import type { OwnAttributes, UnitAttributeField } from "./unit-attributes";
+
 /** Ids of sample records start with "MAU" written in hex. */
 export const SAMPLE_ID_PREFIX = "4d415500-";
 
@@ -358,4 +360,31 @@ export function checkOneOpenListingPerUnit(data: SampleListings): string[] {
     if (status && OPEN_STATUSES.includes(status)) open.set(x.upi, (open.get(x.upi) ?? 0) + 1);
   }
   return [...open].filter(([, n]) => n > 1).map(([upi]) => `two open listings on one unit: ${upi}`);
+}
+
+/**
+ * Own values of the unit attributes on a few sample listings (row 3h), by listing position, so the clickable prototype
+ * shows every state: an own area that differs from the catalog (typed, and from a file), own bedrooms equal to the
+ * catalog's, an own direction where the catalog has none, and a closed listing that keeps a differing area locked.
+ * Kept apart from the pinned sample of row 1 (its digest does not move), like the fees and the own fields.
+ */
+export const SAMPLE_OWN_ATTRIBUTES: Readonly<Record<number, OwnAttributes>> = {
+  3: { livingArea: 78.5, livingAreaSource: "Typed" },
+  4: { bedroomsTotal: 2, bedroomsTotalSource: "Typed" },
+  8: { livingArea: 112, livingAreaSource: "Typed" },
+  10: { livingArea: 55.5, livingAreaSource: "File", floor: "8A", floorSource: "File" },
+  14: { directionFaces: "Đông", directionFacesSource: "Typed" },
+};
+
+/** Sample positions whose catalog unit has no value for an attribute (row 3h: the company fills the gap, no mark). */
+export const SAMPLE_CATALOG_GAPS: Readonly<Record<number, readonly UnitAttributeField[]>> = {
+  14: ["directionFaces"],
+};
+
+/** The sample listings with their own unit attribute values (row 3h). */
+export function withSampleOwnAttributes<L extends Listing>(listings: readonly L[]): L[] {
+  return listings.map((l, i) => {
+    const own = SAMPLE_OWN_ATTRIBUTES[i];
+    return own ? { ...l, ...own } : l;
+  });
 }

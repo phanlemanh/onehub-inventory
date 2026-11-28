@@ -185,6 +185,8 @@ describe("screens", () => {
         "/login",
         "/members",
         "/company-layer",
+        // Row 11 (nhap-excel): the import screen.
+        "/nhap-tep",
       ]),
     );
   });

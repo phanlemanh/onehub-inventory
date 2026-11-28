@@ -363,7 +363,11 @@ test("dang-ban-chi-nguoi-giu: Active is offered on one's own unit and on an unke
   );
   const none = sampleRow("none");
   await page.goto(`/inventory?record=${companyListingId(w.mau.id, none.id)}`);
-  await expect(page.locator('[data-slot="ask-list-agent"]')).toBeDisabled();
+  // Row 3h (C2): an unkept unit's foot is one quiet line saying why, not a dimmed button.
+  await expect(page.locator('[data-slot="ask-list-agent"]')).toHaveCount(0);
+  await expect(
+    page.locator('[data-slot="ask-locked-reason"]').filter({ visible: true }),
+  ).toHaveCount(1);
 });
 
 // ---- E6b · conflict at the cell, undo of the price only ------------------------------------------------------------

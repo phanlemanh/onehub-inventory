@@ -1,12 +1,12 @@
 # Components
 
-Written from the design ledgers at 871f9e446b70. Do not change it here: change a ledger, then write it again with make design-exports.
+Written from the design ledgers at 5e3e1ca2f6ba. Do not change it here: change a ledger, then write it again with make design-exports.
 
 - **ActionPermissionProvider** (atom), `src/components/candidate/action-permission.tsx`: permitted
 - **CellEditor** (atom), `src/components/candidate/cell-editor.tsx`: anchor, find, label, onClose
 - **ColumnFilterCell** (organism), `src/components/candidate/column-filter-cell.tsx`: spec, column, options
 - **CornerClose** (organism), `src/components/candidate/corner-close.tsx`: of
-- **DataRegion** (template), `src/components/candidate/data-region.tsx`: title, columns, rows, status, onRetry, onCancel, emptyWhy, emptyAction, action, headAction, rowActions, record, editable, cellEdit, initialFilters, groupBy, initialView, onViewChange, hiddenAtFirst, phoneList
+- **DataRegion** (template), `src/components/candidate/data-region.tsx`: title, columns, rows, status, onRetry, onCancel, emptyWhy, emptyAction, action, headAction, rowActions, record, editable, cellEdit, initialFilters, groupBy, initialView, onViewChange, hiddenAtFirst, phoneList, cellMark
 - **InDialog** (organism), `src/components/candidate/form-dialog.tsx`: value
 - **FormDialog** (organism), `src/components/candidate/form-dialog.tsx`: trigger, title, description, submitLabel, busyLabel, busy, open, onOpenChange, onSubmit, formError, refused, slot, badge, canSubmit, focusSubmit
 - **ListFace** (organism), `src/components/candidate/framed-list.tsx`: name, sub, avatar
@@ -29,7 +29,7 @@ Written from the design ledgers at 871f9e446b70. Do not change it here: change a
 - **RecordActions** (organism), `src/components/candidate/row-actions.tsx`: main, actions, mine, title
 - **TouchTarget** (atom), `src/components/candidate/touch-target.tsx`
 - **TruncatedText** (atom), `src/components/candidate/truncated-text.tsx`: text
-- **TypedCell** (molecule), `src/components/candidate/typed-cell.tsx`: kind, value, transaction, lockedReason, editMode
+- **TypedCell** (molecule), `src/components/candidate/typed-cell.tsx`: kind, value, transaction, lockedReason, editMode, pencil
 - **Badge** (atom), `src/components/reui/badge.tsx`: render
 - **CascaderColumnPanel** (organism), `src/components/reui/cascader/cascader-columns.tsx`: column, virtualized
 - **CascaderColumns** (organism), `src/components/reui/cascader/cascader-columns.tsx`: columnWidth, maxHeight
@@ -136,6 +136,16 @@ Written from the design ledgers at 871f9e446b70. Do not change it here: change a
 - **FrameTitle** (atom), `src/components/reui/frame.tsx`
 - **FrameDescription** (atom), `src/components/reui/frame.tsx`
 - **FrameFooter** (atom), `src/components/reui/frame.tsx`
+- **Stepper** (atom), `src/components/reui/stepper.tsx`: defaultValue, value, onValueChange, orientation, indicators
+- **StepperItem** (atom), `src/components/reui/stepper.tsx`: step, completed, disabled, loading
+- **StepperTrigger** (atom), `src/components/reui/stepper.tsx`: tabIndex, render
+- **StepperIndicator** (atom), `src/components/reui/stepper.tsx`
+- **StepperSeparator** (atom), `src/components/reui/stepper.tsx`
+- **StepperTitle** (atom), `src/components/reui/stepper.tsx`
+- **StepperDescription** (atom), `src/components/reui/stepper.tsx`
+- **StepperPanel** (atom), `src/components/reui/stepper.tsx`
+- **StepperContent** (atom), `src/components/reui/stepper.tsx`: value, forceMount
+- **StepperNav** (atom), `src/components/reui/stepper.tsx`
 - **AppShell** (template), `src/components/templates/app-shell.tsx`: nav, roles, company, account, search, columnOpen
 - **PlaceChangeProvider** (template), `src/components/templates/app-shell/place-change.tsx`
 - **ShellNavProvider** (template), `src/components/templates/app-shell/place-crumb.tsx`: items, roles

@@ -1,9 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { FieldKey } from "@/components/candidate/column-kind";
+import {
+  CONTENT_WIDTH_KINDS,
+  alignFor,
+  columnWidthCh,
+  type FieldKey,
+  type TypedColumn,
+} from "@/components/candidate/column-kind";
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
 import type { RegionPhoneList } from "@/components/candidate/phone-list";
 import type { ColumnFilters, GridView } from "@/components/candidate/grid-view";
@@ -11,8 +18,20 @@ import { usePlaceChange } from "@/components/templates/app-shell/place-change";
 import { notifyResult } from "@/components/templates/notify";
 import { Button } from "@/components/ui/button";
 import type { Listing } from "@/generated/ontology";
+import { PermittedAction, usePermitted } from "@/modules/identity/ui";
 
 import type { ListingSaveDoor } from "../save-door";
+import { effectiveAttributes, type CatalogAttributes } from "../unit-attributes";
+import {
+  GRID_ATTRIBUTES,
+  MORE_ATTRIBUTES,
+  attributeCellFields,
+  attributeCells,
+  attributeOfColumn,
+} from "./attribute-cells";
+import { AttributeDiffersMark, MARK_ROOM_CH, MarkLookProvider } from "./attribute-differs-mark";
+import { EditOneProvider } from "./unit-attributes-edit";
+import { attributeText, type MarkLook, type UnitAttributeWords } from "./unit-attribute-copy";
 import { httpSaveDoor } from "./http-save-door";
 import { detailCells, type DetailColumnWords } from "./detail-cells";
 import { DetailsEditProvider, type DetailsEditApi } from "./listing-details-edit";
@@ -43,6 +62,25 @@ const PARTIAL_ROWS = 40;
 /** The fee inclusion column is in the Cột menu, off until the person turns it on (row 19, Hỏi-3). */
 const HIDDEN_AT_FIRST = [FEE_INCLUSION_FIELD] as const;
 
+/**
+ * The unit attribute columns keep `roomCh` more for the catalog mark after their value (row 3h), so the mark never
+ * covers the value nor pushes it out. The grid fits a text column to its longest value, leaving no room for a mark, so
+ * floor and direction (variant B) show as choice-kind columns, whose width the screen sets; the grid frame is unchanged.
+ */
+function withMarkRoom(columns: TypedColumn[], roomCh: number): TypedColumn[] {
+  if (roomCh === 0) return columns;
+  return columns.map((c) => {
+    if (!attributeOfColumn(c.field)) return c;
+    const kind = CONTENT_WIDTH_KINDS.includes(c.kind) ? "select" : c.kind;
+    return {
+      ...c,
+      kind,
+      align: alignFor(kind),
+      widthCh: columnWidthCh(c.header, kind) + roomCh,
+    };
+  });
+}
+
 /** The inventory grid: the screen declares columns, rows, its empty reason and what one listing's record shows. */
 export function InventoryGrid({
   title,
@@ -53,6 +91,7 @@ export function InventoryGrid({
   state,
   emptyWhy,
   reloadLabel,
+  emptyLink,
   filters,
   staleLinkNote,
   savedViews,
@@ -68,6 +107,7 @@ export function InventoryGrid({
   noActivate,
   geoTree,
   detailWords,
+  unitAttributes,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
@@ -80,6 +120,11 @@ export function InventoryGrid({
   emptyWhy: string;
   /** The empty state's next step: load the list again (someone may have added units meanwhile). */
   reloadLabel: string;
+  /**
+   * A way to fill the list from elsewhere (row 11: the import screen): the empty state then says it in one sentence with one
+   * link, shown only to a session the permission table gives importListings, and has no button (design-assembly empty-state).
+   */
+  emptyLink?: { lead: string; word: string; href: string };
   /** Column filters the grid opens with (a status shortcut, or the top-bar search of row 3f). */
   filters?: ColumnFilters;
   /** Said once when the page opens: the address named a listing that is not among the rows (a stale link, row 3f). */
@@ -110,8 +155,21 @@ export function InventoryGrid({
   geoTree?: readonly GeoNode[];
   /** Row 3g (Hỏi-3 «lối C»): the four details as columns, edited on their cells; their words from the label table. */
   detailWords?: DetailColumnWords;
+  /**
+   * Row 3h: the listing's own unit attributes — their words, what the catalog says for each listing, the mark's look
+   * (`?mark=`) and whether floor, direction and sub type show as columns too (`?columns=five`, variant B).
+   */
+  unitAttributes?: {
+    words: UnitAttributeWords;
+    catalog: Readonly<Record<string, CatalogAttributes>>;
+    look?: MarkLook;
+    more?: boolean;
+    /** Variant (b) of the record's edit button (`?edit=one`): one edit button for the unit and the listing together. */
+    editOne?: boolean;
+  };
 }) {
   const router = useRouter();
+  const permitted = usePermitted();
   const [current, setCurrent] = useState<InventoryState>(state);
   // A new read of the page (Tải lại, or after a change the server works out) brings its own state.
   const [givenState, setGivenState] = useState(state);
@@ -146,9 +204,30 @@ export function InventoryGrid({
   }, [staleLinkNote]);
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
+  const attrWords = unitAttributes?.words;
+  const more = unitAttributes?.more === true;
+  const look = unitAttributes?.look ?? "dot";
   const columns = useMemo(
-    () => inventoryColumns(headers, customColumns, feeHeaders, detailWords),
-    [headers, customColumns, feeHeaders, detailWords],
+    () =>
+      // Row 3h: a column of a fixed kind (area, count, choice) keeps room for the mark after its value, so the mark
+      // never covers the value; a text column (floor, direction) cuts a long value with an ellipsis instead.
+      withMarkRoom(
+        inventoryColumns(
+          headers,
+          customColumns,
+          feeHeaders,
+          detailWords,
+          more && attrWords
+            ? {
+                floor: attrWords.names.floor,
+                directionFaces: attrWords.names.directionFaces,
+                propertySubType: attrWords.names.propertySubType,
+              }
+            : undefined,
+        ),
+        attrWords ? MARK_ROOM_CH[look] : 0,
+      ),
+    [headers, customColumns, feeHeaders, detailWords, more, attrWords, look],
   );
   const headerOf = useCallback(
     (field: FieldKey) => columns.find((c) => c.field === field)?.header ?? field,
@@ -162,26 +241,6 @@ export function InventoryGrid({
   const inclusionOf = useMemo(
     () => new Map((listings ?? []).map((l) => [l.id, l.feeInclusion])),
     [listings],
-  );
-  const phoneList = useMemo(
-    (): RegionPhoneList<GridRow> => ({
-      label: (row) => `${headers["Listing.unitNumber"]} ${String(row["Listing.unitNumber"] ?? "")}`,
-      card: (row) => {
-        const net = feeHeaders
-          ? cardNetOf(row, inclusionOf.get(row.id), feeHeaders.netToSeller)
-          : null;
-        return (
-          <ListingCard
-            layout="row"
-            view={listingView(row, headers)}
-            priceLabel={headers["Listing.listPrice"]}
-            building={String(row["Listing.buildingName"] ?? "")}
-            net={net}
-          />
-        );
-      },
-    }),
-    [headers, feeHeaders, inclusionOf],
   );
   // The company's own fields whose cells edit by kind (row 3g): those the page gave a field kind.
   const customFields = useMemo(
@@ -201,15 +260,38 @@ export function InventoryGrid({
       ),
     [customColumns],
   );
-  // The four detail cells of each row, from the listing the row shows (row 3g).
+  // The four detail cells of each row, from the listing the row shows (row 3g), and its unit attributes (row 3h).
   const shownRows = useMemo(() => {
-    if (!detailWords || !listings) return rows;
+    if ((!detailWords && !unitAttributes) || !listings) return rows;
     const byId = new Map(listings.map((l) => [l.id, l]));
     return rows.map((row) => {
       const l = byId.get(row.id);
-      return l ? ({ ...row, ...detailCells(l, detailWords) } as GridRow) : row;
+      return l
+        ? ({
+            ...row,
+            ...(detailWords ? detailCells(l, detailWords) : {}),
+            ...(unitAttributes
+              ? attributeCells(l, unitAttributes.catalog[l.id], unitAttributes.words)
+              : {}),
+          } as GridRow)
+        : row;
     });
-  }, [rows, listings, detailWords]);
+  }, [rows, listings, detailWords, unitAttributes]);
+  // Row 3h: the attribute cells edited on the grid (area and bedrooms; with variant B the three more).
+  const attributeEdit = useMemo(
+    () =>
+      unitAttributes && listings
+        ? {
+            fields: attributeCellFields(
+              more ? [...GRID_ATTRIBUTES, ...MORE_ATTRIBUTES] : GRID_ATTRIBUTES,
+              unitAttributes.words,
+            ),
+            words: unitAttributes.words,
+            catalogOf: (id: string) => unitAttributes.catalog[id],
+          }
+        : undefined,
+    [unitAttributes, listings, more],
+  );
   const [detailsTick, setDetailsTick] = useState(0);
   const edit = useListingCellEdit({
     rows: shownRows,
@@ -225,9 +307,81 @@ export function InventoryGrid({
     detailWords,
     // Any saved write re-renders an open record, so a detail saved on a cell shows there too (row 3g).
     onSaved: () => setDetailsTick((n) => n + 1),
+    attributes: attributeEdit,
   });
   // The record edits the open listing's details through the same door (row 3g); a save re-renders the record.
-  const { writeListing, savedListing } = edit;
+  const { writeListing, savedListing, revertAttribute } = edit;
+  // Row 3h: the mark on a cell whose own value differs from the catalog's, with «Lấy lại» for a person who may edit.
+  const listingOf = useMemo(() => new Map((listings ?? []).map((l) => [l.id, l])), [listings]);
+  /** What a differing attribute cell's mark says (row 3h), or null when the row's value does not differ. */
+  const differsOf = useCallback(
+    (row: GridRow, field: FieldKey) => {
+      const attribute = attributeOfColumn(field);
+      if (!attribute || !unitAttributes) return null;
+      const l = savedListing(row.id) ?? listingOf.get(row.id);
+      if (!l) return null;
+      const e = effectiveAttributes(l, unitAttributes.catalog[row.id])[attribute];
+      if (!e.differs || (e.source !== "Typed" && e.source !== "File")) return null;
+      return {
+        catalogShown: attributeText(unitAttributes.words, attribute, e.catalogValue),
+        sourceWord: unitAttributes.words.sources[e.source],
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the tick moves on with every saved write, so the marks read the listing as last saved
+    [unitAttributes, savedListing, listingOf, detailsTick],
+  );
+  const cellMark = useCallback(
+    (row: GridRow, field: FieldKey) => {
+      if (!unitAttributes || !attributeOfColumn(field)) return null;
+      const d = differsOf(row, field);
+      // Every cell of an attribute column keeps the mark's room, so the values of the column stay on one edge.
+      if (!d) return <AttributeDiffersMark.Room words={unitAttributes.words} />;
+      const may = listings !== undefined && permitted("updateListing", true);
+      const locked = row.locked?.[field];
+      return (
+        <AttributeDiffersMark
+          inGrid
+          words={unitAttributes.words}
+          catalogShown={d.catalogShown}
+          sourceWord={d.sourceWord}
+          onRevert={may && !locked ? () => revertAttribute(row.id, field) : undefined}
+          lockedReason={may ? locked : undefined}
+        />
+      );
+    },
+    [differsOf, unitAttributes, listings, permitted, revertAttribute],
+  );
+  // Row 3h: the phone card marks a differing value too, with the dot as a sign only (the card is the record's link).
+  const cardMark = useCallback(
+    (row: GridRow, field: FieldKey) => {
+      const d = differsOf(row, field);
+      return d && unitAttributes ? (
+        <AttributeDiffersMark still words={unitAttributes.words} catalogShown={d.catalogShown} />
+      ) : null;
+    },
+    [differsOf, unitAttributes],
+  );
+  const phoneList = useMemo(
+    (): RegionPhoneList<GridRow> => ({
+      label: (row) => `${headers["Listing.unitNumber"]} ${String(row["Listing.unitNumber"] ?? "")}`,
+      card: (row) => {
+        const net = feeHeaders
+          ? cardNetOf(row, inclusionOf.get(row.id), feeHeaders.netToSeller)
+          : null;
+        return (
+          <ListingCard
+            layout="row"
+            view={listingView(row, headers)}
+            priceLabel={headers["Listing.listPrice"]}
+            building={String(row["Listing.buildingName"] ?? "")}
+            net={net}
+            factMark={(field) => cardMark(row, field)}
+          />
+        );
+      },
+    }),
+    [headers, feeHeaders, inclusionOf, cardMark],
+  );
   const detailsApi = useMemo<DetailsEditApi | null>(
     () =>
       listings && editLabels
@@ -244,47 +398,68 @@ export function InventoryGrid({
   const shown =
     current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;
   return (
-    <DetailsEditProvider api={detailsApi}>
-      {edit.dialogs}
-      <DataRegion
-        // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
-        key={`${openView?.id ?? ""}:${place.reopened}:${geo.picked}`}
-        title={title}
-        columns={columns}
-        rows={shown}
-        status={status}
-        onRetry={() => (readFailed ? router.refresh() : setCurrent("ready"))}
-        record={record}
-        emptyWhy={emptyWhy}
-        initialFilters={filters}
-        initialView={geo.view ?? saved}
-        hiddenAtFirst={feeHeaders ? HIDDEN_AT_FIRST : undefined}
-        onViewChange={setView}
-        action={
-          savedViews && copy
-            ? {
-                allowed: true,
-                node: (
-                  <SaveViewButtons
-                    current={view}
-                    open={openView ?? null}
-                    changed={changed}
-                    taken={savedViews.map((v) => v.name)}
-                    copy={copy}
-                  />
-                ),
-              }
-            : undefined
-        }
-        groupBy={INVENTORY_GROUP_BY}
-        emptyAction={
-          <Button variant="outline" onClick={() => router.refresh()}>
-            {reloadLabel}
-          </Button>
-        }
-        cellEdit={edit.cellEdit}
-        phoneList={phoneList}
-      />
-    </DetailsEditProvider>
+    <MarkLookProvider value={look}>
+      <EditOneProvider value={unitAttributes?.editOne === true}>
+        <DetailsEditProvider api={detailsApi}>
+          {edit.dialogs}
+          <DataRegion
+            // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
+            key={`${openView?.id ?? ""}:${place.reopened}:${geo.picked}`}
+            title={title}
+            columns={columns}
+            rows={shown}
+            status={status}
+            onRetry={() => (readFailed ? router.refresh() : setCurrent("ready"))}
+            record={record}
+            emptyWhy={emptyWhy}
+            initialFilters={filters}
+            initialView={geo.view ?? saved}
+            hiddenAtFirst={feeHeaders ? HIDDEN_AT_FIRST : undefined}
+            onViewChange={setView}
+            action={
+              savedViews && copy
+                ? {
+                    allowed: true,
+                    node: (
+                      <SaveViewButtons
+                        current={view}
+                        open={openView ?? null}
+                        changed={changed}
+                        taken={savedViews.map((v) => v.name)}
+                        copy={copy}
+                      />
+                    ),
+                  }
+                : undefined
+            }
+            groupBy={INVENTORY_GROUP_BY}
+            emptyAction={
+              // A role that imports is sent to the import screen from the sentence; any other keeps the reload button.
+              emptyLink && permitted("importListings") ? (
+                <PermittedAction action="importListings">
+                  <p data-slot="empty-link" className="text-sm text-muted-foreground">
+                    {emptyLink.lead}{" "}
+                    <Link
+                      href={emptyLink.href}
+                      className="font-medium text-foreground underline underline-offset-4"
+                    >
+                      {emptyLink.word}
+                    </Link>
+                    .
+                  </p>
+                </PermittedAction>
+              ) : (
+                <Button variant="outline" onClick={() => router.refresh()}>
+                  {reloadLabel}
+                </Button>
+              )
+            }
+            cellEdit={edit.cellEdit}
+            phoneList={phoneList}
+            cellMark={unitAttributes ? cellMark : undefined}
+          />
+        </DetailsEditProvider>
+      </EditOneProvider>
+    </MarkLookProvider>
   );
 }

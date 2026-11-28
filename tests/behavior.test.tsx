@@ -195,8 +195,8 @@ function assertFieldInline(rule: (event: NotifyEvent) => NotifyChannel): void {
 }
 
 function assertLockedHasReason(container: HTMLElement): void {
-  for (const lock of container.querySelectorAll('[data-slot="cell-lock"]')) {
-    const cell = lock.closest('[data-slot="typed-cell"]');
+  // A locked cell draws no padlock (VP11): it is the cell that says it is locked, to hover and to screen readers.
+  for (const cell of container.querySelectorAll('[data-slot="typed-cell"][aria-description]')) {
     const reason = cell?.querySelector('[data-slot="cell-lock-reason"]')?.textContent ?? "";
     if (reason.trim() === "") throw new Error("locked cell without reason");
   }
@@ -856,7 +856,7 @@ describe("the six behaviour decisions can fail", () => {
       run: () => {
         const root = document.createElement("div");
         root.innerHTML =
-          '<span data-slot="typed-cell"><svg data-slot="cell-lock"></svg><span data-slot="cell-lock-reason"></span></span>';
+          '<span data-slot="typed-cell" aria-description="Ô đang khoá"><span data-slot="cell-lock-reason"></span></span>';
         assertLockedHasReason(root);
       },
     },

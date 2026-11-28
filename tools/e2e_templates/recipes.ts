@@ -59,6 +59,11 @@ export function pinned(brk: Break, screen: string): RegExp {
   return typeof brk.message === "function" ? brk.message(screen) : brk.message;
 }
 
+/** What an empty state offers as its next step: its buttons and its links. */
+function nextStep(box: Locator): Locator {
+  return box.getByRole("button").or(box.getByRole("link"));
+}
+
 function fail(message: string): never {
   throw new Error(message);
 }
@@ -353,7 +358,11 @@ async function mountedRows(page: Page): Promise<[number, string[]][]> {
   return tableRows(page).evaluateAll(
     (trs, kinds) =>
       trs
-        .filter((tr) => getComputedStyle(tr).display !== "none")
+        // A row a person cannot see is not read: out of the layout, or kept in it unseen (the «chi con khung dau» break).
+        .filter((tr) => {
+          const style = getComputedStyle(tr);
+          return style.display !== "none" && style.visibility !== "hidden";
+        })
         .map((tr): [number, string[]] => {
           const text = (cell: HTMLElement) => {
             const copy = cell.cloneNode(true) as HTMLElement;
@@ -678,14 +687,16 @@ export const REGION: Recipe[] = [
       const box = stateOf(page, "empty");
       if ((await box.count()) !== 1) fail("trong: khong co trang thai trong");
       if (!(await box.textContent())?.trim()) fail("trong: khong noi vi sao");
-      if ((await box.getByRole("button").count()) === 0) fail("trong: khong co buoc tiep");
+      // The next step is a button, or the one link inside the sentence when the list is filled elsewhere (the
+      // design-assembly empty-state rule: a button only where this screen fills the list; row 11, AC-11).
+      if ((await nextStep(box).count()) === 0) fail("trong: khong co buoc tiep");
     },
     breaks: [
       {
         name: "go buoc tiep",
         message: /trong: khong co buoc tiep/,
         apply: async ({ page }) => {
-          await suaCacPhanTu(stateOf(page, "empty").getByRole("button"), (els) =>
+          await suaCacPhanTu(nextStep(stateOf(page, "empty")), (els) =>
             els.forEach((el) => el.remove()),
           );
         },
@@ -849,13 +860,19 @@ export const REGION: Recipe[] = [
       if ((await cut.getAttribute("tabindex")) !== "0")
         fail("chu-dai: khong toi duoc bang ban phim");
       await page.keyboard.press("Tab");
-      await cut.focus();
-      const shown = await cut.evaluate((el) => ({
-        wraps: getComputedStyle(el).whiteSpace !== "nowrap",
-        fits: el.scrollWidth <= el.clientWidth,
-        full: el.textContent,
-        title: el.getAttribute("title"),
-      }));
+      // Focus and the reading in one call, on one node: right after the region is ready the grid can still redraw, and
+      // a focused cell that fits is no longer marked cut, so a second call through the locator landed on another,
+      // unfocused cell (Linux, GitHub run of row 11; same root as 2fcd4039, supervisor ruling G-2811-25). The wrap on
+      // focus is CSS (focus-visible), so it holds inside the call; nothing measured changed.
+      const shown = await cut.evaluate((el: HTMLElement) => {
+        el.focus();
+        return {
+          wraps: getComputedStyle(el).whiteSpace !== "nowrap",
+          fits: el.scrollWidth <= el.clientWidth,
+          full: el.textContent,
+          title: el.getAttribute("title"),
+        };
+      });
       if (!shown.wraps || !shown.fits || shown.full !== shown.title) {
         fail("chu-dai: khong doc du khi focus");
       }
@@ -962,6 +979,9 @@ export const REGION: Recipe[] = [
         // Hides every result row numbered past the first window (the rows a person sees before any scrolling),
         // re-applied on every re-render: the results never reach past that window. When every result fits in that
         // window (a short grid, row 2e), the cut falls at half the results, so the results still stop short.
+        // A hidden row keeps its height (`visibility`, not `display`): taken out of the layout, the virtual body measured
+        // it as nothing, the run shrank and grew back on every re-render, and the page never settled — 46 s on GitHub
+        // at 1440, then past the 90 s limit (#136, ef8659bd). The check reads neither kind of hidden row.
         apply: async ({ page }) => {
           const window = await visibleRows(page);
           await onResult(
@@ -979,7 +999,7 @@ export const REGION: Recipe[] = [
              const cut = left > 1 && left <= ${window} ? Math.floor(left / 2) : ${window};
              document.querySelectorAll('[data-slot="data-region-body"] tbody tr').forEach((tr) => {
                const n = Number(tr.querySelector('[data-slot="row-number"]')?.textContent ?? '0');
-               if (n > cut) tr.style.display = 'none';
+               if (n > cut) tr.style.visibility = 'hidden';
              });`,
           );
         },

@@ -63,9 +63,10 @@ describe("so-man-du-cua-vao", () => {
     expect(buttonTable(missing).errors).toContain("members: thieu khoa vao");
     const unknown = registerCopy(inScreen("members", "vao", "khongCo"));
     expect(buttonTable(unknown).errors).toContain("members: vao khongCo khong co trong bang quyen");
-    const planned = registerCopy(inScreen("today", "vao", "createListing"));
+    // createListing went live with row 11 (nhap-excel); removeListing is still planned (row 18b).
+    const planned = registerCopy(inScreen("today", "vao", "removeListing"));
     expect(buttonTable(planned).errors).toContain(
-      "today: man built tro thao tac planned createListing",
+      "today: man built tro thao tac planned removeListing",
     );
     const noButtons = registerCopy((t) =>
       t.replace(/(- id: inventory\n(?: {4}.*\n)*?) {4}nut:\n(?: {6}- .*\n)+/, "$1"),
@@ -76,10 +77,10 @@ describe("so-man-du-cua-vao", () => {
 
 describe("tap-cap-bang-tich", () => {
   // Written before the code: the built staff screens and the four roles.
-  const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "company-layer"];
+  const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "company-layer", "nhap-tep"];
   const ROLES = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
 
-  it("24 pairs, and every other screen of the register with its reason", () => {
+  it("28 pairs, and every other screen of the register with its reason", () => {
     const { pairs: all, outside } = pairs(ROOT);
     const got = all.map((p) => `${p.screen}×${p.role}`).sort();
     const want = SCREENS.flatMap((s) => ROLES.map((r) => `${s}×${r}`)).sort();
@@ -90,7 +91,13 @@ describe("tap-cap-bang-tich", () => {
       "proto-permitted-actions": "dev",
     });
     const blocked = all.filter((p) => p.expect === "chan").map((p) => `${p.screen}×${p.role}`);
-    expect(blocked.sort()).toEqual(["members×BuyerAgent", "members×ListAgent", "members×TeamLead"]);
+    expect(blocked.sort()).toEqual([
+      "members×BuyerAgent",
+      "members×ListAgent",
+      "members×TeamLead",
+      "nhap-tep×BuyerAgent",
+      "nhap-tep×CompanyAdmin",
+    ]);
     expect(all.filter((p) => p.expect === "day-ve-hom-nay").map((p) => p.screen)).toEqual(
       Array(4).fill("sign-in"),
     );
@@ -109,10 +116,10 @@ describe("tap-cap-bang-tich", () => {
       "export default function Page() {\n  return null;\n}\n",
     );
     const { pairs: all } = pairs(dir);
-    expect(all).toHaveLength(28);
+    expect(all).toHaveLength(32);
     expect(all.filter((p) => p.screen === "thu-them").map((p) => p.role)).toEqual(ROLES);
     // Đối chứng: the same reader on the real register gives 24.
-    expect(pairs(ROOT).pairs).toHaveLength(24);
+    expect(pairs(ROOT).pairs).toHaveLength(28);
   });
 });
 
@@ -167,7 +174,14 @@ describe("thanh-ben-khop-so-man", () => {
   it("every sidebar entry gates its screen with the register's action", () => {
     const t = buttonTable(ROOT);
     const linked = NAV.filter((i) => t.screens.some((s) => s.route === i.href)).map((i) => i.href);
-    expect(linked.sort()).toEqual(["/", "/company-layer", "/inventory", "/members", "/sent"]);
+    expect(linked.sort()).toEqual([
+      "/",
+      "/company-layer",
+      "/inventory",
+      "/members",
+      "/nhap-tep",
+      "/sent",
+    ]);
     expect(navProblems(NAV, t.screens)).toEqual([]);
   });
 

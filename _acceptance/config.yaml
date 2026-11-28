@@ -12,6 +12,7 @@ executors:
     sua_tren_o: "npx vitest run src/modules/listings/edit-rules.test.ts src/modules/listings/save-door.test.ts src/components/candidate/use-change.test.tsx src/components/candidate/data-region-cell-edit.test.tsx --coverage.enabled=false --reporter=verbose"   # sua-tren-o (row 4): edit rules, save door and undo, cell edit by permission
     sua_tren_o_e2e: "npx playwright test tests/e2e/sua-tren-o.spec.ts tests/e2e/sheet.spec.ts tests/e2e/ho-so-can.spec.ts"   # sua-tren-o (row 4): in-cell edit at four sizes, with the 2a and 3 key rules
     sua_tren_o_rao: "npx vitest run tests/behavior-guard.test.ts --coverage.enabled=false --reporter=verbose"   # sua-tren-o (row 4): behaviour guard reads .ts as TypeScript (K-5)
+    tin_rao_sua_tren_o: "bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E13"   # tin-rao-giu-gia-tri-rieng (row 3h): row 4's suite unchanged, then the phone case of the two attribute cells in the listings module; red on zero cases
     dan_tu_excel: "npx vitest run src/modules/listings/paste-rules.test.ts src/modules/listings/ui/listing-paste.test.ts src/components/candidate/door-batch.test.tsx src/components/candidate/data-region-paste.test.tsx --coverage.enabled=false --reporter=verbose"   # dan-tu-excel (row 5): paste reading by the row 4 rules, apply once and undo once, paste by permission
     dan_tu_excel_e2e: "npx playwright test tests/e2e/dan-tu-excel.spec.ts tests/e2e/sua-tren-o.spec.ts tests/e2e/sheet.spec.ts"   # dan-tu-excel (row 5): paste preview at four sizes, with the 2a and 4 key rules
     vai_dang_nhap_unit: "npx vitest run src/modules/identity/with-company.test.ts tests/vai-dang-nhap-nguon.test.ts --coverage.enabled=false --reporter=verbose"   # ung-dung-noi-bang-vai-khong-chu (row 7c): door checks its login role, source scan of test connection strings, .env.example add-only
@@ -42,6 +43,7 @@ executors:
     app_shell_verve_unit: "npx vitest run tests/app-shell.test.tsx tests/frame.test.tsx tools/e2e_templates/e2e-templates.test.ts --coverage.enabled=false --reporter=verbose"   # app-shell-khuon-dau-trang: shell laid out as the ReUI Verve template, unit level
     nk30_kit_root: "npx vitest run tests/kit-root.test.ts --coverage.enabled=false --reporter=verbose"   # nang-kit-3-0: kit-root reads only the delivery-loop install
     da071_two_tests: "npx vitest run tests/ci-ban-sao-nong.test.ts tests/design-check.test.ts --coverage.enabled=false --reporter=verbose"   # upgrade-design-assembly-0-7-1: the shallow-clone test and the ledger test, the fixtures built from TAG
+    nhap_excel_unit: "npx vitest run src/modules/imports tests/nhap-excel --coverage.enabled=false --reporter=verbose"   # nhap-excel (row 11): file reader, column/value/unit marks, no cell lost on the dirty set, ontology
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -236,6 +238,9 @@ executors:
     lnt_kiem_tron: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs"   # lint-bo-qua-thu-muc-ngoai-git: make check stays green with a file each step would fail on planted in both out-of-git folders
     lnt_two_way: "node --test _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs"   # lint-bo-qua-thu-muc-ngoai-git: each measure green on the sound object, red with its pinned message on a broken copy
     bdx_ghi_chep: "node _acceptance/bien-do-sau-xoay-mat-khau/rang/ghi-chep.mjs && node _acceptance/bien-do-sau-xoay-mat-khau/rang/ghi-chep.mjs --tu-kiem"   # bien-do-sau-xoay-mat-khau: decision 0048, README step order and the len-ban.mjs header follow STEPS
+    nhap_excel_db: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx vitest run -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts --reporter=verbose"   # nhap-excel (row 11): preview, batched apply, learn, second import, undo on lane D Postgres
+    nhap_excel_e2e: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts"   # nhap-excel (row 11): Nạp tệp screen and inventory entry in the browser, lane D
+    cach_ly_d: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} bash db/scripts/cach-ly.sh"   # nhap-excel (row 11): isolation suite with import_runs and the import delete rule, lane D
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files

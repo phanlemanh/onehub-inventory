@@ -23,6 +23,14 @@ import {
   statusNeeds,
   type StatusNeed,
 } from "./edit-rules";
+import {
+  SOURCE_OF,
+  UNIT_ATTRIBUTE_FIELDS,
+  attributeFits,
+  type AttributeSource,
+  type UnitAttributeField,
+  type UnitAttributeValues,
+} from "./unit-attributes";
 
 /** A new price, or a status move with what it needs: what a cell or a pasted region changes (rows 4, 5). */
 export type PriceOrStatusChange =
@@ -54,12 +62,36 @@ export type CustomFieldChange = {
   value: string | number | boolean | null;
 };
 
+/**
+ * The company's own values of the unit attributes (row 3h): only the attributes named change. A value is written as
+ * typed by the company (source Typed); `null` clears the own value and its source, so the listing follows the catalog
+ * again («Lấy lại» on the screen).
+ */
+export type UnitAttributesChange = {
+  field: "unitAttributes";
+  /**
+   * Only «Hoàn tác» names a source: it writes back a value an imported file brought with the source it had. Any other
+   * write is the company typing, so its source is Typed.
+   */
+  sources?: Partial<Record<UnitAttributeField, AttributeSource>>;
+} & {
+  [K in keyof UnitAttributeValues]?: UnitAttributeValues[K] | null;
+};
+
 /** One edit of a listing: a price or status change, the fee inclusion (row 10), its details or a custom value (3g). */
 export type ListingChange =
   | PriceOrStatusChange
   | { field: "feeInclusion"; feeInclusion: ListingFeeInclusion }
   | DetailsChange
-  | CustomFieldChange;
+  | CustomFieldChange
+  | UnitAttributesChange
+  | UnitMoveChange;
+
+/**
+ * «Gắn sang căn khác» (row 3h, AC-10): the listing points at another unit of the shared catalog. Its own values stay; the
+ * catalog's values follow the new unit. The server moves the unit link; one open listing per unit stays the database's.
+ */
+export type UnitMoveChange = { field: "unit"; upi: string };
 
 /** Why a change breaks a rule; the editors never send one, so this answer means an editor let it through. */
 export type Invalid =
@@ -70,7 +102,13 @@ export type Invalid =
   /** A detail outside its fixed values, or words longer than DETAILS_TEXT_LIMIT. */
   | { rule: "details" }
   /** A custom value the company's field does not take (the reason of checkCustomValue, row 7e). */
-  | { rule: "custom"; reason: string };
+  | { rule: "custom"; reason: string }
+  /** A unit attribute the readers of unit-attributes.ts do not take (row 3h). */
+  | { rule: "attributes" }
+  /** The unit to move to already has an open listing of the company, named by its unit number (row 3h). */
+  | { rule: "unit-open"; unitNumber: string }
+  /** The unit to move to is not in the shared catalog, or is the unit the listing already points at (row 3h). */
+  | { rule: "unit" };
 
 export type SaveOutcome =
   | { kind: "saved"; listing: Listing }
@@ -144,6 +182,29 @@ export function applyChange(
     next = withPart(next, "furnished", change.furnished);
     next = withPart(next, "financing", change.financing);
     next = withPart(next, "occupantType", change.occupantType);
+    return { ok: true, listing: next };
+  }
+  if (change.field === "unit") {
+    // The link moves with the listing's details: a sold or withdrawn listing stays on the unit it was sold on.
+    if (detailsLocked(listing.standardStatus)) return { ok: false, why: { rule: "locked" } };
+    return { ok: true, listing: confirmed };
+  }
+  if (change.field === "unitAttributes") {
+    if (detailsLocked(listing.standardStatus)) return { ok: false, why: { rule: "locked" } };
+    const named = UNIT_ATTRIBUTE_FIELDS.filter((f) => change[f] !== undefined);
+    if (named.length === 0 || named.some((f) => change[f] !== null && !attributeFits(f, change[f])))
+      return { ok: false, why: { rule: "attributes" } };
+    const next: Listing = { ...confirmed };
+    for (const f of named) {
+      const value = change[f];
+      if (value === null) {
+        delete next[f];
+        delete next[SOURCE_OF[f]];
+      } else {
+        (next as unknown as Record<string, unknown>)[f] = value;
+        next[SOURCE_OF[f]] = change.sources?.[f] === "File" ? "File" : "Typed";
+      }
+    }
     return { ok: true, listing: next };
   }
   if (change.field === "customField") {

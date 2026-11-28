@@ -6,7 +6,14 @@
 // one change through the grid's save door, with undo (row 4's rule). A save that does not go through keeps what
 // was typed and says why in the dialog.
 import { PencilIcon } from "lucide-react";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useImperativeHandle,
+  useState,
+  type ReactNode,
+  type Ref,
+} from "react";
 
 import { FormDialog } from "@/components/candidate/form-dialog";
 import { runDoorChange, type WriteOutcome } from "@/components/candidate/use-change";
@@ -56,7 +63,8 @@ export interface DetailsEditApi {
   tick: number;
 }
 
-const DetailsEditContext = createContext<DetailsEditApi | null>(null);
+/** The grid's write lent to its records (row 3g); row 3h's unit attributes edit through it too. */
+export const DetailsEditContext = createContext<DetailsEditApi | null>(null);
 
 /** Lends the grid's write to every record it opens; without it a record is read-only. */
 export function DetailsEditProvider({
@@ -132,82 +140,21 @@ function undoOf(from: ListingDetails, change: DetailsChange): DetailsChange {
   return back;
 }
 
-/** The edit button of the record's listing section and its dialog; nothing without the grid's write or for an earlier listing. */
-export function ListingDetailsEdit({
-  id,
-  unitNumber,
-  details,
-  words,
-}: {
-  id: string;
-  unitNumber: string;
-  details: ListingDetails;
-  words: DetailsWords;
-}) {
-  const api = useContext(DetailsEditContext);
-  const [open, setOpen] = useState(false);
+/**
+ * The four detail fields of a dialog, their draft and what a save sends: the record's edit button of the listing section uses
+ * it, and so does row 3h's one-button variant (`?edit=one`) beside the unit's fields.
+ */
+export function useDetailsForm(
+  details: ListingDetails,
+  words: DetailsWords,
+  /** The field the dialog opens on (row 3h: a missing part named in «Còn thiếu»); the legal status otherwise. */
+  first: DetailKey = "legalStatus",
+) {
   const [draft, setDraft] = useState<Draft>(() => draftOf(details));
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState<Exclude<WriteOutcome, "saved"> | null>(null);
   const [tried, setTried] = useState(false);
-  if (!api) return null;
   // Only a part the person changed is checked: words already longer from an imported sheet do not block the save.
   const tooLong = (text: string, key: "legalStatus" | "financing") =>
     text.trim() !== (details[key] ?? "") && !detailText(text).ok;
-  const openChange = (next: boolean) => {
-    if (next) {
-      setDraft(draftOf(details));
-      setFailed(null);
-      setTried(false);
-    }
-    setOpen(next);
-  };
-  const what = RECORD_COPY.detailsWhat(words.unit, unitNumber);
-  const submit = async () => {
-    setTried(true);
-    if (tooLong(draft.legalStatus, "legalStatus") || tooLong(draft.financing, "financing")) return;
-    const change = changeOf(details, draft);
-    if (!change) {
-      setOpen(false);
-      return;
-    }
-    setBusy(true);
-    const at = new Date().toISOString();
-    const outcome = await api.write(id, change, at);
-    setBusy(false);
-    if (outcome !== "saved") {
-      setFailed(outcome);
-      api.changed();
-      return;
-    }
-    setOpen(false);
-    api.changed();
-    const back = undoOf(details, change);
-    // Words longer than the limit, kept from an imported sheet, cannot be written back: no undo then (row 3g).
-    const undoable = detailUndoable(back.legalStatus) && detailUndoable(back.financing);
-    // The save already went through: the shared door says it and offers undo by row 4's one rule.
-    await runDoorChange({
-      done: RECORD_COPY.detailsDone(what),
-      undone: RECORD_COPY.detailsUndone(what),
-      write: () => Promise.resolve("saved"),
-      undo: undoable
-        ? async () => {
-            const result = await api.write(id, back, new Date().toISOString());
-            if (result === "saved") api.changed();
-            return result;
-          }
-        : undefined,
-      failed: (why) => RECORD_COPY.detailsFailed(why),
-      undoFailed: (why) => RECORD_COPY.detailsUndoFailed(what, why),
-    });
-  };
-  const refused = failed === "refused";
-  const formError =
-    failed === null
-      ? undefined
-      : refused
-        ? FRAME_COPY.refusedAction
-        : RECORD_COPY.detailsFailed(failed);
   const text = (key: "legalStatus" | "financing", label: string) => {
     const long = tried && tooLong(draft[key], key);
     return (
@@ -217,7 +164,7 @@ export function ListingDetailsEdit({
           id={`details-${key}`}
           data-detail={key}
           value={draft[key]}
-          autoFocus={key === "legalStatus"}
+          autoFocus={key === first}
           aria-invalid={long || undefined}
           onChange={(event) => setDraft({ ...draft, [key]: event.target.value })}
         />
@@ -243,7 +190,7 @@ export function ListingDetailsEdit({
           onValueChange={(value) => setDraft({ ...draft, [key]: String(value) })}
           items={items}
         >
-          <SelectTrigger aria-label={label} data-detail={key}>
+          <SelectTrigger aria-label={label} data-detail={key} autoFocus={key === first}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -257,6 +204,120 @@ export function ListingDetailsEdit({
       </Field>
     );
   };
+  return {
+    /** Starts the draft afresh from what the record shows. */
+    reset: () => {
+      setDraft(draftOf(details));
+      setTried(false);
+    },
+    /** Marks the fields tried; true when a field must be fixed before anything is sent. */
+    blocked: (): boolean => {
+      setTried(true);
+      return tooLong(draft.legalStatus, "legalStatus") || tooLong(draft.financing, "financing");
+    },
+    change: (): DetailsChange | null => changeOf(details, draft),
+    undo: (change: DetailsChange): DetailsChange => undoOf(details, change),
+    /** Words longer than the limit, kept from an imported sheet, cannot be written back: no undo then (row 3g). */
+    undoable: (back: DetailsChange): boolean =>
+      detailUndoable(back.legalStatus) && detailUndoable(back.financing),
+    fields: (
+      <FieldGroup>
+        {text("legalStatus", words.legalStatus)}
+        {choice("furnished", words.furnished, FURNISHED_VALUES, words.furnishedValues)}
+        {text("financing", words.financing)}
+        {choice("occupantType", words.occupantType, OCCUPANT_VALUES, words.occupantValues)}
+      </FieldGroup>
+    ),
+  };
+}
+
+/** The four details by their field (row 3h: «Còn thiếu» names them). */
+export type DetailKey = "legalStatus" | "furnished" | "financing" | "occupantType";
+
+/** Row 3h: what the record may ask of the listing section's dialog. */
+export interface DetailsEditHandle {
+  openOn: (field: DetailKey) => void;
+}
+
+/** The edit button of the record's listing section and its dialog; nothing without the grid's write or for an earlier listing. */
+export function ListingDetailsEdit({
+  id,
+  unitNumber,
+  details,
+  words,
+  ref,
+}: {
+  id: string;
+  unitNumber: string;
+  details: ListingDetails;
+  words: DetailsWords;
+  /** Row 3h: opens the dialog on one field, for a missing part the person pressed in «Còn thiếu». */
+  ref?: Ref<DetailsEditHandle>;
+}) {
+  const api = useContext(DetailsEditContext);
+  const [open, setOpen] = useState(false);
+  const [first, setFirst] = useState<DetailKey>("legalStatus");
+  const form = useDetailsForm(details, words, first);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<Exclude<WriteOutcome, "saved"> | null>(null);
+  const openChange = (next: boolean) => {
+    if (next) {
+      form.reset();
+      setFailed(null);
+    } else setFirst("legalStatus");
+    setOpen(next);
+  };
+  useImperativeHandle(ref, () => ({
+    openOn: (field: DetailKey) => {
+      setFirst(field);
+      openChange(true);
+    },
+  }));
+  if (!api) return null;
+  const what = RECORD_COPY.detailsWhat(words.unit, unitNumber);
+  const submit = async () => {
+    if (form.blocked()) return;
+    const change = form.change();
+    if (!change) {
+      setOpen(false);
+      return;
+    }
+    setBusy(true);
+    const at = new Date().toISOString();
+    const outcome = await api.write(id, change, at);
+    setBusy(false);
+    if (outcome !== "saved") {
+      setFailed(outcome);
+      api.changed();
+      return;
+    }
+    setOpen(false);
+    api.changed();
+    const back = form.undo(change);
+    const undoable = form.undoable(back);
+    // The save already went through: the shared door says it and offers undo by row 4's one rule.
+    await runDoorChange({
+      done: RECORD_COPY.detailsDone(what),
+      undone: RECORD_COPY.detailsUndone(what),
+      write: () => Promise.resolve("saved"),
+      undo: undoable
+        ? async () => {
+            const result = await api.write(id, back, new Date().toISOString());
+            if (result === "saved") api.changed();
+            return result;
+          }
+        : undefined,
+      failed: (why) => RECORD_COPY.detailsFailed(why),
+      undoFailed: (why) => RECORD_COPY.detailsUndoFailed(what, why),
+    });
+  };
+  const refused = failed === "refused";
+  const formError =
+    failed === null
+      ? undefined
+      : refused
+        ? FRAME_COPY.refusedAction
+        : RECORD_COPY.detailsFailed(failed);
   return (
     <PermittedAction action="updateListing">
       <FormDialog
@@ -293,12 +354,7 @@ export function ListingDetailsEdit({
         refused={refused}
         slot="listing-details-edit"
       >
-        <FieldGroup>
-          {text("legalStatus", words.legalStatus)}
-          {choice("furnished", words.furnished, FURNISHED_VALUES, words.furnishedValues)}
-          {text("financing", words.financing)}
-          {choice("occupantType", words.occupantType, OCCUPANT_VALUES, words.occupantValues)}
-        </FieldGroup>
+        {form.fields}
       </FormDialog>
     </PermittedAction>
   );

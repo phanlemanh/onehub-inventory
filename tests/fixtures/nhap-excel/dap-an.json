@@ -1,0 +1,136 @@
+{
+  "_ghi_chu": "Đáp án viết tay, soát từng ô theo luật của hợp đồng nhap-excel (AC-2, AC-4, AC-5); KHÔNG sinh từ markTable. Mỗi ô là «dấu:lý do». units là điều máy chủ tra ra cho từng mã (bài giả lập lookupInCompany).",
+  "units": {
+    "s1.01-0905": { "kind": "catalog", "via": "catalog", "unitKeys": ["unt_s1_01_0905"] },
+    "s1.01-0906": { "kind": "catalog", "via": "catalog", "unitKeys": ["unt_s1_01_0906"] },
+    "sa5-12.08": { "kind": "catalog", "via": "reader", "unitKeys": ["unt_sa5_12_08"] },
+    "r2.11-1503": { "kind": "none" },
+    "q-1": { "kind": "none" }
+  },
+  "files": {
+    "gon.xlsx": {
+      "khong-lua-chon": {
+        "createCount": 3,
+        "canApply": true,
+        "cells": [
+          ["keep:catalog", "keep:text", "keep:price-read", "keep:standard", "keep:date-read"],
+          ["keep:catalog", "keep:text", "keep:price-read", "keep:standard", "keep:date-read"],
+          ["fixed:reader", "keep:text", "keep:price-read", "keep:standard", "keep:empty"]
+        ]
+      }
+    },
+    "sheet.csv": {
+      "khong-lua-chon": {
+        "createCount": 3,
+        "canApply": true,
+        "cells": [
+          ["keep:catalog", "keep:text", "keep:price-read", "keep:standard", "keep:date-read"],
+          ["keep:catalog", "keep:text", "keep:price-read", "keep:standard", "keep:date-read"],
+          ["ask:not-in-catalog", "keep:text", "ask:price-unread", "ask:unknown-value", "keep:empty"]
+        ]
+      }
+    },
+    "ban.xlsx": {
+      "khong-lua-chon": {
+        "createCount": 0,
+        "canApply": false,
+        "cells": [
+          [
+            "keep:catalog",
+            "keep:text",
+            "keep:number-read",
+            "keep:number-read",
+            "block:same-target",
+            "block:same-target",
+            "ask:unknown-value",
+            "ask:unknown",
+            "block:owner-column"
+          ],
+          [
+            "fixed:reader",
+            "keep:text",
+            "keep:number-read",
+            "keep:number-read",
+            "block:same-target",
+            "block:same-target",
+            "ask:unknown-value",
+            "ask:unknown",
+            "block:owner-column"
+          ],
+          [
+            "ask:not-in-catalog",
+            "keep:text",
+            "keep:number-read",
+            "keep:number-read",
+            "block:same-target",
+            "block:same-target",
+            "ask:unknown-value",
+            "keep:empty",
+            "block:owner-column"
+          ],
+          [
+            "block:duplicate-unit",
+            "keep:text",
+            "keep:number-read",
+            "keep:number-read",
+            "block:same-target",
+            "block:same-target",
+            "ask:unknown-value",
+            "ask:unknown",
+            "block:owner-column"
+          ]
+        ]
+      },
+      "lua-chon": {
+        "createCount": 3,
+        "canApply": true,
+        "cells": [
+          [
+            "keep:catalog",
+            "keep:text",
+            "keep:number-read",
+            "keep:number-read",
+            "fixed:price-read",
+            "keep:empty",
+            "fixed:chosen",
+            "fixed:standard-folded",
+            "keep:column-skipped"
+          ],
+          [
+            "fixed:reader",
+            "keep:text",
+            "keep:number-read",
+            "keep:number-read",
+            "fixed:price-read",
+            "keep:empty",
+            "fixed:chosen",
+            "fixed:standard-folded",
+            "keep:column-skipped"
+          ],
+          [
+            "fixed:pending-new",
+            "keep:text",
+            "keep:number-read",
+            "keep:number-read",
+            "ask:price-unread",
+            "keep:empty",
+            "fixed:chosen",
+            "keep:empty",
+            "keep:column-skipped"
+          ],
+          [
+            "keep:row-skipped",
+            "keep:row-skipped",
+            "keep:row-skipped",
+            "keep:row-skipped",
+            "keep:row-skipped",
+            "keep:row-skipped",
+            "keep:row-skipped",
+            "keep:row-skipped",
+            "keep:row-skipped"
+          ]
+        ]
+      }
+    }
+  }
+}

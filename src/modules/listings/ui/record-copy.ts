@@ -6,13 +6,28 @@ export const RECORD_COPY = {
   missing: "Chưa có",
   lacking: (parts: readonly string[]) => `Còn thiếu: ${parts.join(", ")}`,
   complete: "Đủ thông tin",
-  confirmedToday: "Xác nhận hôm nay",
-  confirmedDaysAgo: (days: number) => `Xác nhận ${days} ngày trước`,
+  /** Row 3h (B): a complete listing says it on one line, after a check mark: «Đủ thông tin · 5/5». */
+  completeLine: (have: number, need: number) => `Đủ thông tin · ${have}/${need}`,
+  /** Row 3h (B): the lead of the missing parts, each part a button after it. */
+  lackingLead: "Còn thiếu:",
+  confirmedToday: "Xác nhận với chủ nhà hôm nay",
+  confirmedDaysAgo: (days: number) => `Xác nhận với chủ nhà ${days} ngày trước`,
   neverConfirmed: "Chưa xác nhận với chủ nhà",
+  /** Row 3h (C): a confirmation older than STALE_CONFIRMATION_DAYS, in the warning colour. */
+  staleConfirmation: (days: number) => `Quá ${days} ngày — nên xác nhận lại`,
   /** One line of the listings of a unit: «Lần 2». */
   listingNumber: (n: number) => `Lần ${n}`,
+  /** Row 3h (D): the listing in view, among the unit's listings. */
+  listingInView: (n: number) => `Lần ${n} · đang xem`,
   viewingEarlier: (n: number) => `Đang xem lần chào cũ · Lần ${n}`,
   backToNewest: "Về lần mới nhất",
+  /**
+   * Row 3h (C1, C2; the shared button rule, sentence 2): a task the listing's status blocks gives its place to one quiet
+   * line saying why: «<unit> <status>, không <task>», the three words from the label table (the owner's example is in
+   * design/behaviors.md, «Chuẩn nút dùng chung»).
+   */
+  blocked: (unit: string, status: string, task: string) =>
+    `${unit} ${status.toLocaleLowerCase("vi")}, không ${task.toLocaleLowerCase("vi")}`,
   /** «Mã căn»: the code of the unit, from the unit's label. */
   unitCode: (unit: string) => `Mã ${unit.toLocaleLowerCase("vi")}`,
   /** The heading of the unit's listings with their count, after the label passed in. */
@@ -54,6 +69,9 @@ export const RECORD_COPY = {
           ? `Chưa hoàn tác được vì phiên đăng nhập đã hết; đăng nhập lại rồi bấm «Thử lại».`
           : `Chưa hoàn tác được thông tin ${what}.`,
 } as const;
+
+/** Row 3h (C): a confirmation older than this many days asks to be made again (Quỹ hàng's «Xác nhận <14 ngày»). */
+export const STALE_CONFIRMATION_DAYS = 14;
 
 /** The sentence at the head of the record: how long ago the listing was confirmed with the owner. */
 export function confirmationSentence(days: number | null): string {

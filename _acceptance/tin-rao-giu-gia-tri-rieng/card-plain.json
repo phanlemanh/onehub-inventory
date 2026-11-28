@@ -1,0 +1,24 @@
+{
+  "feature_plain": "Đầu chủ sửa được diện tích, tầng, phòng ngủ, hướng, loại hình của căn mình chào; giá trị ấy là của sàn, danh mục dùng chung chỉ điền chỗ sàn chưa có, ô khác danh mục có dấu nhỏ và lệnh lấy lại.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ hiện giá trị của sàn khi sàn có, không thì giá trị danh mục — trên lưới, chi tiết căn, thẻ điện thoại, lọc và tìm; Loại căn theo Phòng ngủ của tin."},
+    {"id": "AC-2", "p": "Sẽ cho sửa Diện tích, Phòng ngủ ngay trên ô ở máy tính, cùng luật đọc số, câu lỗi, hoàn tác và báo xung đột của hàng 4."},
+    {"id": "AC-3", "p": "Sẽ cho sửa cả năm thuộc tính trong chi tiết căn ở mọi cỡ màn, một lần lưu, hoàn tác cả năm."},
+    {"id": "AC-4", "p": "Sẽ đặt dấu nhỏ sát giá trị khi giá trị sàn khác danh mục; không dấu khi bằng, khi danh mục trống, hay ở căn chờ khớp."},
+    {"id": "AC-5", "p": "Sẽ cho lấy lại giá trị danh mục từ dấu, trên ô hay trong chi tiết, và hoàn tác được."},
+    {"id": "AC-6", "p": "Sẽ giữ nguyên giá trị sàn khi danh mục đổi về sau; sàn không đổi được một dòng nào của danh mục."},
+    {"id": "AC-7", "p": "Sẽ ghi giá trị từ tệp nhập thành giá trị của sàn (nguồn «nhập từ tệp»), kể cả các lần nhập đã chạy trước, không đè giá trị sàn đã gõ."},
+    {"id": "AC-8", "p": "Sẽ hiện dấu khác danh mục ngay ở bước xem trước của lần nhập."},
+    {"id": "AC-9", "p": "Sẽ giữ năm thuộc tính cho căn chờ khớp; khi khớp vào danh mục, giá trị giữ nguyên, chỗ khác thì có dấu."},
+    {"id": "AC-10", "p": "Sẽ cho gắn tin sang căn khác chỉ trong chi tiết căn; giá trị sàn giữ, căn đã có tin mở thì từ chối."},
+    {"id": "AC-11", "p": "Sẽ chỉ cho vai được sửa hàng thấy lệnh sửa; vai khác còn «Báo sai»; sàn khác không đọc được giá trị của sàn này; căn đã bán khoá."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "KHÔNG làm khoá một giá trị — lát B, anh quyết sau khi dùng lát A."},
+    {"id": "OOS-2", "p": "KHÔNG thêm các cột còn lại vào Bảng hàng — hàng riêng «Bảng hàng đủ cột» sau 3h."},
+    {"id": "OOS-3", "p": "KHÔNG gửi chỗ lệch về onehub-invest — sau MVP."},
+    {"id": "OOS-4", "p": "KHÔNG làm nhập lại để cập nhật tin đã có — hàng 11b, dùng lại luật thắng của 3h."},
+    {"id": "OOS-5", "p": "KHÔNG làm lịch sử ai sửa gì (hàng 3c); mức đủ thông tin không đổi."},
+    {"id": "OOS-6", "p": "KHÔNG làm trang khách (hàng 17)."}
+  ]
+}

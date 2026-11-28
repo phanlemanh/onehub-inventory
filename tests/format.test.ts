@@ -138,8 +138,9 @@ describe("status tone", () => {
 
   it("gives each of the six statuses its colour", () => {
     expect(Object.keys(STATUS_TONE).sort()).toEqual([...ALL].sort());
+    // VP11 (owner 2026-11-27, «Duyệt cả ba lối A»): «Chưa đủ để rao» is grey, no longer the amber of «Tạm ngừng».
     expect(ALL.map(statusTone)).toEqual([
-      "warning-light",
+      "invert-light",
       "success-light",
       "info-light",
       "primary-light",

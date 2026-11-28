@@ -372,19 +372,27 @@ describe("sổ giả thêm màn thì có bộ", () => {
       /**
        * Written before the code: the built staff and public screens on main after row 9. Row 1r: members is listed
        * too — it needs a session, so the signed-out run hands it over by name at run time (64 became 80). Row 7e adds
-       * the company layer screen (80 became 96).
+       * the company layer screen (80 became 96). Row 11 adds the import screen (96 became 112).
        */
-      const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "company-layer"];
+      const SCREENS = [
+        "today",
+        "inventory",
+        "sent",
+        "sign-in",
+        "members",
+        "company-layer",
+        "nhap-tep",
+      ];
       const expected = SCREENS.flatMap((s) =>
         SIZES.flatMap((z) => FRAME_TESTS.map((t) => `${z} ${s} ${t}`)),
       );
-      expect(expected).toHaveLength(96);
+      expect(expected).toHaveLength(112);
 
       const root = copyRegister();
       const before = list(root);
       expect(before.status).toBe(0);
       expect(frameCases(before.lines, "khung").sort()).toEqual([...expected].sort());
-      expect(frameCases(before.lines, "pha khung")).toHaveLength(96);
+      expect(frameCases(before.lines, "pha khung")).toHaveLength(112);
       // Every built screen has a suite or a named skip line.
       for (const s of bridge(root).screens.filter((x) => x.status === "built")) {
         const has = before.lines.some((l) => l.includes(` › man ${s.id} › `));
@@ -403,11 +411,11 @@ describe("sổ giả thêm màn thì có bộ", () => {
       expect(added.status).toBe(0);
       const ghost = frameCases(added.lines, "khung").filter((c) => c.includes(" ghost-built "));
       expect(ghost).toHaveLength(16);
-      expect(frameCases(added.lines, "khung")).toHaveLength(112);
+      expect(frameCases(added.lines, "khung")).toHaveLength(128);
 
       edit(root, "design/screens.yaml", (t) => t.split("  - id: ghost-built\n")[0]!);
       rmSync(join(root, "src/app/ghost"), { recursive: true });
-      expect(frameCases(list(root).lines, "khung")).toHaveLength(96);
+      expect(frameCases(list(root).lines, "khung")).toHaveLength(112);
     },
     SLOW * 3,
   );

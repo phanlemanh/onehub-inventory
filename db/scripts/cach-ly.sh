@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Company isolation suite (SP-1, hồ sơ cach-ly-moi-san). Runs on this lane's Postgres container, never on real data:
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
-#   2. db/tests/cach-ly.sql — 23 cases under the API role, using the door's own statements;
-#   3. ten break cases (twenty-five break files), each file on its own scratch database: the suite must go red with the
+#   2. db/tests/cach-ly.sql — 28 cases under the API role, using the door's own statements;
+#   3. eleven break cases (thirty-four break files), each file on its own scratch database: the suite must go red with the
 #      pinned messages;
 #   4. the app's login role (row 7c): db/tests/vai-dang-nhap.sql on the clean database in a rolled-back transaction;
 #      db/tests/vai-dang-nhap-phien.sql on a connection logged in AS quy_hang_login; seven break files, each in one
 #      rolled-back transaction with the catalog case (roles belong to the whole cluster, so a break is never committed),
 #      then the catalog case once more — a trace left on the cluster fails it.
 # Every case prints `ok <case>` exactly once; the last line is
-# `cach-ly: 37 ca đạt, vai quy_hang_app, nối bằng quy_hang_login`.
+# `cach-ly: 44 ca đạt, vai quy_hang_app, nối bằng quy_hang_login`.
 # Missing, repeated or failing cases are named and the exit code is not 0.
 #
 #   DB_LANE=n bash db/scripts/cach-ly.sh       (see db/scripts/psql.sh for DB_LANE and PSQL)
@@ -53,6 +53,11 @@ CA_SQL=(
   lop-rieng-theo-san
   thue-phi-theo-san
   can-chao-theo-san
+  nhap-excel-theo-san
+  nhap-excel-can-cho-theo-san
+  nhap-excel-moi-noi-cua-minh
+  gia-tri-rieng-theo-san
+  gia-tri-rieng-cung-san
 )
 CA_LENH=(
   ap-hai-lan
@@ -66,6 +71,7 @@ CA_LENH=(
   pha-thu-dang-xem-vuot
   pha-thu-ham-dac-quyen
   pha-thu-dang-xem-chi-ghi
+  pha-thu-gia-tri-rieng-long
 )
 CA_DANG_NHAP=(
   vai-dang-nhap-khong-ve-chu
@@ -94,7 +100,8 @@ pha_thu_tep() {
   case "$1" in
     bo-ep-luat) printf '%s\n' bo-ep-luat goc-nhin-bo-ep-luat lop-rieng-khong-ep thue-phi-khong-ep can-chao-khong-ep ;;
     luat-them-khong-kiem)
-      printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac luat-ghi-for-all-doi-tac luat-xoa-doi-tac ;;
+      printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac luat-ghi-for-all-doi-tac luat-xoa-doi-tac \
+        nhap-excel-xoa-mo nhap-excel-can-cho-cheo-san nhap-excel-moi-noi-mo ;;
     luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ma-rieng-doc-mo ;;
     bang-moi-luat-mo) printf '%s\n' bang-moi-luat-mo ;;
     ghi-bi-chan) printf '%s\n' ghi-bi-chan ;;
@@ -103,6 +110,7 @@ pha_thu_tep() {
     dang-xem-vuot) printf '%s\n' dang-xem-thuong dang-xem-vat-chat ;;
     ham-dac-quyen) printf '%s\n' ham-dac-quyen-public ham-trigger-dac-quyen ;;
     dang-xem-chi-ghi) printf '%s\n' dang-xem-chi-xoa dang-xem-chi-sua-cot dang-xem-chi-them-schema-khac ;;
+    gia-tri-rieng-long) printf '%s\n' gia-tri-rieng-khong-nguon gia-tri-rieng-gan-mo gia-tri-rieng-sua-mo ;;
   esac
 }
 # Break file → the lines its red run must contain.
@@ -117,6 +125,9 @@ pha_thu_ghim() {
     luat-them-khong-kiem-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-ghi-for-all-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: bang_doi_tac_mau" ;;
     luat-xoa-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
+    nhap-excel-xoa-mo) printf '%s\n' "HỎNG nhap-excel-theo-san" "HỎNG luat-doc-ghi-theo-san: listings" ;;
+    nhap-excel-can-cho-cheo-san) printf '%s\n' "HỎNG nhap-excel-can-cho-theo-san: câu chạy được" ;;
+    nhap-excel-moi-noi-mo) printf '%s\n' "HỎNG nhap-excel-moi-noi-cua-minh: câu chạy được" ;;
     luat-doc-mo | luat-doc-mo-hoac-true)
       printf '%s\n' "HỎNG chua-dat-san-khong-thay-gi: agreements" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-doc-mo-khac-san) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
@@ -139,6 +150,9 @@ pha_thu_ghim() {
     dang-xem-chi-xoa) printf '%s\n' "HỎNG dang-xem-ghi-khong-vuot-luat: public.agreements_xoa DELETE" ;;
     dang-xem-chi-sua-cot) printf '%s\n' "HỎNG dang-xem-ghi-khong-vuot-luat: public.agreements_sua_ben UPDATE" ;;
     dang-xem-chi-them-schema-khac) printf '%s\n' "HỎNG dang-xem-ghi-khong-vuot-luat: kho_xem.agreements_them INSERT" ;;
+    gia-tri-rieng-khong-nguon) printf '%s\n' "HỎNG gia-tri-rieng-theo-san: câu chạy được" ;;
+    gia-tri-rieng-gan-mo) printf '%s\n' "HỎNG gia-tri-rieng-theo-san: sàn B gắn được" ;;
+    gia-tri-rieng-sua-mo) printf '%s\n' "HỎNG gia-tri-rieng-cung-san: quản trị sàn sửa được" ;;
   esac
 }
 
@@ -221,7 +235,7 @@ done <<<"$ket_lanh"
 
 # 3. Break tests: every break file of a case must turn the suite red with its pinned lines.
 for pha in bo-ep-luat luat-them-khong-kiem luat-doc-mo bang-moi-luat-mo \
-  ghi-bi-chan quyen-nguy-hiem bang-khong-luat dang-xem-vuot ham-dac-quyen dang-xem-chi-ghi; do
+  ghi-bi-chan quyen-nguy-hiem bang-khong-luat dang-xem-vuot ham-dac-quyen dang-xem-chi-ghi gia-tri-rieng-long; do
   loi_ca=""
   while IFS= read -r tep; do
     db="cach_ly_${nhan:+${nhan}_}pha_${tep//-/_}"

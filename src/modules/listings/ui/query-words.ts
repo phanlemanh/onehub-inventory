@@ -21,6 +21,12 @@ export const QUERY_WORD = {
   sample: "sample",
   /** Development only, on the behaviour prototype: `?permission=denied` takes «Thêm dòng» away. */
   permission: "permission",
+  /** Development only, row 3h's prototype: `?columns=five` also shows floor, direction and sub type (variant B). */
+  columns: "columns",
+  /** Development only, row 3h's prototype: `?mark=dot|badge|icon`, the look of the catalog mark (Hỏi-6). */
+  mark: "mark",
+  /** Development only, row 3h's prototype: `?edit=one`, one edit button for the whole record (variant b). */
+  edit: "edit",
 } as const;
 
 /**

@@ -105,7 +105,8 @@ test.describe("E1 · copy link at the head of the record", () => {
     await openInventory(page);
     await openFifth(page);
     await checkCopyButtonPlace(page, PHONE.has(info.project.name));
-    await expect(panel(page).locator('[data-slot="listing-card"]')).toBeVisible();
+    // Row 3h (A): the record's body opens on its status and price.
+    await expect(panel(page).locator('[data-slot="record-summary"]')).toBeVisible();
   });
 
   test("the check fails when the button is gone", async ({ page }, info) => {

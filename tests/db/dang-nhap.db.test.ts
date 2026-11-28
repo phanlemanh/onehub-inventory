@@ -570,8 +570,9 @@ describe("dang-nhap (Postgres của dãy)", () => {
   });
 
   it("vai-ham-danh-tinh-hep", async () => {
-    // Six sign-in functions of row 8 and four member functions of row 9 (migration 003).
-    expect(await checkIdentityRoleNarrow(w)).toBe(10);
+    // Six sign-in functions of row 8, four member functions of row 9 (migration 003), and row 11's list agents for a
+    // company-wide importer (migration 016; owner's choice, _acceptance/nhap-excel/decisions.jsonl d-20261117T064233Z-63).
+    expect(await checkIdentityRoleNarrow(w)).toBe(11);
   });
 });
 

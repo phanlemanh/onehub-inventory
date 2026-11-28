@@ -6,6 +6,7 @@
 // Every rule is called from ../edit-rules; nothing here compares numbers or lists moves by itself.
 import { useState, type KeyboardEvent } from "react";
 
+import { useSaveOnAway } from "@/components/candidate/cell-editor";
 import type { CellEditSession, GridRow } from "@/components/candidate/data-region";
 import { GRID_COPY } from "@/components/candidate/grid-copy";
 import { FormDialog } from "@/components/candidate/form-dialog";
@@ -19,7 +20,19 @@ import type {
 } from "@/generated/ontology";
 import { statusLabel, statusTone } from "@/lib/format";
 
-import { readCustomValue, sameCustomValue, type CustomKind } from "../custom-rules";
+import {
+  readCustomValue,
+  sameCustomValue,
+  type CustomKind,
+  type CustomRead,
+} from "../custom-rules";
+import {
+  readBedrooms,
+  readFloor,
+  readLivingArea,
+  type AttributeProblem,
+  type UnitAttributeField,
+} from "../unit-attributes";
 import {
   detailsLocked,
   nextStatuses,
@@ -41,6 +54,7 @@ import {
   word,
   type CellEditLabels,
 } from "./cell-edit-copy";
+import { UNIT_ATTRIBUTE_COPY, attributeInput } from "./unit-attribute-copy";
 
 /** The writes an editor asks for; the grid applies them through the save door and offers «Hoàn tác». */
 export type ListingEdit =
@@ -105,6 +119,8 @@ function PriceEditor({
     if (priceAsksAgain(previous, read.value)) return setAsking(read.value);
     save(read.value, move);
   };
+  // Clicking away saves like Enter (VP11): a value not understood keeps the editor open and says so.
+  useSaveOnAway(() => submit());
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -293,6 +309,30 @@ export interface CustomCellField {
   options: readonly string[];
   key?: string;
   limit?: number;
+  /** Row 3h: the cell is one of the listing's unit attributes, read by its own reader; empty takes the catalog again. */
+  attribute?: UnitAttributeField;
+}
+
+/** What an attribute cell's editor knows of its row (row 3h): whether the listing holds an own value, and the catalog's. */
+export interface AttributeCellNote {
+  hasOwn: boolean;
+  /** The catalog's value and how to take it again, while the catalog has a value; null otherwise. */
+  note: string | null;
+  /** The way-back command's word, offered while the own value differs from the catalog's. */
+  revert?: string | undefined;
+  /** The choice that takes the catalog's value again in a choice cell, by the catalog source's word. */
+  noneText: string;
+}
+
+/** A typed attribute (row 3h) by its reader: empty is null (the catalog's value again), else the value or why not. */
+function readAttribute(
+  attribute: UnitAttributeField,
+  raw: string,
+): { ok: true; value: string | number | null } | { ok: false; problem: AttributeProblem } {
+  if (raw.trim() === "") return { ok: true, value: null };
+  if (attribute === "livingArea") return readLivingArea(raw);
+  if (attribute === "bedroomsTotal") return readBedrooms(raw);
+  return readFloor(raw);
 }
 
 /** The grid column of a typed cell. */
@@ -304,26 +344,40 @@ function CustomTextEditor({
   field,
   labels,
   onSave,
+  attribute,
 }: {
   session: CellEditSession;
   field: CustomCellField;
   labels: CellEditLabels;
   onSave: (edit: CustomEdit) => void;
+  attribute?: AttributeCellNote | undefined;
 }) {
   const stored = session.row[session.field];
+  const own = field.attribute;
   const [text, setText] = useState(
     session.initialText ??
-      (stored === null || stored === undefined ? "" : COPY.customShown(field.kind, stored)),
+      (own
+        ? attributeInput(stored)
+        : stored === null || stored === undefined
+          ? ""
+          : COPY.customShown(field.kind, stored)),
   );
   const [tried, setTried] = useState(false);
-  const read = readCustomValue(field.kind, text, field.options, field.limit);
+  const read: CustomRead | { ok: false; problem: AttributeProblem } = own
+    ? readAttribute(own, text)
+    : readCustomValue(field.kind, text, field.options, field.limit);
+  const save = (value: string | number | boolean | null) =>
+    onSave({ field: cellKeyOf(field), custom: field.code, value });
   const submit = (move?: "next") => {
     setTried(true);
     if (!read.ok) return;
     session.close(move);
-    if (!sameCustomValue(read.value, stored))
-      onSave({ field: cellKeyOf(field), custom: field.code, value: read.value });
+    // An empty attribute cell takes the catalog's value again; with no own value there is nothing to take back.
+    if (own && read.value === null && !attribute?.hasOwn) return;
+    if (!sameCustomValue(read.value, stored)) save(read.value);
   };
+  // Clicking away saves like Enter (VP11): a value not understood keeps the editor open and says so.
+  useSaveOnAway(() => submit());
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -359,7 +413,40 @@ function CustomTextEditor({
       </div>
       {problem ? (
         <UnderCell alert>
-          <span id="cell-edit-line">{COPY.customProblem(problem, field.limit)}</span>
+          <span id="cell-edit-line">
+            {own
+              ? UNIT_ATTRIBUTE_COPY.problem(own, problem as AttributeProblem, text)
+              : COPY.customProblem(
+                  problem as Parameters<typeof COPY.customProblem>[0],
+                  field.limit,
+                )}
+          </span>
+        </UnderCell>
+      ) : attribute?.note ? (
+        <UnderCell>
+          <span
+            id="cell-edit-line"
+            data-slot="attribute-cell-note"
+            className="text-muted-foreground"
+          >
+            {attribute.note}
+          </span>
+          {attribute.revert ? (
+            <span className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="xs"
+                data-slot="attribute-revert"
+                onClick={() => {
+                  session.close();
+                  save(null);
+                }}
+              >
+                {attribute.revert}
+              </Button>
+            </span>
+          ) : null}
         </UnderCell>
       ) : null}
     </>
@@ -372,11 +459,13 @@ function CustomChoiceEditor({
   field,
   labels,
   onSave,
+  attribute,
 }: {
   session: CellEditSession;
   field: CustomCellField;
   labels: CellEditLabels;
   onSave: (edit: CustomEdit) => void;
+  attribute?: AttributeCellNote | undefined;
 }) {
   const stored = session.row[session.field] ?? null;
   const values: { value: string | boolean | null; text: string }[] = [
@@ -386,10 +475,12 @@ function CustomChoiceEditor({
           { value: false, text: GRID_COPY.no },
         ]
       : field.options.map((o) => ({ value: o, text: o }))),
-    { value: null, text: COPY.customNone },
+    { value: null, text: attribute ? attribute.noneText : COPY.customNone },
   ];
   const pick = (value: string | boolean | null) => {
     session.close();
+    // The catalog's choice on a cell that already follows the catalog changes nothing (row 3h).
+    if (field.attribute && value === null && !attribute?.hasOwn) return;
     if (!sameCustomValue(value, stored))
       onSave({ field: cellKeyOf(field), custom: field.code, value });
   };
@@ -411,7 +502,11 @@ function CustomChoiceEditor({
           variant="ghost"
           size="sm"
           role="option"
-          aria-selected={sameCustomValue(o.value, stored)}
+          aria-selected={
+            field.attribute && o.value === null
+              ? !attribute?.hasOwn
+              : sameCustomValue(o.value, stored)
+          }
           autoFocus={index === 0}
           onClick={() => pick(o.value)}
         >
@@ -438,7 +533,14 @@ export function ListingCellEdit({
   /** Whether Active is offered for this row (row 10, AC-5); the server checks it again. */
   canActivate?: boolean;
   /** The company's own field of this cell, when it is one, and where its value goes (row 3g). */
-  custom?: { field: CustomCellField; onSave: (edit: CustomEdit) => void } | undefined;
+  custom?:
+    | {
+        field: CustomCellField;
+        onSave: (edit: CustomEdit) => void;
+        /** Row 3h: what an attribute cell's editor says of the catalog. */
+        attribute?: AttributeCellNote | undefined;
+      }
+    | undefined;
 }) {
   if (custom)
     return custom.field.kind === "single_select" || custom.field.kind === "boolean" ? (
@@ -447,6 +549,7 @@ export function ListingCellEdit({
         field={custom.field}
         labels={labels}
         onSave={custom.onSave}
+        attribute={custom.attribute}
       />
     ) : (
       <CustomTextEditor
@@ -454,6 +557,7 @@ export function ListingCellEdit({
         field={custom.field}
         labels={labels}
         onSave={custom.onSave}
+        attribute={custom.attribute}
       />
     );
   if (session.field === "Listing.listPrice")

@@ -25,6 +25,16 @@ export {
 
 export { createListingsHandlers, type ListingsDeps, type ListingsHandlers } from "./listings-http";
 
+// Row 11 (nhap-excel): the create door of listings and the removal of an import's untouched listings.
+export {
+  createListings,
+  removeImportListings,
+  setFileValues,
+  type FileValuesOutcome,
+  type NewListing,
+  type Queryable,
+} from "./create";
+
 let handlers: SavedViewsHandlers | undefined;
 let listingHandlers: ListingsHandlers | undefined;
 

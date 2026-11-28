@@ -1,0 +1,140 @@
+{
+  "feature_plain": "Nhân viên sàn phân biệt được sáu trạng thái căn bằng sáu màu ở cả nền sáng lẫn tối, thấy ngăn chi tiết tách khỏi lưới ở nền tối, và sửa nhanh trên Bảng hàng như bảng tính: Enter để sửa, phím cách để mở hồ sơ, bấm ra ngoài là lưu — lát đầu của việc chuẩn hoá anh đã duyệt ngày 27/11.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ cho sáu nhãn trạng thái sáu màu tách nhau ở cả nền sáng lẫn tối: «Chưa đủ để rao» xám, «Đang giao dịch» theo sắc tím anh chọn ở Hỏi-2, bốn màu kia giữ; một bài kiểm đỏ khi hai trạng thái gần màu nhau."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ tô cùng một màu cho cùng một trạng thái ở lưới, thẻ điện thoại, đầu ngăn chi tiết và lịch sử lần chào."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ bỏ ổ khoá ở căn đã bán và căn ngừng hẳn trên lưới; rê chuột vẫn thấy lý do khoá, ô vẫn không sửa được."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ để Enter mở sửa ô sửa được và mở hồ sơ ở ô khác (chờ Hỏi-1)."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ để phím cách mở hồ sơ ở mọi ô của Bảng hàng và Đã gửi (chờ Hỏi-1)."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ hiện bút chì khi rê lên ô người dùng sửa được; ô khoá và người chỉ xem thì không."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ lưu giá trị khi bấm ra ngoài khung sửa, đúng một lần ghi, có «Hoàn tác»; giá trị chưa hiểu thì khung ở lại."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ có một bộ trợ giúp dùng chung để bài kiểm của hàng 3h mở sửa một ô, báo lỗi rõ khi không mở được."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ giữ mọi bài kiểm của kho xanh ở bốn cỡ màn, sáng và tối, và không sửa tệp của bộ linh kiện."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ ghi luật mới vào sổ hành vi bằng lời và ngày của anh, không lọt điều của lát 2, lát 3."
+    },
+    {
+      "id": "AC-11",
+      "p": "Sẽ cho ngăn chi tiết và mọi lớp nổi ở nền tối sáng hơn lưới một chút, để ngăn tách khỏi lưới mà dấu rê trong trình đơn vẫn thấy (chờ Hỏi-4)."
+    }
+  ],
+  "wont_do": [
+    {
+      "id": "OOS-1",
+      "p": "Lát 2 làm sau: mã căn bấm mở tab mới, nút mở ở ô số thứ tự, ngăn đi theo dòng đang chọn, Tuỳ chỉnh sửa trong ô, vai Thành viên màu trung tính."
+    },
+    {
+      "id": "OOS-2",
+      "p": "Lát 3 làm sau: cả phần lọc."
+    },
+    {
+      "id": "OOS-3",
+      "p": "Không đổi cách sửa trên điện thoại (thuộc hàng 3d)."
+    },
+    {
+      "id": "OOS-4",
+      "p": "Không chọn màu cho dấu «khác danh mục» của hàng 3h; 3h chọn sau, không trùng trạng thái nào."
+    },
+    {
+      "id": "OOS-5",
+      "p": "Không đụng trang khách xem và không sửa tệp của bộ linh kiện."
+    }
+  ],
+  "scope_plain": "Ba phần anh duyệt được cắt ba lát để hàng 3h khỏi chờ; lát này chỉ gồm màu và cách sửa trên ô.",
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Mọi điều của lát 1 có một tiêu chí: màu (AC-1, AC-2), ổ khoá (AC-3), Enter (AC-4), phím cách (AC-5), bút chì (AC-6), bấm ra ngoài (AC-7), trợ giúp cho 3h (AC-8), sổ hành vi (AC-10)."
+    },
+    {
+      "i": 1,
+      "p": "Đo ở 1440 và 1024 cho lưới, 360 cho thẻ điện thoại; sửa trên ô chỉ có từ 768 nên 414 không có điều riêng."
+    },
+    {
+      "i": 2,
+      "p": "Màu đo ở cả nền sáng lẫn tối (AC-1, AC-2, AC-11 và bài nhìn ảnh)."
+    },
+    {
+      "i": 3,
+      "p": "Ở nền tối đo ngăn chi tiết và trình đơn có dấu rê (AC-11); hộp thoại và ô gợi ý cùng màu, xem qua ảnh."
+    },
+    {
+      "i": 4,
+      "p": "Thử cả người được sửa lẫn người chỉ xem (AC-4, AC-6, AC-7)."
+    },
+    {
+      "i": 5,
+      "p": "Thử ô sửa được, ô khoá vì trạng thái, ô không sửa trên ô và ô mã căn (AC-3, AC-4, AC-6)."
+    },
+    {
+      "i": 6,
+      "p": "Thử trên Bảng hàng, Đã gửi và Tuỳ chỉnh của sàn (màn không có ngăn chi tiết)."
+    },
+    {
+      "i": 7,
+      "p": "Thử bằng chuột, bàn phím và màn chạm từ 768 (AC-4 tới AC-7)."
+    },
+    {
+      "i": 8,
+      "p": "Cả kho, bộ bài trình duyệt và bộ có đăng nhập vẫn xanh (AC-9)."
+    },
+    {
+      "i": 9,
+      "p": "Để sau: lát 2 và lát 3, dẫn câu trả lời của anh ở cổng này."
+    },
+    {
+      "i": 10,
+      "p": "Không làm: các lối B anh đã không chọn."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Ngưỡng «khác màu» chưa từng đo trên bảng màu anh duyệt. Đã đo trên màn thật: sắc tím trên ảnh 27/11 chỉ tách «Đã bán» 10,4 ở nền sáng, gần mức hôm nay anh gọi là trùng (9,4); đưa thành Hỏi-2 cho anh chọn sắc."
+    },
+    {
+      "i": 1,
+      "p": "Đổi màu «thông tin» là đổi chung cho cả ứng dụng. Đã kiểm: hôm nay chỉ nhãn «Đang giao dịch» dùng màu ấy, trang khách không dùng; thêm bài kiểm đỏ khi có chỗ mới dùng."
+    },
+    {
+      "i": 2,
+      "p": "Hợp đồng viết như thể anh đã chọn đổi Enter. Đã ghi «chờ Hỏi-1» và nói sẵn: giữ luật cũ thì hai tiêu chí phím rơi, bộ trợ giúp của 3h mở sửa bằng F2."
+    },
+    {
+      "i": 3,
+      "p": "Bài so màu ở mọi chỗ chưa có danh sách ô viết trước. Đã viết sẵn 44 ô, thiếu ô nào bài đỏ có tên."
+    },
+    {
+      "i": 4,
+      "p": "«Bấm ra ngoài là lưu» chỉ đo trên giao diện. Đã thêm bài trên cơ sở dữ liệu thật: mỗi lần sửa ghi đúng một lần, tải lại vẫn thấy giá mới."
+    }
+  ]
+}

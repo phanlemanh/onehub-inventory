@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
 import { PageState, loginHref } from "@/components/templates/page-state";
+import { Button } from "@/components/ui/button";
 import { TEXT_VALUE_LIMIT, customColumnsOf, label, labelOverrides } from "@/modules/company-config";
 import { myCompanyLayer, myFeeSchedule } from "@/modules/company-config/server";
 import { allowedScope } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
-import { SessionRoles } from "@/modules/identity/ui";
+import { PermittedAction, SessionRoles } from "@/modules/identity/ui";
 import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
 import { feeHeaders, withFees } from "../inventory-fees";
 import { inventorySource, standInRole } from "../inventory-source";
-import { placesOf, recordsOf, rowsOf } from "../inventory-view";
+import { catalogAttributesOf, placesOf, recordsOf, rowsOf } from "../inventory-view";
 import { entryAction, entryRefused, NAV } from "../nav";
 import { savedViewLabels } from "../saved-view-labels";
 import {
@@ -30,11 +32,17 @@ import {
   inventoryOpeningFor,
   inventoryStateFrom,
   inventoryEdgeRowsFrom,
+  markLookFrom,
   type InventoryField,
   type RecordLabels,
 } from "@/modules/listings/ui";
 
+import { ATTRIBUTE_WORDS } from "../unit-attribute-words";
+
 export const metadata: Metadata = { title: label("Inventory") };
+
+/** The import screen (row 11), reached from the page head and from the empty state. */
+const IMPORT_HREF = "/nhap-tep";
 
 /** Words of the record's AskListAgent and ReportUnitError buttons (row 3e), from the label table. */
 const ASK_WORDS = {
@@ -101,6 +109,7 @@ const RECORD_LABELS: RecordLabels = {
     "Single Family Residence": label("SubTypeSingleFamily"),
     "Unimproved Land": label("SubTypeLand"),
   },
+  attributes: ATTRIBUTE_WORDS,
 };
 
 const FEE_HEADERS = feeHeaders();
@@ -224,7 +233,23 @@ export default async function Page({ searchParams }: Props) {
           .map((l) => l.id);
   const page = (
     <>
-      <PageHeader title={openView ? openView.name : label("Inventory")} />
+      <PageHeader
+        title={openView ? openView.name : label("Inventory")}
+        action={
+          // Importing a sheet (row 11): an outline button for a session the permission table gives importListings;
+          // others get nothing in its place, not a disabled button.
+          <PermittedAction action="importListings">
+            <Button
+              variant="outline"
+              size="sm"
+              nativeButton={false}
+              render={<Link href={IMPORT_HREF} />}
+            >
+              {label("ImportScreen")}
+            </Button>
+          </PermittedAction>
+        }
+      />
       {/* Always present, so the sentence about a view that is gone is read out when it appears. */}
       <p
         role="status"
@@ -267,9 +292,24 @@ export default async function Page({ searchParams }: Props) {
         noActivate={noActivate}
         emptyWhy={`${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`}
         reloadLabel="Tải lại"
+        emptyLink={{
+          lead: "Có sẵn bảng trong Excel hay Google Sheet?",
+          word: label("ImportScreen"),
+          href: IMPORT_HREF,
+        }}
         filters={filters}
         geoTree={tree}
         staleLinkNote={stale ? ENTRY_COPY.staleLink(label("Unit"), label("Inventory")) : undefined}
+        unitAttributes={{
+          words: ATTRIBUTE_WORDS,
+          catalog: data ? catalogAttributesOf(data) : {},
+          look: markLookFrom(first(query[QUERY_WORD.mark]), process.env.NODE_ENV),
+          // Variant B of row 3h, for comparison at the scope gate: outside production only, like `?state=`.
+          more:
+            process.env.NODE_ENV !== "production" && first(query[QUERY_WORD.columns]) === "five",
+          // Variant (b) of the record's edit button, for the same comparison: one edit button for the whole record.
+          editOne: process.env.NODE_ENV !== "production" && first(query[QUERY_WORD.edit]) === "one",
+        }}
         fullRecord={{
           records: data ? recordsOf(data, new Date()) : {},
           labels: RECORD_LABELS,

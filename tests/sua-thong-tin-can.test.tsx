@@ -374,7 +374,12 @@ describe("sua-thong-tin-can · hồ sơ căn", () => {
     const listing = saved.get(id)!;
     const count = document.querySelector('[data-slot="listing-completeness-count"]')?.textContent;
     const rule = completeness({ ...listing, listPrice: data.listings[0]!.listPrice });
-    expect(count, "du-thong-tin-cho-hang-15: số đếm").toBe(`${rule.have}/${rule.need}`);
+    // Row 3h (B): a complete listing says it on one line.
+    expect(count, "du-thong-tin-cho-hang-15: số đếm").toBe(
+      rule.missing.length === 0
+        ? RECORD_COPY.completeLine(rule.have, rule.need)
+        : `${rule.have}/${rule.need}`,
+    );
   });
 });
 

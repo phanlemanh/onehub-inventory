@@ -1,5 +1,5 @@
 // Listings over HTTP (row 10): PATCH /api/v1/listings/[id] changes one listing by one change — its price, its status
-// with what the status needs, its fee inclusion, its four details or one custom value (row 3g). Plain Request in, Response out, so the route file stays one line and
+// with what the status needs, its fee inclusion, its four details, one custom value (row 3g) or its own unit values (row 3h). Plain Request in, Response out, so the route file stays one line and
 // tests call this directly. The door opens with the action of the change (activateListing for a move to Active,
 // updateListing otherwise) before any data is touched; the rules of the move are the ones of edit-rules, run through
 // applyChange; the write names the version the person edited, so a change made in between is a conflict, never
@@ -11,9 +11,18 @@ import type { DbClient, DbPool, DoorError, OpenedDoor } from "@/modules/identity
 
 import type { Listing } from "../../generated/ontology";
 
-import { LISTING_COLUMNS, toListing, type ListingRow } from "./inventory-read";
-import { applyChange, type CustomCheck, type ListingChange } from "./save-door";
+import { readCatalogUnits } from "../catalog/server";
+
+import {
+  LISTING_COLUMNS,
+  LISTING_FROM,
+  PENDING_UNIT,
+  toListing,
+  type ListingRow,
+} from "./inventory-read";
+import { applyChange, type CustomCheck, type Invalid, type ListingChange } from "./save-door";
 import { STANDARD_STATUSES } from "./sample";
+import { UNIT_ATTRIBUTE_FIELDS } from "./unit-attributes";
 import {
   DETAILS_TEXT_LIMIT,
   FURNISHED_VALUES,
@@ -82,6 +91,22 @@ const Change = z.discriminatedUnion("field", [
       value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
     })
     .strict(),
+  // Row 3h: the listing's own unit values (migration 020). `null` takes the catalog's value again; a value's kind is
+  // checked by the rule of edit (attributeFits in save-door), so the shapes here only keep out what is no value at all.
+  z
+    .object({
+      field: z.literal("unitAttributes"),
+      livingArea: z.number().nullable().optional(),
+      floor: z.string().max(8).nullable().optional(),
+      bedroomsTotal: z.number().int().nullable().optional(),
+      directionFaces: z.string().max(16).nullable().optional(),
+      propertySubType: z.string().max(32).nullable().optional(),
+      // Only «Hoàn tác» names a source, to write back a value a file brought (plan decision, ledger d-…-23).
+      sources: z.partialRecord(z.enum(UNIT_ATTRIBUTE_FIELDS), z.literal("File")).optional(),
+    })
+    .strict(),
+  // Row 3h, «Gắn sang căn khác»: the unit of the shared catalog the listing points at from now on.
+  z.object({ field: z.literal("unit"), upi: z.string().min(1).max(64) }).strict(),
 ]);
 const Body = z.object({ version: z.number().int().min(1), change: Change }).strict();
 
@@ -128,6 +153,38 @@ export const actionOf = (change: ListingChange): ActionName =>
     ? "activateListing"
     : "updateListing";
 
+/**
+ * Moves the listing's unit link (row 3h, AC-10), or says why not: the unit is not in the catalog or is the same one, or
+ * the company already has an open listing on it, on the catalog link or on a pending unit matched to it (named by its unit
+ * number). The unique index of 013 still guards a race on the catalog link.
+ */
+async function moveUnit(
+  c: DbClient,
+  id: string,
+  from: string,
+  to: string,
+): Promise<Invalid | null> {
+  // A listing on a pending unit (row 11) has no catalog link to move: the pending unit is matched instead.
+  if (to === from || from.startsWith(PENDING_UNIT)) return { rule: "unit" };
+  const [unit] = await readCatalogUnits(c, [to]);
+  if (!unit) return { rule: "unit" };
+  // A pending unit matched to the catalog since keeps its open listing on the pending link: it counts for that catalog
+  // unit too, as it does for the import (Listing rule one-open-listing).
+  const taken = await c.query(
+    `select 1 from listing_units where upi = $1 and open and listing_id <> $2
+     union all
+     select 1 from listing_pending_units p
+       join company_pending_units cpu on cpu.id = p.pending_unit_id
+       join catalog_units u on u.unit_key = cpu.unit_key
+      where u.upi = $1 and p.open and p.listing_id <> $2
+     limit 1`,
+    [to, id],
+  );
+  if ((taken.rowCount ?? 0) > 0) return { rule: "unit-open", unitNumber: unit.unitNumber };
+  await c.query("update listing_units set upi = $2 where listing_id = $1", [id, to]);
+  return null;
+}
+
 export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
   return {
     async change(req, id, options = {}) {
@@ -151,7 +208,7 @@ export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
             : undefined;
         const outcome = await deps.withCompany<Outcome>(door.pool, door.ctx, async (c) => {
           const { rows } = await c.query(
-            `select ${LISTING_COLUMNS} from listings l join listing_units u on u.listing_id = l.id
+            `select ${LISTING_COLUMNS} from ${LISTING_FROM}
               where l.id = $1 for update of l`,
             [id],
           );
@@ -170,11 +227,18 @@ export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
           const next = applyChange(listing, change, at, custom);
           if (!next.ok) return { kind: "invalid", why: next.why };
           const l = next.listing;
+          if (change.field === "unit") {
+            const moved = await moveUnit(c, id, row.upi, change.upi);
+            if (moved) return { kind: "invalid", why: moved };
+          }
           const r = await c.query(
             `update listings
                 set list_price = $3, standard_status = $4, close_price = $5, close_date = $6, withdrawn_reason = $7,
                     fee_inclusion = $8, last_confirmed_at = $9, legal_status = $10, furnished = $11,
                     financing = $12, occupant_type = $13, custom_fields = $14::jsonb,
+                    living_area = $15, living_area_source = $16, floor = $17, floor_source = $18,
+                    bedrooms_total = $19, bedrooms_total_source = $20, direction_faces = $21,
+                    direction_faces_source = $22, property_sub_type = $23, property_sub_type_source = $24,
                     version = version + 1, updated_at = now()
               where id = $1 and version = $2
             returning id`,
@@ -193,6 +257,16 @@ export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
               l.financing ?? null,
               l.occupantType ?? null,
               JSON.stringify(l.customFields ?? {}),
+              l.livingArea ?? null,
+              l.livingAreaSource ?? null,
+              l.floor ?? null,
+              l.floorSource ?? null,
+              l.bedroomsTotal ?? null,
+              l.bedroomsTotalSource ?? null,
+              l.directionFaces ?? null,
+              l.directionFacesSource ?? null,
+              l.propertySubType ?? null,
+              l.propertySubTypeSource ?? null,
             ],
           );
           // A role whose cell does not let it change listings sees no row to change.

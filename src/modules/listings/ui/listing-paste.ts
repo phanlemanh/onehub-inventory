@@ -13,23 +13,42 @@ import { readCustomValue, sameCustomValue } from "../custom-rules";
 import { detailUndoable } from "../edit-rules";
 import { readPastePrice, readPasteStatus, readStatusText } from "../paste-rules";
 import type { ListingChange, PriceOrStatusChange } from "../save-door";
+import { readBedrooms, readLivingArea, type UnitAttributeField } from "../unit-attributes";
 
 import { CELL_EDIT_COPY, type CellEditLabels } from "./cell-edit-copy";
 import { isDetailColumn } from "./detail-cells";
 import { cellKeyOf, type CustomCellField } from "./listing-cell-edit";
+import { attributeChange } from "./attribute-cells";
 import { pasteWords } from "./listing-paste-copy";
+import { UNIT_ATTRIBUTE_COPY, attributeText, type UnitAttributeWords } from "./unit-attribute-copy";
 
 const PRICE = "Listing.listPrice";
 const STATUS = "Listing.standardStatus";
 const CONFIRMED = "Listing.lastConfirmedAt";
-/** The unit's own facts: fixed on the grid (row 4, a Never the owner signed). */
+/**
+ * The unit's own facts: a paste never writes them (row 4, a Never the owner signed), except the two unit attributes
+ * row 3h lets a paste take as the company's own values (PASTE_ATTRIBUTES; design §6 of row 3h, a change after row 5's
+ * sign-off).
+ */
 const UNIT_FACTS: readonly FieldKey[] = [
   "Listing.unitNumber",
   "Listing.buildingName",
   "Listing.subdivisionName",
   "Unit.livingArea",
   "Unit.bedroomsTotal",
+  "Unit.floor",
+  "Unit.directionFaces",
+  "Unit.propertySubType",
 ];
+
+/** Row 3h: the unit attributes a paste takes, each read by the cell's own reader — the two the grid always shows. */
+export const PASTE_ATTRIBUTES: readonly UnitAttributeField[] = ["livingArea", "bedroomsTotal"];
+
+/** Row 3h: the grid's unit attribute cells, and the words their values are shown with. */
+export interface PasteAttributes {
+  fields: ReadonlyMap<string, CustomCellField>;
+  words: UnitAttributeWords;
+}
 
 /** One write the preview may apply, keyed by its line's id. */
 export interface PasteWrite {
@@ -78,6 +97,8 @@ export function planPaste(
     code: f.code,
     value,
   }),
+  /** Row 3h: the unit attribute cells; a paste takes PASTE_ATTRIBUTES of them as the company's own values. */
+  attributes?: PasteAttributes,
 ): PastePlan {
   const say = pasteWords(labels);
   const changes: PasteChangeLine[] = [];
@@ -97,6 +118,41 @@ export function planPaste(
     }
     if (cell.group !== undefined) {
       skipped.push({ id, where: PASTE_COPY.groupRow(cell.group), raw, why: say.other });
+      continue;
+    }
+    const own = attributes?.fields.get(field)?.attribute;
+    if (attributes && own && PASTE_ATTRIBUTES.includes(own)) {
+      // A unit attribute (row 3h) by the cell's reader; a sold or withdrawn row keeps its values, with the cell's reason.
+      const read = own === "livingArea" ? readLivingArea(raw) : readBedrooms(raw);
+      if (!read.ok) {
+        wrong.push({ ...line, why: UNIT_ATTRIBUTE_COPY.problem(own, read.problem, raw) });
+        continue;
+      }
+      if (row[field] === read.value) {
+        same += 1;
+        continue;
+      }
+      if (!cell.open) {
+        skipped.push({ ...line, why: row.locked?.[field] ?? say.notAllowed });
+        continue;
+      }
+      const shown = (v: unknown) =>
+        typeof v === "number" ? attributeText(attributes.words, own, v) : "—";
+      changes.push({
+        id,
+        where: line.where,
+        field: line.field,
+        from: shown(row[field]),
+        to: shown(read.value),
+      });
+      writes.set(id, {
+        row,
+        field,
+        change: attributeChange(own, read.value, attributes.words),
+        undoable: true,
+        cell: read.value,
+      });
+      rows.add(row.id);
       continue;
     }
     const custom = customs.get(field);

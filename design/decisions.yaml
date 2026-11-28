@@ -258,6 +258,12 @@ decisions:
     kind: closed
     source: "sáu trạng thái StandardStatus"
     check: "e2e:tests/e2e/frame.spec.ts"
+  - id: attribute-differs-mark-colour
+    layer: patterns
+    kind: closed
+    source: "row 3h plan, task 5 (approved 2026-11-27): the catalog-differs mark takes the neutral muted-foreground token"
+    check: "e2e:tests/e2e/tin-rao-mau-dau.spec.ts"
+    note: "since VP11 every badge tone is a status's and amber is the warning's; the plan's fallback when the mark would share a status colour, measured on pixels in light and dark"
   - id: read-only-cell
     layer: patterns
     kind: closed

@@ -1,0 +1,1 @@
+2026-11-17 — Nhập Excel (hàng 11): màn Nạp tệp năm bước, đọc tệp trên trình duyệt, năm chỗ ghép và bốn dấu mỗi ô, áp theo gói 200 dòng tạo lần chào (kể cả căn chờ khớp), sàn học lựa chọn, hoàn tác cả lần nhập; migration 015 (lần nhập, lần chào trên căn chờ khớp, thêm và xoá có rào) và 016 (Trưởng nhóm thấy tên Đầu chủ) — `_acceptance/nhap-excel/`.

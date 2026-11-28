@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 // Row 4 (sua-tren-o), AC-8 and AC-9, region layer: a cell opens its editor only when the permission table gives the
-// session the edit action and the row does not lock it; Enter on a selected cell still opens the record.
+// session the edit action and the row does not lock it; Enter edits such a cell and opens the record elsewhere (VP11).
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -127,11 +127,20 @@ describe("khoa-theo-dong", () => {
   });
 });
 
-describe("enter-van-mo-ho-so", () => {
-  it("enter-van-mo-ho-so: Enter on an editable cell opens the record, not the editor", async () => {
+// VP11 (owner 2026-11-28, Hỏi-1) changed this signed rule: Enter now edits a cell the session may edit, and opens the
+// record from any other cell. Was «enter-van-mo-ho-so» (sửa sau ký, _acceptance/sua-tren-o/decisions.jsonl).
+describe("enter-sua-o-sua-duoc", () => {
+  it("enter-sua-o-sua-duoc: Enter on an editable cell opens the editor, not the record", async () => {
     show(asRole("ListAgent"));
     await press(cellOf("a", PRICE), "Enter");
-    expect(editorOpen(), "enter-van-mo-ho-so").toBe(false);
-    expect(navigate, "enter-van-mo-ho-so").toHaveBeenCalledWith("a");
+    expect(editorOpen(), "enter-sua-o-sua-duoc").toBe(true);
+    expect(navigate, "enter-sua-o-sua-duoc").not.toHaveBeenCalled();
+  });
+
+  it("enter-sua-o-sua-duoc: Enter on a locked cell opens the record, not the editor", async () => {
+    show(asRole("ListAgent"));
+    await press(cellOf("b", PRICE), "Enter");
+    expect(editorOpen(), "enter-sua-o-sua-duoc: locked").toBe(false);
+    expect(navigate).toHaveBeenCalledWith("b");
   });
 });

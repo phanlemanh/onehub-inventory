@@ -91,6 +91,7 @@ import {
   RegionPartial,
   RegionPartialEmpty,
 } from "./region-state";
+import { gridKeyAction } from "./grid-keys";
 import { TypedCell } from "./typed-cell";
 import { useChange } from "./use-change";
 
@@ -336,6 +337,10 @@ function useWidthInCh() {
   const [widthCh, setWidthCh] = useState<number | null>(null);
   const [chPx, setChPx] = useState(8);
   const [denseChPx, setDenseChPx] = useState(7);
+  // True once the width was read on the grid's own scroll viewport, the room the columns really get. Until then the
+  // width is the outer box's, and the density chosen from it may still flip (normal to dense), which starts the virtual
+  // body again: rows drawn anew, the selected cell lost. The region reports itself ready only after this.
+  const [onViewport, setOnViewport] = useState(false);
   useEffect(() => {
     const box = boxRef.current;
     const ch = chRef.current;
@@ -354,6 +359,7 @@ function useWidthInCh() {
         observer.observe(viewport);
       }
       setWidthCh((viewport ? viewport.clientWidth : box.getBoundingClientRect().width) / one);
+      setOnViewport(viewport !== null);
     };
     const observer = new ResizeObserver(measure);
     const mounts = new MutationObserver(() => {
@@ -367,7 +373,7 @@ function useWidthInCh() {
       mounts.disconnect();
     };
   }, []);
-  return { boxRef, chRef, denseChRef, widthCh, chPx, denseChPx };
+  return { boxRef, chRef, denseChRef, widthCh, chPx, denseChPx, onViewport };
 }
 
 /** The values a value column holds, in the order a reader expects: statuses in STATUS_ORDER, others as they come. */
@@ -424,6 +430,7 @@ export function DataRegion({
   onViewChange,
   hiddenAtFirst,
   phoneList,
+  cellMark,
 }: {
   title: string;
   columns: readonly TypedColumn[];
@@ -469,6 +476,11 @@ export function DataRegion({
   hiddenAtFirst?: readonly FieldKey[];
   /** Row 2b: below 768 px the rows show as the screen's cards instead of the table. */
   phoneList?: RegionPhoneList<GridRow>;
+  /**
+   * A small mark the screen draws after a cell's value (row 3h: a value that differs from the shared catalog); null
+   * for none. It never changes the cell's words or colour; a control inside it carries `data-cell-interactive`.
+   */
+  cellMark?: (row: GridRow, field: FieldKey) => ReactNode;
 }) {
   // VP4: undefined until the browser knows the width; meanwhile both layouts are drawn and CSS shows one.
   const phoneLayout = usePhoneLayout();
@@ -500,12 +512,20 @@ export function DataRegion({
     initialText?: string;
     anchor: Element;
   } | null>(null);
+  // Screens build `cellEdit` anew on each of their renders (its editor closes over their state), so the rule below keeps
+  // the one it was made from until what it decides changes — the action and the fields. Changing with every new object
+  // made the columns new, and new columns draw every cell's content again: right after the grid opened (the screen
+  // hears the first arrangement and renders once more) a cell a person or a test was on was replaced (VP11, G-2811-25).
+  // `mine` is the session's own rule and does not change while the action and fields stay.
+  const editRule = cellEdit ? `${cellEdit.action}|${cellEdit.fields.join(",")}` : "";
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- kept by what it decides: `editRule`
+  const ruleEdit = useMemo(() => cellEdit, [editRule]);
   const canEdit = useCallback(
     (row: GridRow, field: FieldKey): boolean => {
-      if (!cellEdit || !cellEdit.fields.includes(field) || row.locked?.[field]) return false;
-      return permitted(cellEdit.action, cellEdit.mine ? cellEdit.mine(row) : true);
+      if (!ruleEdit || !ruleEdit.fields.includes(field) || row.locked?.[field]) return false;
+      return permitted(ruleEdit.action, ruleEdit.mine ? ruleEdit.mine(row) : true);
     },
-    [permitted, cellEdit],
+    [permitted, ruleEdit],
   );
   // Full screen, like a sheet's: the whole page goes full screen (browser bars hidden, menus still open on top) and the
   // App Shell steps aside, so the region alone fills the screen. Esc, handled by the browser, leaves it.
@@ -553,7 +573,15 @@ export function DataRegion({
       () => undefined,
     );
   };
-  const { boxRef, chRef, denseChRef, widthCh, chPx: baseChPx, denseChPx } = useWidthInCh();
+  const {
+    boxRef,
+    chRef,
+    denseChRef,
+    widthCh,
+    chPx: baseChPx,
+    denseChPx,
+    onViewport,
+  } = useWidthInCh();
 
   const filters = useMemo(() => filtersFrom(columnFilters), [columnFilters]);
   const activeFilterCount = columns.filter((c) => !filterIsEmpty(filters[c.field])).length;
@@ -865,15 +893,39 @@ export function DataRegion({
               }
               return column.field === groupCountField ? count : null;
             }
-            const cell = (
+            const typed = (
               <TypedCell
                 kind={column.kind}
                 value={info.getValue()}
                 transaction={row.transaction}
                 lockedReason={row.locked?.[column.field]}
                 editMode={editable ? editModeFor(column.kind) : undefined}
+                pencil={
+                  canEdit(row as GridRow, column.field)
+                    ? "shown"
+                    : editRule.split("|")[1]?.split(",").includes(column.field)
+                      ? "room"
+                      : undefined
+                }
               />
             );
+            const mark = cellMark?.(row as GridRow, column.field) ?? null;
+            const cell =
+              mark === null ? (
+                typed
+              ) : (
+                // The mark sits right after the value, on its line; a text value too long gives way with an ellipsis.
+                <span
+                  data-slot="cell-with-mark"
+                  className={cn(
+                    "flex w-full min-w-0 items-center gap-1 whitespace-nowrap",
+                    column.align === "right" ? "justify-end" : "justify-start",
+                  )}
+                >
+                  {typed}
+                  {mark}
+                </span>
+              );
             if (index !== 0 || !opensRecord) return cell;
             const id = row.id;
             return (
@@ -962,6 +1014,7 @@ export function DataRegion({
       rowActions,
       removing.run,
       firstField,
+      editRule,
       columns,
       chPx,
       editable,
@@ -972,6 +1025,7 @@ export function DataRegion({
       groupLabelField,
       groupCountField,
       canEdit,
+      cellMark,
     ],
   );
 
@@ -1047,15 +1101,20 @@ export function DataRegion({
     }
   });
 
-  // Enter on a selected cell opens its row, the region's one «open row» door (the record panel of row 3); on a row's
-  // «…» cell it opens that row's menu instead (row 9e).
+  // The keys of a selected cell: one rule, src/components/candidate/grid-keys.ts. «edit» is left to the grid, which
+  // opens the editor through onCellEditRequest as F2 does; an editor's own keys never come here (it is outside the body).
   const onGridKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Enter" || event.shiftKey || event.altKey || event.metaKey || event.ctrlKey)
-      return;
+    if (event.shiftKey || event.altKey || event.metaKey || event.ctrlKey) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
     const focused = table.getFocusedCell?.();
     const id = focused?.row.id;
-    if (!id || id.startsWith(GROUP_ID_PREFIX)) return;
-    if (focused?.column.id === ROW_ACTIONS_ID) {
+    if (!focused || !id || id.startsWith(GROUP_ID_PREFIX)) return;
+    const action = gridKeyAction(event.key, {
+      editable: canEdit(focused.row.original as GridRow, focused.column.id as FieldKey),
+      rowActions: focused.column.id === ROW_ACTIONS_ID,
+      opensRecord,
+    });
+    if (action === "menu") {
       const trigger = document.querySelector<HTMLElement>(
         `[data-row-actions-for="${CSS.escape(id)}"] [data-slot="row-actions"]`,
       );
@@ -1065,11 +1124,27 @@ export function DataRegion({
       trigger.click();
       return;
     }
-    if (!opensRecord) return;
+    if (action !== "record") return;
     event.preventDefault();
     event.stopPropagation();
     openRef.current?.(id);
   };
+
+  // Closing the editor gives the keyboard back to the grid: the edited cell is still the selected cell, so arrows carry
+  // on from it; `next` moves on as Tab does.
+  const closeEditor = useCallback((move?: "next") => {
+    setEditing(null);
+    requestAnimationFrame(() => {
+      const viewport = document.querySelector<HTMLElement>(
+        `[data-slot="data-region-scroll-content"] [tabindex="0"]`,
+      );
+      viewport?.focus();
+      if (move === "next")
+        viewport?.dispatchEvent(
+          new globalThis.KeyboardEvent("keydown", { key: "Tab", bubbles: true }),
+        );
+    });
+  }, []);
 
   const onSelection = useCallback((snapshot: DataGridCellSelectionSnapshot) => {
     setSelectedCells(snapshot.visibleCellCount);
@@ -1364,20 +1439,6 @@ export function DataRegion({
           ? (() => {
               const row = rows.find((r) => r.id === editing.rowId);
               if (!row) return null;
-              const close = (move?: "next") => {
-                setEditing(null);
-                // Back to the grid: the edited cell is still the selected cell, so arrows carry on from it.
-                requestAnimationFrame(() => {
-                  const viewport = document.querySelector<HTMLElement>(
-                    `[data-slot="data-region-scroll-content"] [tabindex="0"]`,
-                  );
-                  viewport?.focus();
-                  if (move === "next")
-                    viewport?.dispatchEvent(
-                      new globalThis.KeyboardEvent("keydown", { key: "Tab", bubbles: true }),
-                    );
-                });
-              };
               return (
                 <CellEditor
                   anchor={editing.anchor}
@@ -1387,13 +1448,13 @@ export function DataRegion({
                     )
                   }
                   label={cellEdit.label(row, editing.field)}
-                  onClose={() => close()}
+                  onClose={() => closeEditor()}
                 >
                   {cellEdit.render({
                     row,
                     field: editing.field,
                     initialText: editing.initialText,
-                    close,
+                    close: closeEditor,
                   })}
                 </CellEditor>
               );
@@ -1463,7 +1524,13 @@ export function DataRegion({
         data-slot="data-region"
         // VP4: set once the browser has taken over the server's HTML and drawn one layout only. Tests that read the
         // region wait for it (tests/e2e/phone-list.ts); the frames before it are watched by tests/e2e/bang-loe.spec.ts.
-        data-hydrated={phoneLayout === undefined ? undefined : ""}
+        // A table also waits for its width read on its own scroll viewport (VP11, G-2811-25): before that its density
+        // may still flip and draw every row anew, and a test holding a cell from before would hold a dead one.
+        data-hydrated={
+          phoneLayout === undefined || (gridShown && !(phoneList && isPhone) && !onViewport)
+            ? undefined
+            : ""
+        }
         data-full-screen={fullScreen || undefined}
         style={REGION_HEIGHTS}
         className={`group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background ${PINNED_EDGE_CLASS}`}

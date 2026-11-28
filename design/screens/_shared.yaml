@@ -30,6 +30,7 @@ families:
   grid: Lưới
   list-frame: Danh sách khung
   dang-nhap: Đăng nhập
+  luong-nhieu-buoc: Luồng nhiều bước
 audiences: [staff, public, dev]
 statuses: [built, planned]
 khung:

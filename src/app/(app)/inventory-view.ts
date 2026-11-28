@@ -2,7 +2,14 @@
 // suggestions and the places of the geography tree. Pure, and the same for the database read and the sample company,
 // so the search, the tree and the record only ever show what the grid shows.
 import { formatDate } from "@/lib/format";
-import { confirmationAge, listingsOfUnit, type InventoryData } from "@/modules/listings";
+import {
+  confirmationAge,
+  ownAttributesOf,
+  listingsOfUnit,
+  type CatalogAttributes,
+  type InventoryData,
+  type OwnAttributes,
+} from "@/modules/listings";
 import { inventoryRows, type BuildingPlace, type ListingRecordData } from "@/modules/listings/ui";
 
 /** One grid row per current listing. */
@@ -22,6 +29,30 @@ export function searchRowsOf(rows: ReturnType<typeof rowsOf>) {
     "Listing.buildingName": r["Listing.buildingName"],
     "Listing.subdivisionName": r["Listing.subdivisionName"],
   }));
+}
+
+/** What the catalog says of the five unit attributes of each current listing's unit (row 3h); none for a pending unit. */
+export function catalogAttributesOf(data: InventoryData): Record<string, CatalogAttributes> {
+  const unitByUpi = new Map(data.units.map((u) => [u.upi, u]));
+  const out: Record<string, CatalogAttributes> = {};
+  for (const x of data.listingUnits) {
+    const u = unitByUpi.get(x.upi);
+    if (!u) continue;
+    out[x.listingId] = {
+      livingArea: u.livingArea ?? null,
+      floor: u.floor ?? null,
+      bedroomsTotal: u.bedroomsTotal ?? null,
+      directionFaces: u.directionFaces ?? null,
+      propertySubType: u.propertySubType ?? null,
+    };
+  }
+  return out;
+}
+
+/** A listing's own values of the five unit attributes and their sources (row 3h); nothing when it has none. */
+function ownOf(l: OwnAttributes): { own?: OwnAttributes } {
+  const own = ownAttributesOf(l);
+  return Object.keys(own).length > 0 ? { own } : {};
 }
 
 /** Where each building of these listings stands: its project and its complex (row 2d's tree). */
@@ -74,6 +105,7 @@ export function recordsOf(data: InventoryData, now: Date): Record<string, Listin
         occupantType: x.occupantType,
         legalStatus: x.legalStatus,
         financing: x.financing,
+        ...ownOf(x),
       })),
     };
   }

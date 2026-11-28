@@ -2,6 +2,7 @@
 // session. The database keeps what it can (shapes, lengths, the cap, uniqueness, migration 010); the rules that need
 // the business model — folding, value sets, name clashes, value kinds — live here, in exactly one place.
 import type { DisplayKind } from "@/generated/display";
+import { DIRECTION_VALUES } from "@/modules/catalog";
 import type {
   CustomField,
   ListingStandardStatus,
@@ -16,6 +17,8 @@ export const OPTION_LIMIT = 30;
 export const TEXT_VALUE_LIMIT = 500;
 /** Longest name of a field and longest words of a label. */
 export const NAME_LIMIT = 40;
+/** Longest code of a pending unit, as the file wrote it. */
+export const PENDING_CODE_LIMIT = 80;
 
 export type FieldKind = CustomField["kind"];
 export const FIELD_KINDS: readonly FieldKind[] = [
@@ -148,23 +151,12 @@ const WITHDRAWN_REASONS = [
   "owner_changed_mind",
   "unreachable",
 ] as const satisfies readonly ListingWithdrawnReason[];
-// The catalog writes directions as Vietnamese words (row 7d sample); these eight are the closed set a spelling maps to.
-const DIRECTIONS = [
-  "Bắc",
-  "Nam",
-  "Đông",
-  "Tây",
-  "Đông Bắc",
-  "Đông Nam",
-  "Tây Bắc",
-  "Tây Nam",
-] as const;
-
 /** Standard fields whose values form a closed set, so a company spelling can stand for one of them. */
 export const STANDARD_VALUE_SETS: Readonly<Record<string, readonly string[]>> = {
   "Listing.standardStatus": LISTING_STATUSES,
   "Listing.withdrawnReason": WITHDRAWN_REASONS,
-  "Unit.directionFaces": DIRECTIONS,
+  // The catalog writes directions as Vietnamese words; its eight are the closed set a spelling maps to.
+  "Unit.directionFaces": DIRECTION_VALUES,
 };
 
 /**

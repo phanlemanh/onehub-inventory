@@ -71,6 +71,18 @@ export {
   type CellEditLabels,
 } from "./cell-edit-copy";
 export { UnitJump } from "./unit-jump";
+// Row 3h: the listing's own unit attributes — the words, the catalog mark and its three looks.
+export {
+  MARK_LOOKS,
+  UNIT_ATTRIBUTE_COPY,
+  attributeText,
+  markLookFrom,
+  type MarkLook,
+  type UnitAttributeWords,
+} from "./unit-attribute-copy";
+export { AttributeDiffersMark } from "./attribute-differs-mark";
+export { AttributeDiffersSign } from "./attribute-differs-sign";
+export { UnitAttributesEdit } from "./unit-attributes-edit";
 export { ASK_COPY, type AskWords } from "./ask-copy";
 export {
   GEO_PARAM,

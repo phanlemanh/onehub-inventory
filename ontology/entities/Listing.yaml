@@ -1,6 +1,6 @@
 name: Listing
 description: One offer by a company to sell or lease one unit.
-reso: Property (StandardStatus, ListPrice, ClosePrice, CloseDate, Furnished, OccupantType, OriginalEntryTimestamp)
+reso: Property (StandardStatus, ListPrice, ClosePrice, CloseDate, Furnished, OccupantType, OriginalEntryTimestamp, LivingArea, UnitFloorLocation, BedroomsTotal, DirectionFaces, PropertySubType)
 
 properties:
   id: { type: uuid, required: true, unique: true }
@@ -37,6 +37,25 @@ properties:
   listAgentKey: { type: uuid, display: none, reso: ListAgentKey }
   listAgentFullName: { type: string, pii: true, display: person, reso: ListAgentFullName }
   version: { type: integer, min: 1, required: true, display: none }
+  # The company's own values of five unit attributes (row 3h, _acceptance/tin-rao-giu-gia-tri-rieng): same RESO names as
+  # the catalog unit (Unit), so a listing reads them with the same meaning. No own value follows the catalog; the catalog
+  # never overwrites one and the company never edits the catalog. Each value remembers its AttributeSource (who wrote it).
+  livingArea: { type: number, min: 0, display: area, reso: LivingArea }
+  livingAreaSource: { type: enum, values: [Typed, File], display: none }
+  floor: { type: string, display: text, reso: UnitFloorLocation }
+  floorSource: { type: enum, values: [Typed, File], display: none }
+  bedroomsTotal: { type: integer, min: 0, display: count, reso: BedroomsTotal }
+  bedroomsTotalSource: { type: enum, values: [Typed, File], display: none }
+  directionFaces: { type: string, display: text, reso: DirectionFaces }
+  directionFacesSource: { type: enum, values: [Typed, File], display: none }
+  propertySubType:
+    {
+      type: enum,
+      values: [Condominium, Townhouse, Single Family Residence, Unimproved Land],
+      display: select,
+      reso: PropertySubType,
+    }
+  propertySubTypeSource: { type: enum, values: [Typed, File], display: none }
   # The company's own columns (row 7e), keyed by CustomField code; each value fits its field's kind. Stored on the
   # listings table from row 10.
   customFields: { type: json, display: none }
@@ -62,6 +81,9 @@ rules:
   - id: details-text-limit
     description: Legal status and financing are free words of at most 200 characters each; only a part being changed is checked, so longer words from an imported sheet stay until changed (row 3g).
     implemented_in: src/modules/listings/edit-rules.ts
+  - id: own-value-beats-catalog
+    description: For each of the five unit attributes a listing shows its own value when it has one, typed by the company before one read from an imported file, and the catalog unit's value otherwise; the catalog never overwrites an own value, and an own value and its source are set and cleared together (row 3h).
+    implemented_in: src/modules/listings/unit-attributes.ts
 
 code:
   model: src/modules/listings/
@@ -72,7 +94,7 @@ wiki: wiki/entities/listing.md
 # co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
 # khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
 vong_doi:
-  them: { co: createListing, hang: "12" }
+  them: { co: createListing }
   xem: { co: viewListings }
   sua: { co: updateListing }
   go: { co: removeListing, hang: "18b" }
@@ -81,6 +103,7 @@ vong_doi:
       hang: "3g"
       ly_do: "Legal, furniture, finance and occupancy are edited in row 3g; rows 4 and 3d edit price and status only."
     dua_len_ban: { co: activateListing }
+    sua_thuoc_tinh_can: { co: updateListing }
     nhan: { hang: "18a", ly_do: "Taking a unit nobody keeps yet." }
     doi_nguoi_giu:
       hang: "18a"

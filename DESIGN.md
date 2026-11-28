@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: "onehub-inventory"
-description: "The design system of onehub-inventory, written from the design ledgers at 871f9e446b70. Do not change it here: change a ledger, then write it again with make design-exports."
+description: "The design system of onehub-inventory, written from the design ledgers at 5e3e1ca2f6ba. Do not change it here: change a ledger, then write it again with make design-exports."
 colors:
   accent: "#ebf2ff"
   accent-foreground: "#171717"
@@ -17,8 +17,8 @@ colors:
   destructive: "#e7000b"
   destructive-foreground: "#9f0712"
   foreground: "#0a0a0a"
-  info: "#0246ff"
-  info-foreground: "#193cb8"
+  info: "#c800de"
+  info-foreground: "#a800b7"
   input: "#e5e5e5"
   invert: "#171717"
   invert-foreground: "#fafafa"
@@ -58,14 +58,14 @@ colors:
     destructive: "#ff6467"
     destructive-foreground: "#e7000b"
     foreground: "#fafafa"
-    info: "#a684ff"
-    info-foreground: "#7f22fe"
+    info: "#ed6aff"
+    info-foreground: "#c800de"
     input: "#ffffff26"
     invert: "#3f3f46"
     invert-foreground: "#fafafa"
     muted: "#262626"
     muted-foreground: "#a1a1a1"
-    popover: "#171717"
+    popover: "#1e1e1e"
     popover-foreground: "#fafafa"
     primary: "#6a9cff"
     primary-foreground: "#0a0a0a"
@@ -127,7 +127,7 @@ spacing:
 
 ## Overview
 
-The design system of onehub-inventory, as its design ledgers hold it at 871f9e446b70. Product type: not decided; conformance level: not decided.
+The design system of onehub-inventory, as its design ledgers hold it at 5e3e1ca2f6ba. Product type: not decided; conformance level: not decided.
 
 ## Colors
 

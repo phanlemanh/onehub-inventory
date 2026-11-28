@@ -22,6 +22,8 @@ case "${1:-}" in
   E22) pw tests/e2e/khung-luoi-nut.spec.ts -g "Hỏi-7 · " ;;
   E20) pw tests/e2e/khung-luoi-nut.spec.ts -g "Đã gửi · " ;;
   E15) make -s design-role-table && DB_LANE="${DB_LANE:-h}" DB_PORT="${DB_PORT:-5567}" npx playwright test -c playwright.db.config.ts --reporter=list ;;
-  E16) git diff --exit-code --stat "$(git merge-base HEAD origin/main)" HEAD -- src/components/ui src/components/reui && echo "vendor folders untouched" ;;
+  # E16 measures VP10's own span, pinned after it merged (fixed after sign-off by row 11 on the supervisor's word that VP10 is on main; precedent d3694bcf):
+  # base c55415fe = where the VP10 branch left main, head af17d93c = the VP10 branch tip merged in bc9d22f5.
+  E16) git diff --exit-code --stat c55415fe3cd8cba215c31b56d5794600fd41093b af17d93c0453ec84bdd3941f85d5b1011e5d8992 -- src/components/ui src/components/reui && echo "vendor folders untouched" ;;
   *) echo "chay.sh: unknown eval '${1:-}'" >&2; exit 2 ;;
 esac

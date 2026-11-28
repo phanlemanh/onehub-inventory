@@ -444,7 +444,8 @@ test.describe("dan-tu-excel", () => {
       `${statusLabel(rows[0]!.status, "sale")}\t${money(nudged(rows[0]!))}\t60\n${statusLabel(rows[1]!.status, "sale")}\t${money(nudged(rows[1]!))}\n`,
     );
     await expect(preview(page)).toBeVisible();
-    await expect(changeLine(page, rows[0]!.id, "Unit.livingArea")).toContainText("«60»");
+    // Row 3h: the living area takes a paste as the listing's own value, so the third cell is a change, read as m².
+    await expect(changeLine(page, rows[0]!.id, "Unit.livingArea")).toContainText("60 m²");
     await expect(
       changeLine(page, rows[1]!.id, "Unit.livingArea"),
       "dong-ngan-khong-chu-la: ô thiếu hiện chữ lạ",
@@ -529,7 +530,8 @@ test.describe("dan-tu-excel", () => {
       `${statusLabel(rows[0]!.status, "sale")}\t60\n${statusLabel(rows[1]!.status, "sale")}\n`,
     );
     await expect(preview(page)).toBeVisible();
-    await expect(changeLine(page, rows[0]!.id, "Unit.livingArea")).toContainText("«60»");
+    // Row 3h: the living area takes a paste as the listing's own value, so the third cell is a change, read as m².
+    await expect(changeLine(page, rows[0]!.id, "Unit.livingArea")).toContainText("60 m²");
     await expect(
       changeLine(page, rows[1]!.id, "Unit.livingArea"),
       "dong-ngan-cot-an: ô thiếu hiện chữ lạ",

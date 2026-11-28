@@ -3,10 +3,11 @@
 import type { GridRow, RegionRecord } from "@/components/candidate/data-region";
 import { TypedCell } from "@/components/candidate/typed-cell";
 import { EMPTY, formatByKind } from "@/lib/format";
-import type { TypedColumn } from "@/components/candidate/column-kind";
+import type { FieldKey, TypedColumn } from "@/components/candidate/column-kind";
+import type { ListingStandardStatus } from "@/generated/ontology";
 
 import Image from "next/image";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
 import type { Keeper } from "../inventory-data";
 import { sampleKeeperOf } from "../sample";
@@ -110,6 +111,7 @@ export function ListingCard({
   noPhoto = "tile",
   building,
   net,
+  factMark,
 }: {
   view: ListingView;
   priceLabel: string;
@@ -128,16 +130,28 @@ export function ListingCard({
    * price and status. A row without one keeps the card exactly as it is.
    */
   net?: { label: string; value: number } | null;
+  /** Row layout only (row 3h): a sign drawn right after a fact's value, such as the catalog mark; null for none. */
+  factMark?: (field: FieldKey) => ReactNode;
 }) {
   if (layout === "row") {
-    const facts = view.facts
+    const shownFacts = view.facts
       .filter(({ column }) => column.field !== "Listing.lastConfirmedAt")
-      .filter(({ value }) => value !== null && value !== undefined && value !== "")
-      .map(({ column, value }) =>
-        column.kind === "count"
-          ? `${formatByKind(column.kind, value)} ${column.header.toLocaleLowerCase("vi")}`
-          : formatByKind(column.kind, value),
-      );
+      .filter(({ value }) => value !== null && value !== undefined && value !== "");
+    const factText = shownFacts.map(({ column, value }) =>
+      column.kind === "count"
+        ? `${formatByKind(column.kind, value)} ${column.header.toLocaleLowerCase("vi")}`
+        : formatByKind(column.kind, value),
+    );
+    const marks = shownFacts.map(({ column }) => factMark?.(column.field) ?? null);
+    const facts = marks.some((m) => m !== null)
+      ? factText.map((text, i) => (
+          <Fragment key={shownFacts[i]!.column.field}>
+            {i > 0 ? " · " : null}
+            {text}
+            {marks[i]}
+          </Fragment>
+        ))
+      : factText.join(" · ");
     const tile = photo ? (
       <Image
         src={photo}
@@ -185,18 +199,18 @@ export function ListingCard({
             // The facts give way to the amount: they cut with an ellipsis, the amount stays whole.
             <div className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground tabular-nums">
               <span data-slot="listing-card-facts" className="min-w-0 truncate">
-                {facts.join(" · ")}
+                {facts}
               </span>
               <span data-slot="listing-card-net" className="shrink-0 whitespace-nowrap">
                 {net.label} {formatByKind("money", net.value)}
               </span>
             </div>
-          ) : facts.length > 0 ? (
+          ) : shownFacts.length > 0 ? (
             <span
               data-slot="listing-card-facts"
               className="text-xs text-muted-foreground tabular-nums"
             >
-              {facts.join(" · ")}
+              {facts}
             </span>
           ) : null}
         </div>
@@ -353,7 +367,13 @@ export function listingRecord(
         footer: words ? (
           <AskListAgent
             key={view.id}
-            listing={{ id: view.id, unitNumber: view.unitNumber, buildingName: building }}
+            listing={{
+              id: view.id,
+              unitNumber: view.unitNumber,
+              buildingName: building,
+              status: view.status as ListingStandardStatus,
+              ...(view.transaction ? { transaction: view.transaction } : {}),
+            }}
             keeper={full?.keepers ? (full.keepers[view.id] ?? null) : sampleKeeperOf(view.id)}
             words={words}
           />

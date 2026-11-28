@@ -1,0 +1,234 @@
+schema_version: 1
+feature_slug: tin-rao-giu-gia-tri-rieng
+# Lệnh riêng của hồ sơ chạy qua _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh <E> (dựng ở S3; lane R Postgres
+# DB_LANE=r DB_PORT=5565). Lệnh dùng chung của kho đi qua config:.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, tests/tin-rao-gia-tri-rieng.test.ts]
+    expected: "exit 0; tests/tin-rao-gia-tri-rieng.test.ts: ma trận viết trước 5 thuộc tính × 4 nguồn (Typed, File, không có riêng + danh mục có, không có riêng + danh mục trống) cho effectiveAttributes — số assert bằng 20; mỗi ô so value, source, catalogValue, differs; differs so số theo số (72 và 72,0 bằng nhau) và chữ theo foldWords ('Đông Nam' và 'dong nam' bằng nhau); unitKind đọc Phòng ngủ hiệu lực (riêng 2, danh mục 3 → '2PN'); hàng lưới, hồ sơ căn, thẻ điện thoại, chữ ⌘K và lá cây địa lý dựng từ cùng một tin có giá trị riêng đều mang giá trị riêng (rút từ hàm thật của từng nơi, không viết tay chữ mong đợi); ca đối chứng cho một nơi đọc thẳng danh mục cho 'surface reads catalog instead of listing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E1b
+    criterion: AC-1
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E1b
+    paths: [src/modules/listings/**, src/app/api/v1/listings/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; trên Postgres dãy R qua đường đọc thật của Bảng hàng (readInventory và mọi lọc chạy ở máy chủ): tin có Phòng ngủ riêng 2 (danh mục 3) và Diện tích riêng 72 (danh mục 70) — lọc Phòng ngủ = 2 trả tin ấy, lọc = 3 không trả; lọc Diện tích trong khoảng 71–73 trả tin ấy; tin không riêng lọc theo danh mục; ca đối chứng cho lọc đọc cột danh mục cho 'filter reads catalog value'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/modules/listings/ui/**, tests/tin-rao-gia-tri-rieng.test.ts]
+    expected: "exit 0; ma trận viết trước luật đọc ô: Diện tích nhận '72,5', '72.5', '72,5 m2', '72,5m²' → 72.5, từ chối '', 'bảy mươi', '0', '-3', '72,5,1' với câu lỗi ghim; Phòng ngủ nhận '0', '3', từ chối '2,5', 'Studio' (câu lỗi gợi 'gõ 0'); ô sửa gửi qua cửa giả đúng một thay đổi {field:'unitAttributes', livingArea:72.5} kèm version, không gửi khi chữ không đọc được; Hoàn tác gửi lại giá trị trước (kể cả null khi trước là theo Danh bạ); cửa giả trả 409 (phiên bản cũ) thì ô hiện đúng câu xung đột của write-failure.ts và trở về giá trị máy chủ trả; ca đối chứng gửi khi đọc hỏng cho 'unreadable value sent'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2b
+    criterion: AC-2
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.ui-check
+    ref: config:executors.ui-check
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E2b` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E2b-1024.png and evidence/E2b-1440.png: the area cell of the open listing reads «72,5 m²» and the saved notice offers «Hoàn tác»."
+    expected: "exit 0; trên Bảng hàng đăng nhập (Postgres dãy R) ở 1024 và 1440: chọn ô Diện tích của một tin đang mở, mở sửa và xác nhận theo luật sửa trên ô hiện hành của kho (rút từ helper e2e dùng chung của sửa trên ô, không viết tay phím), gõ '72,5' → ô hiện '72,5 m²', thông báo đã lưu có Hoàn tác; tải lại trang thì ô vẫn '72,5 m²'; Hoàn tác trả ô về giá trị trước; gõ 'bảy mươi' hiện câu lỗi dưới ô và không có lời gọi PATCH nào (đếm mạng); ảnh evidence/E2b-1024.png, E2b-1440.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E3
+    criterion: AC-3
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.ui-check
+    ref: config:executors.ui-check
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E3` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E3-360.png, E3-414.png, E3-1024.png and E3-1440.png: the unit section shows the five new values (Tầng 15A, Hướng Tây Bắc) with the typed source."
+    expected: "exit 0; ở 360, 414, 1024, 1440 mở hồ sơ căn của một tin đang mở, bấm 'Sửa' ở khối thông tin căn, đổi năm trường (Diện tích, Tầng '15A', Phòng ngủ, Hướng chọn, Loại hình chọn), Lưu → đúng một PATCH mang năm giá trị; khối hiện năm giá trị mới; tầng '07' bị từ chối với câu lỗi ghim và không có PATCH; Hoàn tác trả cả năm; ảnh evidence/E3-<khổ>.png cho mỗi khổ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E3b
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, src/modules/catalog/unit-code.ts, tests/tin-rao-gia-tri-rieng.test.ts]
+    expected: "exit 0; luật tầng của 3h gọi đúng hàm của danh mục (unit-code.ts): ma trận '7','15A','0' nhận, '07','A15','',' 7 ' (sau trim nhận '7') — kết quả bằng kết quả hàm danh mục trên cùng chữ (rút từ hàm thật, không chép bảng); Loại hình chỉ nhận bốn giá trị của Unit.propertySubType trong ontology sinh ra; ca đối chứng viết luật tầng thứ hai cho 'second floor rule'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.ui-check
+    ref: config:executors.ui-check
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E4` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E4-360.png and evidence/E4-1440.png: one mark after the living area of the record, the value in the same colour as the other values."
+    expected: "exit 0; dữ liệu mẫu có bốn tin: riêng khác danh mục, riêng bằng danh mục, danh mục trống, căn chờ khớp; ở 1440 và 360 chỉ tin thứ nhất có dấu (đếm phần tử data-slot attribute-differs bằng 1 trên lưới và 1 trong hồ sơ căn), tên truy cập là chữ của khái niệm dấu khác danh mục trong ontology/labels.yaml (đọc từ bảng nhãn, không viết tay) nối giá trị danh mục; màu chữ của ô có dấu bằng ô không dấu (getComputedStyle color); axe không có lỗi ở sáng và tối; ca đối chứng gắn dấu cho ô bằng danh mục cho 'mark on equal value'; ảnh evidence/E4-1440.png, E4-360.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E5
+    criterion: AC-5
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.ui-check
+    ref: config:executors.ui-check
+    paths: [src/modules/listings/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E5` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E5-1440.png (grid cell) and evidence/E5-360.png (record): the living area reads the catalog's 75 m² with no mark after it."
+    expected: "exit 0; ở 1440 trên ô có dấu và ở 360 trong hồ sơ căn: chọn lệnh lấy lại (tìm theo chữ đọc từ ontology/labels.yaml, không viết tay) → PATCH mang giá trị null cho đúng thuộc tính ấy; ô hiện giá trị danh mục, dấu tắt; đọc lại từ cơ sở dữ liệu: cột giá trị và cột nguồn đều null; Hoàn tác trả giá trị riêng và nguồn cũ (đọc lại cơ sở dữ liệu); ca tin nguồn File bị gõ đè rồi lấy lại: về thẳng danh mục theo Hỏi-7 (cột giá trị và cột nguồn null); ca đối chứng dùng chữ cứng khác bảng nhãn cho 'label not from labels.yaml'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E6
+    paths: [db/migrations/**, src/modules/listings/**, src/modules/catalog/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; tests/db/tin-rao-gia-tri-rieng.db.test.ts trên Postgres dãy R: ba tin trỏ căn X (riêng Typed, riêng File, không riêng); vai chủ danh mục đổi living_area của X → hai tin riêng giữ nguyên giá trị và nguồn (so từng cột), tin không riêng đọc qua readInventory hiện giá trị mới; trước và sau mọi lệnh sửa, lấy lại, gắn sang căn khác của vai ứng dụng: số dòng và md5 toàn bảng catalog_units không đổi; vai ứng dụng update catalog_units bị từ chối (42501); ràng buộc cột nguồn null ⇔ cột giá trị null: chèn nguồn không giá trị bị từ chối; ca đối chứng cho trigger đè giá trị riêng khi danh mục đổi cho 'catalog overwrote listing value'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E7
+    paths: [db/migrations/**, src/modules/imports/**, src/modules/listings/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; tệp mẫu năm cột (rút khuôn từ bộ đọc tiêu đề thật của hàng 11, không viết tay tiêu đề) nhập ba dòng: mỗi tin mới có năm giá trị nguồn File đúng dòng (so qua listingIdOf); ô 'Loại căn' = '2PN' không thành giá trị Loại hình, còn trong kept với dấu cần người; lần nhập cũ dựng bằng chính đường ghi của hàng 11 khi bước đặt giá trị của 3h tắt (bộ ghi thật sinh kept, không chèn tay; hai tin, rồi một tin được PATCH giá trị Typed) → sau bước đọc lại: tin chưa riêng nhận giá trị File, tin Typed giữ nguyên; số tin nhận giá trị File bằng số dòng có ô đọc được; chạy bước đọc lại hai lần ra cùng kết quả; ca đối chứng cho bước đọc lại đè Typed cho 'file overwrote typed'; ca đối chứng kept sai hình (đổi khoá row) cho 'kept shape unread' — đỏ có tên, không im lặng ra 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.ui-check
+    ref: config:executors.ui-check
+    paths: [src/modules/imports/**, src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E8` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E8-1440.png: one cell of the import preview carries the mark, its own text is the file's value; open evidence/E8-360.png: the screen says it is for a computer, no file area and no mark."
+    expected: "exit 0; ở 1440 đo dấu: bước xem trước của lần nhập với tệp có một dòng Diện tích khác danh mục của căn khớp và một dòng bằng có đúng một ô có dấu khác Danh bạ (cùng data-slot attribute-differs của lưới) kèm giá trị danh mục; ô ấy vẫn hiện giá trị tệp là giá trị sẽ ghi; ở 360 đo đúng lời báo màn nhập tệp dùng trên máy tính (không ô chọn tệp, không dấu) theo luật đã ký của hàng 11 (G-2811-55); ảnh evidence/E8-1440.png, E8-360.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E9
+    paths: [src/modules/listings/**, src/modules/company-config/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; tin trỏ căn chờ khớp: PATCH năm giá trị → đọc lại có năm giá trị nguồn Typed, effectiveAttributes differs false cho cả năm; chạy matchPendingUnits khi danh mục có căn cùng mã (Diện tích khác, Phòng ngủ bằng) → giá trị riêng giữ nguyên từng cột, chỉ Diện tích differs true; ca đối chứng xoá giá trị riêng khi khớp cho 'match dropped listing values'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E10
+    paths: [src/modules/listings/**, src/app/api/v1/listings/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; qua /api/v1: gắn tin T (riêng Diện tích Typed) từ căn X sang căn Y → listing_units.upi = Y, Diện tích riêng giữ, Phòng ngủ (không riêng) đọc theo Y; gắn sang căn Z đã có tin mở → 409 với câu nêu mã căn Z, liên kết và giá trị không đổi; lưới không có lệnh gắn (tìm theo tên trong menu ô bằng 0); ca đối chứng cho phép hai tin mở trên Z cho 'two open listings on one unit'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  # E10b (the «Gắn sang căn khác» button on screen) moved to row 12 them-can: the owner, 2026-11-28, «Hoãn sang hàng 12»
+  # (G-2811-70). Its text, as written here, is in ban-giao-hang-12-them-can.md for row 12's scope gate.
+
+  - id: E11
+    criterion: AC-11
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E11
+    paths: [db/migrations/**, db/scripts/cach-ly.sh, src/modules/listings/**, src/app/api/v1/listings/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; bộ kiểm cách ly (db/scripts/cach-ly.sh) xanh với ca mới: người sàn B select năm cột riêng của tin sàn A ra 0 dòng, update ra 0 dòng; ma trận viết trước bốn vai × ba lệnh (sửa, lấy lại, gắn sang căn khác) qua /api/v1: 200 khi vai có updateListing, 403 khi không (số assert bằng 12, vai rút từ bảng quyền thật); tin Closed và Withdrawn: PATCH unitAttributes → 400 với lý do khoá; ca đối chứng mở chính sách đọc cho sàn khác cho 'other company reads listing values'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11b
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, src/modules/identity/**, tests/tin-rao-gia-tri-rieng.test.ts]
+    expected: "exit 0; ma trận bốn vai qua ActionPermissionProvider dựng từ actionVisibility thật: lệnh Sửa thuộc tính, Lấy lại, Gắn sang căn khác hiện khi và chỉ khi vai có updateListing; nút Báo sai thông tin căn hiện cho mọi vai có viewListings; ca đối chứng so tên vai thay bảng quyền cho 'role name instead of permission table'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    paths: [ontology/**, src/generated/**, wiki/**]
+    expected: "exit 0; make check xanh: Listing.yaml có năm thuộc tính mang đúng tên reso của Unit (LivingArea, UnitFloorLocation, BedroomsTotal, DirectionFaces, PropertySubType) và khái niệm riêng AttributeSource có trong bảng thuật ngữ; ô vòng đời Unit.sua vẫn 'khong'; nhãn mới đến từ ontology/labels.yaml"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-2
+    executor: test
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E13
+    paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/components/candidate/**, src/modules/listings/ui/attribute-cell-edit.test.tsx, src/modules/listings/ui/use-listing-cell-edit.tsx]
+    expected: "exit 0; bộ bài của hàng 4 chạy lại không đổi một ca (giá, trạng thái, ô máy tính ra không sửa); cộng ca mới trong src/components/candidate/data-region-cell-edit.test.tsx: dưới 768 px ô Diện tích, Phòng ngủ không mở sửa (mọi lối mở sửa của luật sửa trên ô hiện hành đều không mở khung), từ 768 px mở; ca đối chứng mở sửa ở 360 cho 'phone cell opened for edit'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-12
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, tests/tin-rao-gia-tri-rieng.test.tsx]
+    expected: "exit 0; ma trận viết trước ba trạng thái (đang mở, Closed, Withdrawn) × hai vai (có updateListing, không giữ căn) dựng hồ sơ căn, cộng tin đang mở chưa ai giữ: tin đang mở có nút «Sửa» ở đầu khối thông tin căn và nút «Hỏi đầu chủ» ở đáy khi người xem không giữ căn; tin Closed, Withdrawn không có hai nút ấy (không có button nào mang tên ấy, kể cả disabled) mà có hai dòng data-slot section-locked-reason và ask-locked-reason, chữ rút từ ontology/labels.yaml (không viết tay); tin chưa ai giữ không có button «Hỏi đầu chủ» nào (kể cả disabled) mà có dòng ask-locked-reason nói chưa ai giữ; thuộc tính căn hiện chỉ để đọc khi chưa bấm «Sửa» (không input nào trong khối); ca đối chứng ẩn nút không để dòng cho 'blocked action disappears silently' và ca dùng nút disabled cho 'dimmed button instead of reason'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14b
+    criterion: AC-12
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.ui-check
+    ref: config:executors.ui-check
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E14b` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E14b-360-light.png, E14b-360-dark.png, E14b-414-light.png, E14b-414-dark.png, E14b-1440-light.png and E14b-1440-dark.png: on the sold unit the unit section's edit place and the foot each hold one quiet line with the reason, no dimmed button."
+    expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 360 và 1440, sáng và tối: hồ sơ căn 0606 (Đã bán) và 1201 (Ngừng hẳn) có dòng chữ nhạt có ổ khoá ở chỗ «Sửa» và dòng nhạt nói lý do ở chỗ «Hỏi đầu chủ»; tin đang mở chưa ai giữ có dòng nhạt nói lý do ở đáy, không nút mờ; tin đang mở có hai nút; ở 360 hộp bao của nút «Sửa» đầu mục cao ít nhất 44px, ở 1440 cao 28px (getBoundingClientRect); axe không có lỗi; ảnh evidence/E14b-<khổ>-<nền>.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E15
+    criterion: AC-12
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, tests/tin-rao-gia-tri-rieng.test.tsx]
+    expected: "exit 0; ma trận viết trước thân hồ sơ căn: (A) dòng đầu thân có data-slot record-status bên trái và record-price bên phải, dòng kế 'dự án · loại hình'; mã căn xuất hiện đúng một lần trong ngăn (ở đầu ngăn), không còn data-slot record-facts; năm thuộc tính căn chỉ nằm trong khối căn; (B) căn 5/5 hiện đúng một dòng chữ 'Đủ thông tin' kèm '5/5' và không có thanh; căn 3/5 có thanh, số đếm và «Còn thiếu» là nút, bấm tên một phần thì khối của phần ấy ở chế độ Sửa và dòng ấy nhận tiêu điểm; giá trị thiếu đọc 'Chưa có' và có data-slot missing-dot trước nhãn; số đếm bằng hàm mức đủ của hàng 3b (không đổi); (C) lần xác nhận 3 ngày trước hiện 'Xác nhận với chủ nhà 3 ngày trước' và không dòng cảnh báo; 15 ngày trước có thêm dòng 'Quá 14 ngày — nên xác nhận lại'; (D) lần chào đang xem đọc 'Lần n · đang xem' và không có lớp nền xám; lần khác là liên kết có '›'; mọi chữ rút từ ontology/labels.yaml (không viết tay); ca đối chứng lặp mã căn trong thân cho 'unit code said twice', ca đối chứng đếm thiếu khác hàm 3b cho 'completeness counted differently'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15b
+    criterion: AC-12
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.ui-check
+    ref: config:executors.ui-check
+    paths: [src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E15b` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E15b-320-light.png, E15b-320-dark.png, E15b-360-light.png, E15b-360-dark.png, E15b-1440-light.png and E15b-1440-dark.png: status and price on one line, the label column narrow, each listing of the unit on two even lines at 320, the amber dot and the «Quá 14 ngày» line."
+    expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 320, 360 và 1440, sáng và tối: dòng trạng thái và giá nằm trên một dòng (hai hộp bao cùng hàng); cột nhãn rộng 120±8px ở 1440 và 104±8px ở 360 (getBoundingClientRect); ở 320 mỗi lần chào đúng hai dòng (chiều cao các mục bằng nhau); bấm một tên trong «Còn thiếu» thì khối ấy mở Sửa và cuộn tới dòng; chấm và dòng quá 14 ngày dùng màu cảnh báo của bảng màu VP11 (không mã màu viết tay); axe không có lỗi; ảnh evidence/E15b-<khổ>-<nền>.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  # The screen-shape check of the kit (G-2811-85, s4-args): row 3h touches the grid group (the two cells, the mark) and
+  # the multi-step flow group (the import preview's mark); each group has one eval of the check, silent means held.
+  - id: E16
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luong-nhieu-buoc.md", "src/app/(app)/nhap-tep/**/*.tsx", "src/modules/imports/ui/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luong-nhieu-buoc"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
