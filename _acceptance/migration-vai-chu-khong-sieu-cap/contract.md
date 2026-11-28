@@ -5,7 +5,7 @@ slug: migration-vai-chu-khong-sieu-cap
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-28
 design_doc: _acceptance/migration-vai-chu-khong-sieu-cap/design.md
@@ -92,3 +92,16 @@ Mọi trục đều đã kiểm chứng: các trục liệt kê từ hai tệp 2
     siêu cấp: các ca tự đổi sang `quy_hang_app`, mà vai chủ chỉ có ADMIN trên vai ấy (đo 28/11: 21/38 ca). Lệnh đưa bản
     lên không chạy bộ ấy.
   - Phép đo chạy trên Postgres chính thức của Docker, không trên Supabase.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-28:
+  - Ngoài-1: Ca tự kiểm «không đọc nhầm dòng lệnh echo» của phép đo CI có thể xanh mà không đo gì khi nhật ký không có dòng ấy.
+  - Ngoài-2: Hai bản phá «mã khác» và «không chứa mã» của phép đo CI chưa đi qua phép so mã bằng git trên cặp commit thật.
+  - Ngoài-3: Phép tự kiểm đọc dòng dùng lại chỉ đối chiếu lượt chạy, còn commit chỉ được kiểm theo định dạng.
+  - Ngoài-4: Phép đo CI nhận tên bài kiểm mới và «postgres:16» theo chuỗi có mặt trong nhật ký, chưa theo dòng khai dịch vụ và kết quả của bài.
+  - Ngoài-5: Lượt chấm vòng 2 thấy phần tự kiểm của phép đo CI vỡ lệnh khi CI chưa xong; vòng 3 đã cho nó báo «chưa xong».
+  - Ngoài-6: Cùng lỗi với Ngoài-5 (vỡ lệnh khi lượt CI chưa có), ghi từ một người soát khác.
+  - Ngoài-7: Vòng 2 phép đo CI hứa ghim sáu thông điệp đỏ mà chỉ có bốn bản phá; vòng 3 đã thêm bản phá cho từng dòng đỏ.
+  - Ngoài-8: Bản phá «dùng lại mã khác» gán thẳng giá trị đúng/sai thay vì đi qua đường tính ra nó.
+  - Ngoài-9: Hai tệp nâng cấp mang số chèn sớm (001 thứ hai và 004) thay vì số cuối; chủ kho đã nhận ngoại lệ ở Cổng Phạm vi, chưa có luật máy chặn số trùng về sau.
+  - Ngoài-10: Phần tự kiểm của bộ đo migration chưa có bản phá cho mọi dòng đỏ của các ca đối chứng, nối bản thử và đã áp từ trước.
+  - Ngoài-11: Bài kiểm của CI kiểm vai danh tính không giữ quyền tạo chỉ theo một chiều, chưa có ca đối chứng dương trong chính bài.
+  - SP-1: Luật cách ly bị chạm theo từ khoá (BYPASSRLS, vai danh tính), không mở luật: cửa của ứng dụng, vai không sở hữu bảng và RLS bắt buộc không đổi; thay đổi duy nhất là tài khoản chạy nâng cấp được mang vai danh tính.

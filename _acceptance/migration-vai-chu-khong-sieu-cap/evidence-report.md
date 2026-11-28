@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: d0e8629afd039a239bde948ad32b1161f765fd3f
-human_signoff:
+human_signoff: Manh Phan 2026-11-28
 ---
 
 # Evidence Report: migration-vai-chu-khong-sieu-cap
