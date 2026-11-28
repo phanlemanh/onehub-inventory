@@ -76,6 +76,20 @@
   severity: low
   Đề xuất: known-limits
 
+- **The check that every write passes the person's choice reads the source text, not what is written (S4-r7)**
+  Người dùng thấy gì: Hôm nay người dùng không bị ảnh hưởng. Một bài kiểm chỉ tìm chữ «choice:» trong mã của bước ghi, nên nếu sau này bước ghi truyền nhầm một lựa chọn khác thì bài ấy vẫn xanh.
+  Căn cứ: Điều người dùng cần — giá trị đã chọn được ghi đúng ô, đúng dòng — đã được đo thật ở bài cơ sở dữ liệu so «xem trước hứa gì» với «đã ghi gì» từng dòng; bài tìm chữ chỉ là lưới nhanh thêm.
+  file: `tests/nhap-excel-noi-ghi.test.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Some answers are not remembered for the next import (matrix of G-2811-71)**
+  Người dùng thấy gì: Khi anh trả lời một cách viết lạ ở cột phí, nội thất, người ở, loại căn hay giá, giá trị vẫn được ghi (hay giữ chữ gốc) đúng như màn xem trước hứa, nhưng lần nhập sau gặp lại cách viết ấy máy vẫn hỏi lại. Chỉ trạng thái, lý do ngừng, hướng và các cột lựa chọn của sàn là được nhớ.
+  Căn cứ: Không mất dữ liệu; màn không hứa sẽ nhớ. Lớp riêng của sàn (hàng 7e) chỉ giữ cách viết cho các tập giá trị nó có; muốn nhớ thêm phải mở rộng hàng 7e thành một việc riêng, tên gợi ý «Sàn nhớ cách viết cho phí, nội thất, người ở».
+  file: `src/modules/company-config/rules.ts`
+  severity: low
+  Đề xuất: known-limits
+
 - **The import screen's 'fixed' mark has the same colour as the 'Đã bán' status (VP11 r1)**
   Người dùng thấy gì: Dấu «máy sửa» trên màn Nạp tệp cùng màu với nhãn «Đã bán» ở Bảng hàng, nên thoáng nhìn có thể nhầm là một trạng thái. Chữ trên dấu vẫn phân biệt được.
   Căn cứ: Chỉ là màu, không mất dữ liệu; đổi màu sau rất rẻ.
@@ -89,6 +103,9 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Đã sửa trên nhánh:
 
+- S4-r7 t4 · Building text of a row whose unit already exists is dropped on write: not written and not kept — chữ toà nay giữ nguyên trong bản ghi lần nhập (lý do unit-attribute) khi không vào căn chờ mới của dòng; cả khi chữ dài quá 80 ký tự căn chờ giữ được (f072a264)
+- S4-r7 t6 · lostCells skips the 'unit' places — bài so nay đo mã căn (lần chào gắn đúng căn danh mục, đúng căn chờ) và chữ toà, trên một dòng căn danh mục và một dòng căn chờ mới, kèm hai ca phá (f072a264)
+- S4-r7 t8 · chosen values compared as a set — so theo từng dòng của tệp (f072a264)
 - VP11 r1 · A value the person chose for a cell of a new single-choice field is silently not written — giá trị đã chọn nay được ghi lên căn cả khi không bấm «nhớ»; ca DB đỏ trước khi sửa (25311d32)
 - VP11 r1 · Close price and close date columns are accepted but their values are dropped with no trace — hai cột giữ nguyên chữ trong bản ghi lần nhập (lý do close-field); mỗi cột đích có một chỗ ở khai sẵn, bài quét tests/nhap-excel-noi-ghi.test.ts (25311d32)
 - VP11 r1 · Shape 1: ImportRun columns are read by regex over migration SQL, not from the table in Postgres — thêm ca DB đọc cột của import_runs từ Postgres, kèm ca phá (25311d32)
@@ -104,6 +121,9 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
+- S4-r7 t1 · AGENTS.md Architecture: never reach into another module's tables (imports module) → #19
+- S4-r7 t2 · AGENTS.md Architecture: listings reads company-config's table without a declared dependency → #26
+- S4-r7 t3 · AGENTS.md: a new module dependency needs a decision page → #20
 - #1 Design / module boundaries: the imports and listings modules read and write other modules' tables directly → #19
 - #2 Design / modules.yaml: the new imports dependencies have no decision page → #20
 - #7 Module boundaries: reaching into another module's tables (AGENTS.md 'never reach into another module's tables or internal files') (r5) → #19
@@ -118,6 +138,7 @@ Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
 Thuộc hồ sơ khác, nhánh này không viết dòng nào của tệp:
 
+- S4-r7 t5, t9, t10 · the «Khớp» column and the author's kit path in _acceptance/khung-luoi-va-ngan-chi-tiet/rang/dung-lai-mang-sang.mjs — công cụ của hồ sơ VP10, hàng 11 không viết dòng nào của tệp
 - #13 Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): Đã gửi «có bóng» đọc kiểu CSS khai báo, không đọc điểm ảnh (r5) — tests/e2e/khung-luoi-nut.spec.ts — tệp của khung lưới (VP10), nhánh này không viết dòng nào
 - #15 Hình dạng 5 (tuyên cả lớp nhưng chỉ đo vài điểm): «28 px on a computer» chỉ đo nút ở đầu ngăn (r5) — tests/e2e/ho-so-can.spec.ts — tệp của khung lưới (VP10), nhánh này không viết dòng nào
 - #18 Hình dạng 6 (đo bản chụp cố định thay vì cây đang kiểm): thước đổi bài kiểm 2e ghim hai commit, lệch với lời hứa trong evals (r5) — thước đổi bài kiểm của bo-o-tim-cua-vung — commit của dãy H (ec70d782) được chọn sang
