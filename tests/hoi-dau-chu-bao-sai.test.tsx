@@ -503,7 +503,12 @@ describe("E7 · the report", () => {
       await openReport(rowKept("other"));
       typeRight("72");
       submit();
-      await new Promise((r) => setTimeout(r, 0));
+      // A report that says something is waited for until it shows: share, then the clipboard, each settle a moment
+      // after the press, and one tick was not enough on a busy machine (VP11 round 3, G-2811-86). A report that says
+      // nothing (the person cancelled) has nothing to wait for, so it gets the one tick.
+      const said = () => document.querySelector('[data-slot="report-result"]')?.textContent ?? null;
+      if (o.said === null) await new Promise((r) => setTimeout(r, 0));
+      else await waitFor(() => expect(said()).toBe(o.said));
       const status = document.querySelector('[data-slot="report-result"]');
       expect(status?.textContent ?? null).toBe(o.said);
       const box = screen.queryByLabelText(ASK_COPY.messageLabel) as HTMLTextAreaElement | null;
