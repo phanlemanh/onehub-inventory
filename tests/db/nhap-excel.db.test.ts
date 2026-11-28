@@ -2420,6 +2420,17 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
         ...written.slice(lastListed + 1),
       ]),
     ).toEqual([`${lastListed}:Mã căn: a listing exists for a row-listed row`]);
+    // A direct sweep of the record (ruling G-2811-92): after a file with the owner's phone column, no text shaped like a
+    // phone number is anywhere in kept, raw or value; and kept is not empty, so the sweep has something to read.
+    // A number of its own (no digit before or after), not the digits inside a price such as 4000000000.
+    const PHONE_SHAPE = /(?<!\d)0\d{2,3}[ .]?\d{3}[ .]?\d{3,4}(?!\d)/;
+    const phones = (cells: { raw: string; value?: unknown }[]) =>
+      cells.filter((k) => PHONE_SHAPE.test(k.raw) || PHONE_SHAPE.test(String(k.value ?? "")));
+    expect(kept.length).toBeGreaterThan(100);
+    expect(phones(kept)).toEqual([]);
+    // Break: the same sweep finds the owner's number when it is planted in the record.
+    expect(phones([...kept, { raw: "0900 000 001" }])).toHaveLength(1);
+    expect(phones([{ raw: "x", value: 4000000000 }, { raw: "0900000001" }])).toHaveLength(1);
     // The owner's phone kept on a row left out is named (S4-r10 t5): a dropped column is never on the record.
     const manyRow = rows.findIndex((x) => x.situation === "many-units");
     const PHONE = MATRIX.findIndex((c) => c.header === "SĐT chủ nhà");
