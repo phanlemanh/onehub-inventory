@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: b8968ecdb386b1d43531056512d35d50e532813d
+verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -200,3 +200,7 @@ none — every multi-run eval is uniform
 
 Round 1: E1 đến E13 chạy và ghi vào nhật ký; lệnh make check hết thời gian ngoài thay đổi nên chấm lại trên cùng cây (commit b8968ec).
 Round 2: ba lệnh suite xanh trên cây b8968ec (make check, npm run build, make e2e với 639 ca qua); E1 đến E13 mang sang từ round 1; E14 chờ người chốt.
+
+### Re-pin lần 1 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
+run_id: repin-20261128T091000Z-36001
+sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E14 (E14 không khai paths)

@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 04f3c1ecef5b5069176ec030bbb05f6480c00348
+verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -231,3 +231,7 @@ Round 2: mọi eval máy xanh, E10 và E14 mang từ round 1 (delta không chạ
 ### Re-pin lần 1 — 2026-11-12, do hoá cũ do gộp nhánh chính sau hàng 7b (PR #41), bài chụp ảnh ghi ra thư mục chạy
 run_id: repin-20261112T233328Z-72931
 sha: 04f3c1ecef5b5069176ec030bbb05f6480c00348 · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E1 (E1 không khai paths), E12, E13 (E13 không khai paths)
+
+### Re-pin lần 2 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
+run_id: repin-20261128T091000Z-36001
+sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E1 (E1 không khai paths), E12, E13 (E13 không khai paths) · diff chạm vật đo ngoài làn máy: E12 — chưa chứng lại, đi vòng S4 delta

@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: ad777eb2aa954565e98bc2d7a306e4c09f1189ad
+verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -217,3 +217,7 @@ none — every multi-run eval is uniform
 
 Round 1: E11 (make check) failed — returned to implementation.
 Round 2: moi eval xanh; E1, E2, E9, E12, E13, E16 carry-forward tu round 1 (delta khong cham paths), phan con lai chay lai tren ad777eb.
+
+### Re-pin lần 1 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
+run_id: repin-20261128T091000Z-36001
+sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng

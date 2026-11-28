@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 038f0756f995c1fef3b8028b48d689a3280ddade
+verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -354,3 +354,7 @@ sha: 19b5266d5821f3a68b13b0e6328b3a3701254f0d · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-16, do lượt ghim lại cuối của hàng 1u sau khi gộp nhánh chính 7ea2f53 (G-1611-41)
 run_id: repin-20261116T070937Z-41988
 sha: 038f0756f995c1fef3b8028b48d689a3280ddade · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E3-ui, E4-ui, E6-ui, E8-wiki (E8-wiki không khai paths), E9-ui, E10-ui
+
+### Re-pin lần 3 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
+run_id: repin-20261128T091000Z-36001
+sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E3-ui, E4-ui, E6-ui, E8-wiki (E8-wiki không khai paths), E9-ui, E10-ui · diff chạm vật đo ngoài làn máy: E2-ui, E3-ui, E4-ui, E6-ui, E9-ui, E10-ui — chưa chứng lại, đi vòng S4 delta
