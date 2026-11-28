@@ -503,7 +503,7 @@ describe("ap (E9)", () => {
     expect(written.rows.map((x) => x.raw_code)).toEqual(["ZZ-203"]);
   });
 
-  it("a team lead reads the list agents to import for: ids and names only; a list agent reads none; a buyer agent is 403 (S4-r1 t9)", async () => {
+  it("whom each role may import for, four roles: a team lead every list agent, a list agent only themself, a buyer agent and a company admin 403 (S4-r1 t9, G-2811-86)", async () => {
     const e = await importWorld("dau_chu");
     const read = async (who: Person) => {
       const res = await e.h.agents(
@@ -515,8 +515,11 @@ describe("ap (E9)", () => {
     expect(tl.status).toBe(200);
     expect(new Set(tl.body.map((a) => a.userId))).toEqual(new Set([e.w.id.LA, e.w.id.X]));
     expect(tl.body.every((a) => Object.keys(a).sort().join() === "name,userId")).toBe(true);
-    expect((await read("LA")).body).toEqual([]);
+    // The list agent reads exactly one row, themself: the HTTP door and the database function say the same (d-…-88).
+    const la = await read("LA");
+    expect([la.status, la.body.map((a) => a.userId)]).toEqual([200, [e.w.id.LA]]);
     expect((await read("BA")).status).toBe(403);
+    expect((await read("CA")).status).toBe(403);
   });
 
   it("who imports for whom: 4 cases written before", async () => {

@@ -94,14 +94,16 @@ describe("cua-http", () => {
     expect((await handlers().undo(post({}), "twice")).status).toBe(409);
     expect((await handlers().recent(new Request("http://x"))).status).toBe(200);
   });
-  it("list agents: a team lead (company scope) reads them, a list agent (own) reads none, a closed door its code", async () => {
+  it("list agents: both scopes read what the database function answers, a closed door its code", async () => {
     const get = () => new Request("http://x/api/v1/imports/list-agents");
     const read = async (scope: Scope | "forbidden") => {
       const r = await handlers(scope).agents(get());
       return [r.status, await r.json()];
     };
     expect(await read("company")).toEqual([200, [{ userId: "u1", name: "[Tên]" }]]);
-    expect(await read("own")).toEqual([200, []]);
+    // «own» asks the same function; the database narrows it to the caller (migration 019), measured on Postgres in
+    // tests/db/nhap-excel.db.test.ts «whom each role may import for» (G-2811-86).
+    expect(await read("own")).toEqual([200, [{ userId: "u1", name: "[Tên]" }]]);
     expect((await read("forbidden"))[0]).toBe(403);
   });
   it("an error inside answers 500 without the error's text", async () => {

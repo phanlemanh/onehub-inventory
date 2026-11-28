@@ -210,9 +210,9 @@ export function createImportsHandlers(deps: ImportsDeps): ImportsHandlers {
       }),
     recent: (req) =>
       guarded(req, "viewImports", async (_d, c) => Response.json(await recentImports(c))),
+    // Whom the caller may import for, as the database function answers (migration 019): every list agent for a
+    // company-wide importer, the caller alone for «own». One answer in both layers (G-2811-86, decision d-…-88).
     agents: (req) =>
-      guarded(req, "importListings", async (door, c) =>
-        Response.json(door.scope === "company" ? await listAgents(c) : []),
-      ),
+      guarded(req, "importListings", async (_door, c) => Response.json(await listAgents(c))),
   };
 }
