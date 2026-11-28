@@ -1,17 +1,15 @@
 name: Deploy
 
-# Agents ship to staging automatically; production waits for a human:
-# the "production" environment has required reviewers (Settings > Environments,
-# or `python3 tools/github_setup.py --apply`). Enable with repo variable DEPLOY_ENABLED=true.
-# The actual commands are `make deploy` / `make smoke` (see mk/deploy.mk).
+# Staging goes up on its own after a release; production waits for the owner's approval on the
+# "production" environment (Settings > Environments > production > Required reviewers).
+# Runbook and variable table: docs/van-hanh/README.md. Secrets are set by `make dat-khoa`;
+# make deploy pushes the app's variables to the Vercel project of each environment.
 on:
   workflow_call:
   workflow_dispatch:
 
 permissions:
   contents: read
-  packages: write
-  id-token: write
 
 concurrency:
   group: deploy
@@ -22,30 +20,45 @@ jobs:
     if: vars.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment: staging
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-project
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - run: npm install --global vercel@65.9.0
       - run: make deploy ENV=staging
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          IMAGE_TAG: ${{ github.sha }}
-          DEPLOY_CMD: ${{ vars.DEPLOY_CMD }}
-      - run: make smoke ENV=staging
-        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          MIGRATE_DATABASE_URL: ${{ secrets.MIGRATE_DATABASE_URL }}
+          LOGIN_DB_PASSWORD: ${{ secrets.LOGIN_DB_PASSWORD }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
           APP_URL: ${{ vars.APP_URL }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
   production:
     needs: staging
     runs-on: ubuntu-latest
     environment: production
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-project
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - run: npm install --global vercel@65.9.0
       - run: make deploy ENV=production
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          IMAGE_TAG: ${{ github.sha }}
-          DEPLOY_CMD: ${{ vars.DEPLOY_CMD }}
-      - run: make smoke ENV=production
-        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          MIGRATE_DATABASE_URL: ${{ secrets.MIGRATE_DATABASE_URL }}
+          LOGIN_DB_PASSWORD: ${{ secrets.LOGIN_DB_PASSWORD }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
           APP_URL: ${{ vars.APP_URL }}
+          STAGING_APP_URL: ${{ vars.STAGING_APP_URL }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
