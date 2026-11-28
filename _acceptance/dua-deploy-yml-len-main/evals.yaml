@@ -50,7 +50,7 @@ evals:
   - id: E4
     criterion: AC-4
     executor: script
-    cmd: python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E4
+    cmd: python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E4 --base 1f4e7d368335a569760cbb9029c2b722987e5094 --head c55415fe3cd8cba215c31b56d5794600fd41093b
     layer: backend-effect
     expected: >-
       exit 0, in «E4 ok: ngoài hồ sơ chỉ đổi deploy.yml (<n> tệp)». Chiều đỏ: chạm src/app/page.tsx → «PR chạm tệp ngoài

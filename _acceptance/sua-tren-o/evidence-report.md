@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a
+verified_commit: 808af8c561772a5926a525f82fd346a9b9200303
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -284,3 +284,7 @@ sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 5 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi bài của các hồ sơ đã ký: thước viền Q3, open-cell-truncate (G-2811-6), bài 44 px và các bài xanh rỗng (G-2811-11); sửa-sau-ký ghi ở từng hồ sơ
 run_id: repin-20261127T222637Z-53064
 sha: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E1b (E1b không khai paths), E2-ui, E7-ui, E10c (E10c không khai paths) · diff chạm vật đo ngoài làn máy: E2-ui, E7-ui — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 6 — 2026-11-28, do gộp main c55415fe (PR #133) vào nhánh VP10; thước E4 hồ sơ deploy (2efc5370); bài 3g chụp ra thư mục chạy (1cb3073b) — G-2811-45/51
+run_id: repin-20261128T015659Z-62110
+sha: 808af8c561772a5926a525f82fd346a9b9200303 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E1b (E1b không khai paths), E2-ui, E7-ui, E10c (E10c không khai paths)
