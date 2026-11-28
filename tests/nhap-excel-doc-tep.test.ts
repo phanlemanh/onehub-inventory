@@ -133,3 +133,27 @@ describe("tu-choi-bay-ca", () => {
     }).toThrow("row limit not enforced: 5001");
   });
 });
+
+// VP11 S4-r2 item 12 (ruling G-2811-84): a .csv saved in another encoding is refused with its reason. Kept apart from
+// the seven refusals written before (tu-choi-bay-ca), which this case does not change.
+describe("csv-khong-phai-utf8", () => {
+  // «Mã căn,Giá» saved as Windows-1252 / Latin-1 by Excel on Windows: «ã» is the single byte 0xE3, not UTF-8.
+  const latin1 = new Uint8Array(Buffer.from("Mã cân,Giá\nA-1,1\n", "latin1"));
+
+  it("a .csv that is not UTF-8 is refused as not-utf8; UTF-8 with and without its BOM still reads", async () => {
+    const r = await readTable(new Blob([latin1]), "excel-windows.csv");
+    expect(r).toEqual({ ok: false, problem: "not-utf8" });
+    const utf8 = new TextEncoder().encode("Mã căn,Giá\nA-1,1\n");
+    const bom = new Uint8Array([0xef, 0xbb, 0xbf, ...utf8]);
+    for (const bytes of [utf8, bom]) {
+      const t = ok(await readTable(new Blob([bytes]), "dung.csv"));
+      expect([t.headers, t.rows]).toEqual([["Mã căn", "Giá"], [["A-1", "1"]]]);
+    }
+  });
+
+  it("break: the same bytes read without strict decoding carry replacement characters, so the case discriminates", () => {
+    const loose = new TextDecoder("utf-8").decode(latin1);
+    expect(loose).toContain("�");
+    expect(loose).not.toContain("Mã");
+  });
+});

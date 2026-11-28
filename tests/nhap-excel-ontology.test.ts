@@ -2,6 +2,8 @@
 // columns of import_runs (every migration that creates or alters the table) are the same set; the listing reaches a
 // pending unit through ListingPendingUnit; the two actions the import opens are live; the module map declares what
 // imports owns and needs; the generated types are the ones the ontology gives today.
+// The migration text is read here, with no database; the same set read from the table Postgres really has is
+// tests/db/nhap-excel.db.test.ts «mo hinh khop bang that (VP11 r1)».
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";

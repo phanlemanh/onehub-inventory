@@ -209,3 +209,50 @@ export const STANDARD_HEADER_CONCEPTS = [
   "BedroomsTotal",
   "LastConfirmedAt",
 ] as const;
+
+/** The listing columns an import writes (each one a column of the listings module's NewListing; store.ts checks it). */
+export type ListingColumn =
+  | "listPrice"
+  | "feeInclusion"
+  | "standardStatus"
+  | "withdrawnReason"
+  | "furnished"
+  | "occupantType"
+  | "legalStatus"
+  | "financing"
+  | "lastConfirmedAt";
+
+/** Where the value of a standard target goes when an import writes (ruling G-2811-65, after VP11's S4-r1). */
+export type Destination =
+  | { listing: ListingColumn }
+  | { kept: "unit-attribute" | "close-field" }
+  | { unit: "code" | "building" };
+
+/**
+ * Every standard target has exactly one place: a column of the listing, kept as written on the import with its reason,
+ * or the unit itself (its code, and the tower text of a new pending unit). A target with no place would be read on the
+ * preview and lost on write; the Record makes the type check fail first, tests/nhap-excel-noi-ghi.test.ts second. It lives here, beside the targets, so the preview and the write read
+ * the same table (table.ts keptCellsOf, store.ts writeBatch).
+ * A listing an import makes is never Closed (row 4: Incomplete does not move to Closed), so close price and close date
+ * have no place on it, and unit attributes never change the unit or the catalog (G-2711-4).
+ */
+export const DESTINATION: Record<StandardTarget, Destination> = {
+  unitCode: { unit: "code" },
+  "Unit.buildingName": { unit: "building" }, // on a pending unit the row creates; otherwise kept as unit-attribute
+  "Unit.livingArea": { kept: "unit-attribute" },
+  "Unit.bedroomsTotal": { kept: "unit-attribute" },
+  "Unit.directionFaces": { kept: "unit-attribute" },
+  "Unit.floor": { kept: "unit-attribute" },
+  "Unit.propertySubType": { kept: "unit-attribute" },
+  "Listing.listPrice": { listing: "listPrice" },
+  "Listing.feeInclusion": { listing: "feeInclusion" },
+  "Listing.standardStatus": { listing: "standardStatus" },
+  "Listing.withdrawnReason": { listing: "withdrawnReason" },
+  "Listing.closePrice": { kept: "close-field" },
+  "Listing.closeDate": { kept: "close-field" },
+  "Listing.furnished": { listing: "furnished" },
+  "Listing.occupantType": { listing: "occupantType" },
+  "Listing.legalStatus": { listing: "legalStatus" },
+  "Listing.financing": { listing: "financing" },
+  "Listing.lastConfirmedAt": { listing: "lastConfirmedAt" },
+};

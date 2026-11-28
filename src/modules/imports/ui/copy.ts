@@ -6,6 +6,9 @@ import { label } from "@/modules/company-config";
 import type { LearnedItem } from "../learned";
 import type { Mark } from "../mark";
 
+/** A concept's label inside a sentence: the product's word, lower case (the same as src/app/(app)/layout.tsx). */
+const word = (c: Parameters<typeof label>[0]) => label(c).toLocaleLowerCase("vi");
+
 export const STEP_WORDS = ["Chọn tệp", "Ghép cột", "Giá trị và mã", "Xem trước", "Xong"] as const;
 
 export const IMPORT_COPY = {
@@ -29,7 +32,7 @@ export const IMPORT_COPY = {
   pickAgent: `Nhập cho ${label("ListAgent")} nào?`,
   skipRow: "Bỏ dòng",
   keepRow: "Lấy lại dòng",
-  pendingDefault: "Giữ nguyên mã, chờ khớp danh mục",
+  pendingDefault: `Giữ nguyên mã, thành ${word("PendingUnit")}`,
   columnHead: "Cột của tệp",
   targetHead: "Đi vào",
   markHead: "Dấu",
@@ -40,19 +43,22 @@ export const IMPORT_COPY = {
   learned: "Vừa học cho lần sau",
   /** One item learned: the word of its concept (label()), a colon, then the name the person gave it. */
   learnedItem: (item: LearnedItem) => `${label(item.concept)}: ${item.name}`,
-  undo: "Hoàn tác lần nhập",
-  undone: "Đã hoàn tác lần nhập.",
+  undo: `Hoàn tác ${word("ImportRun")}`,
+  undone: `Đã hoàn tác ${word("ImportRun")}.`,
   undoneShort: "đã hoàn tác",
   undoneKept: (codes: string[]) =>
-    `Đã hoàn tác lần nhập. Còn ${codes.length} căn chưa gỡ vì đã có người sửa sau lần nhập: ${codes.join(", ")}.`,
-  undoFailed: "Chưa gỡ căn nào — máy chủ chưa hoàn tác được. Lần nhập vẫn còn nguyên.",
-  undoOffline: "Chưa gỡ căn nào — mất kết nối mạng. Lần nhập vẫn còn nguyên.",
+    `Đã hoàn tác ${word("ImportRun")}. Còn ${codes.length} ${word("Unit")} chưa gỡ vì đã có người sửa sau ${word("ImportRun")}: ${codes.join(", ")}.`,
+  undoFailed: `Chưa gỡ ${word("Unit")} nào — máy chủ chưa hoàn tác được. ${label("ImportRun")} vẫn còn nguyên.`,
+  undoOffline: `Chưa gỡ ${word("Unit")} nào — mất kết nối mạng. ${label("ImportRun")} vẫn còn nguyên.`,
   keptCells: (n: number) => `${n} ô giữ chữ gốc của tệp`,
-  recent: "Lần nhập gần đây",
-  recentFailed: "Chưa đọc được lần nhập gần đây — vẫn nạp tệp được.",
+  /** Rows left out because their unit code names several units and nobody chose one (VP11 S4-r2, G-2811-84). */
+  notCreated: (n: number) =>
+    `${n} dòng chưa nhập — mã ${word("Unit")} trỏ nhiều ${word("Unit")} mà chưa chọn; chữ của các dòng ấy giữ trong bản ghi.`,
+  recent: `${label("ImportRun")} gần đây`,
+  recentFailed: `Chưa đọc được ${word("ImportRun")} gần đây — vẫn nạp tệp được.`,
   offline: "Chưa ghi gì — mất kết nối mạng.",
   retry: "Thử lại",
-  changed: "Dữ liệu của sàn vừa đổi — xem lại trước khi áp.",
+  changed: `Dữ liệu của ${word("Company")} vừa đổi — xem lại trước khi áp.`,
   failed: "Chưa ghi được — lỗi máy chủ.",
   /** A batch stopped the writing part way: what is written stays, «Thử lại» writes the rest on the same import. */
   batchStopped: (written: number, total: number, offline: boolean) =>
@@ -75,20 +81,21 @@ export const PROBLEM_WORDS: Record<ReadProblem, string> = {
   "header-only": "Tệp không có dòng nào dưới dòng tiêu đề.",
   broken: "Không đọc được tệp này. Mở bằng Excel, lưu lại rồi chọn lại.",
   locked: "Tệp đang khoá bằng mật khẩu. Bỏ khoá rồi chọn lại.",
+  "not-utf8":
+    "Tệp .csv không lưu bằng UTF-8, dấu tiếng Việt sẽ hỏng. Trong Excel: Lưu thành → CSV UTF-8, rồi chọn lại.",
 };
 
 export const WHY_WORDS: Record<string, string> = {
-  template: "Theo mẫu nhập của sàn",
-  "company-label": "Trùng tên sàn đặt",
+  template: `Theo ${word("ImportTemplate")} của ${word("Company")}`,
+  "company-label": `Trùng tên ${word("Company")} đặt`,
   "standard-label": "Trùng tên chuẩn",
   "header-dictionary": "Cách viết hay gặp",
   unknown: "Tên cột lạ — chọn nơi đi vào",
   "same-target": "Hai cột cùng đi vào một chỗ",
   "no-unit-column": "Tệp chưa có cột mã",
-  "owner-column": "Số và tên chủ nhà chưa nhập ở đây — bỏ cột",
-  "field-refused":
-    "Không thêm được trường này: tên trống, trùng tên hay đã đủ 20 trường — chọn chỗ khác hoặc bỏ cột",
+  "owner-column": `Số và tên ${word("Seller")} hay ${word("Landlord")} chưa nhập ở đây — bỏ cột`,
+  "field-refused": `Không thêm được ${word("CustomField")} này: tên trống, trùng tên hay đã đủ 20 ${word("CustomField")} — chọn chỗ khác hoặc bỏ cột`,
   "code-too-long": "Mã dài quá 80 ký tự — sửa trong tệp rồi nạp lại",
-  "target-retired": "Trường đã ngừng — chọn lại",
+  "target-retired": `${label("CustomField")} đã ngừng — chọn lại`,
   chosen: "Người chọn",
 };

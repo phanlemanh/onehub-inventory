@@ -24,11 +24,13 @@ import {
 } from "@/modules/listings/server";
 
 import type { LearnedConcept, LearnedItem } from "./learned";
-import { markValue, type CellMark, type Choices, type UnitFound } from "./mark";
-import { markTable, type MarkedTable } from "./table";
+import { markValue, valueKey, type CellMark, type Choices, type UnitFound } from "./mark";
+import { keptCellsOf, markTable, type MarkedTable } from "./table";
 import {
+  DESTINATION,
   STANDARD_HEADER_CONCEPTS,
   TEMPLATE_FIELD,
+  type ListingColumn,
   type StandardTarget,
   type Target,
 } from "./targets";
@@ -40,11 +42,25 @@ export interface ImportTable {
   rows: string[][];
 }
 
+/**
+ * A cell kept as written on the import: its place in the file, its text as written and why it was kept. `value` is
+ * what the preview showed for it when it showed one (read by the machine, or the person's answer), so nothing the
+ * preview promised is lost even where the cell has no place on the listing (ruling G-2811-78, after VP11 S4-r8 t7).
+ * An asked cell has none. Added beside `raw`, never instead of it.
+ */
 export interface Kept {
   row: number;
   header: string;
   raw: string;
   why: string;
+  value?: string | number | boolean;
+}
+
+/** A kept cell, with the preview's value when the cell has one. */
+function keptCell(row: number, header: string, raw: string, why: string, cell: CellMark): Kept {
+  return cell.value === null
+    ? { row, header, raw, why }
+    : { row, header, raw, why, value: cell.value };
 }
 
 export interface StoredLearned extends LearnedIds {
@@ -251,21 +267,19 @@ async function lockRun(c: Queryable, id: string): Promise<RunRow | null> {
   return (rows[0] as RunRow | undefined) ?? null;
 }
 
-const STANDARD_COLUMN: Partial<Record<StandardTarget, keyof NewListing>> = {
-  "Listing.listPrice": "listPrice",
-  "Listing.feeInclusion": "feeInclusion",
-  "Listing.furnished": "furnished",
-  "Listing.occupantType": "occupantType",
-  "Listing.legalStatus": "legalStatus",
-  "Listing.financing": "financing",
-  "Listing.withdrawnReason": "withdrawnReason",
-  "Listing.lastConfirmedAt": "lastConfirmedAt",
-  "Listing.standardStatus": "standardStatus",
-};
+export { DESTINATION, type Destination } from "./targets";
+
+// Every listing column a destination names is a column of the listing the listings module creates.
+type ListingColumnsExist = ListingColumn extends keyof NewListing ? true : never;
+const listingColumnsExist: ListingColumnsExist = true;
+void listingColumnsExist;
 
 export type BatchResult =
   | { ok: true; created: number; done: boolean; learned?: LearnedItem[] }
-  | { ok: false; problem: "not-found" | "closed" | "blocked-cells" | "table-changed" };
+  | {
+      ok: false;
+      problem: "not-found" | "closed" | "blocked-cells" | "table-changed" | "batches-missing";
+    };
 
 /**
  * Write one batch of an open import: the rows that become listings (new pending units first), the cells kept as
@@ -312,6 +326,13 @@ export async function writeBatch(
     };
   }
   if (run.status !== "open") return { ok: false, problem: "closed" };
+  // The last batch closes the import and runs what it teaches, so it waits for every earlier batch (AC-8, S4-r11 t5):
+  // sent before them, it is refused and writes nothing; the import stays open and has learned nothing.
+  if (
+    input.last &&
+    Array.from({ length: input.batchNo }, (_, b) => b).some((b) => !run.batches_done.includes(b))
+  )
+    return { ok: false, problem: "batches-missing" };
   const runAs = savepointRun(c);
   // Rows the person left out are counted in the whole file; this batch reads them at its own place (S4-r1 t8).
   const skipRows = (input.choices.skipRows ?? [])
@@ -327,29 +348,39 @@ export async function writeBatch(
   const buildingAt = marked.columns.find(
     (x) => x.target && "standard" in x.target && x.target.standard === "Unit.buildingName",
   )?.index;
+  // What the record keeps as written: the same rule the preview counted (table.ts keptCellsOf, G-2811-84).
+  const keptHere = keptCellsOf(marked, input.rows);
+  for (const k of keptHere)
+    kept.push(
+      keptCell(
+        input.rowOffset + k.row,
+        marked.columns[k.col]!.header,
+        input.rows[k.row]![k.col] ?? "",
+        k.why,
+        marked.cells[k.row]![k.col]!,
+      ),
+    );
   for (let r = 0; r < marked.rows.length; r += 1) {
     const outcome = marked.rows[r]!;
     const cells = marked.cells[r]!;
-    marked.columns.forEach((col, j) => {
-      const cell = cells[j]!;
-      const raw = input.rows[r]![j] ?? "";
-      const unitAttr =
-        col.target &&
-        "standard" in col.target &&
-        col.target.standard.startsWith("Unit.") &&
-        col.target.standard !== "Unit.buildingName";
+    const buildingRaw = buildingAt === undefined ? "" : (input.rows[r]![buildingAt] ?? "");
+    /** A tower text the rule counted as going onto a new pending unit, kept after all when that unit already exists. */
+    const keepBuilding = () => {
       if (
-        (cell.mark === "ask" &&
-          !(col.target && "standard" in col.target && col.target.standard === "unitCode")) ||
-        (unitAttr && raw.trim() !== "")
+        buildingAt !== undefined &&
+        buildingRaw.trim() !== "" &&
+        !keptHere.some((k) => k.row === r && k.col === buildingAt)
       )
-        kept.push({
-          row: input.rowOffset + r,
-          header: col.header,
-          raw,
-          why: unitAttr ? "unit-attribute" : cell.why,
-        });
-    });
+        kept.push(
+          keptCell(
+            input.rowOffset + r,
+            marked.columns[buildingAt]!.header,
+            buildingRaw,
+            "unit-attribute",
+            cells[buildingAt]!,
+          ),
+        );
+    };
     if (outcome.fate !== "create" || !outcome.unit) continue;
     let unit: NewListing["unit"];
     if ("unitKey" in outcome.unit) {
@@ -357,15 +388,18 @@ export async function writeBatch(
         await c.query(`select upi from catalog_units where unit_key = $1`, [outcome.unit.unitKey])
       ).rows[0] as { upi: string };
       unit = { upi: u.upi };
-    } else if ("pendingUnitId" in outcome.unit)
+    } else if ("pendingUnitId" in outcome.unit) {
       unit = { pendingUnitId: outcome.unit.pendingUnitId };
-    else {
+    } else {
       const code = outcome.unit.newPending;
       const known = learned.pendingUnits.find((p) => fold(p.rawCode) === fold(code));
-      if (known) unit = { pendingUnitId: known.id };
-      else {
-        const building =
-          buildingAt === undefined ? "" : (input.rows[r]![buildingAt] ?? "").trim().slice(0, 80);
+      if (known) {
+        // Not reachable for a file the preview passed (a repeated code blocks it); kept for safety, as written.
+        keepBuilding();
+        unit = { pendingUnitId: known.id };
+      } else {
+        // A tower text longer than the pending unit holds is kept whole by the rule as well.
+        const building = buildingRaw.trim().slice(0, 80);
         const w = await learnFromImport(
           runAs,
           {
@@ -406,8 +440,9 @@ export async function writeBatch(
       if (!col.target || cell.value === null || cell.mark === "ask") return;
       if ("custom" in col.target) l.customFields[col.target.custom] = cell.value;
       else if ("standard" in col.target) {
-        const key = STANDARD_COLUMN[col.target.standard];
-        if (key) (l as unknown as Record<string, unknown>)[key] = cell.value;
+        const place = DESTINATION[col.target.standard];
+        if ("listing" in place)
+          (l as unknown as Record<string, unknown>)[place.listing] = cell.value;
         if (col.implies && l.feeInclusion === null) l.feeInclusion = col.implies.feeInclusion;
       }
     });
@@ -528,9 +563,11 @@ async function learnAtEnd(
     // The preview checked the field with the company layer's rule; a refusal here fails the batch, never drops the
     // column's values in silence (S4-r1 t11).
     if (!code) throw new Error("import: custom field refused");
+    // The person's choice for this spelling counts as it did in the preview, remembered or not (VP11 S4-r1).
     const m: CellMark = markValue(t as Target, raw, {
       layer: await readLayer(run),
       today: today(),
+      choice: input.choices.values[valueKey(col!, raw)],
     });
     if (m.value === null) continue;
     await c.query(
