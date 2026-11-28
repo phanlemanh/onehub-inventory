@@ -28,7 +28,7 @@
   Đề xuất: new-contract
 
 - **Rules held only by the screen, not the server or database (gồm #22, #37, #39, #3, #4, #6)**
-  Người dùng thấy gì: Người có quyền nhập, nếu gọi thẳng máy chủ hay cơ sở dữ liệu mà không qua màn, có thể mở lại lần nhập đã hoàn tác, đóng lần nhập khi còn thiếu dòng, ghi giá trị trường riêng khác với bảng đã xem, sửa cột bất kỳ của bản ghi lần nhập, hay gửi một yêu cầu rất lớn; cơ sở dữ liệu cũng chưa tự giữ «mỗi lần chào đúng một căn».
+  Người dùng thấy gì: Người có quyền nhập, nếu gọi thẳng máy chủ hay cơ sở dữ liệu mà không qua màn, có thể mở lại lần nhập đã hoàn tác, ghi giá trị trường riêng khác với bảng đã xem, sửa cột bất kỳ của bản ghi lần nhập, hay gửi một yêu cầu rất lớn; cơ sở dữ liệu cũng chưa tự giữ «mỗi lần chào đúng một căn».
   Căn cứ: Điều không xảy ra được: không lọt sang sàn khác, và người không có quyền nhập không làm được gì trong số ấy; hoàn tác vẫn gỡ được. Siết cho đúng cần đổi cơ sở dữ liệu và cửa máy chủ, nên làm thành việc riêng, tên gợi ý «Siết cửa máy chủ của nhập tệp». Cũng vào việc riêng ấy, mỗi điều một dòng: mô-đun nhập tệp còn viết thẳng câu lệnh trên bảng của mô-đun khác (danh mục căn, lớp riêng của sàn, lần chào) thay vì qua cửa của chúng; bản ghi lần nhập cho sửa mọi cột của nó; cách viết học được ở các phần gửi trước phần cuối được nhớ ở dạng chữ thường bỏ dấu; khi danh sách Đầu chủ tải lỗi, Trưởng nhóm thấy ô chọn trống mà không có lời giải thích. Khuyến nghị của giám sát: nên xong trước khi bản thật có dữ liệu của sàn thật — hôm nay kho chưa lên bản thật.
   file: `db/migrations/015_nhap_excel.sql`
   severity: medium
@@ -110,6 +110,7 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Đã sửa trên nhánh:
 
+- S4-r11 t5 · the last batch can close an import while earlier batches are still unwritten — máy chủ nay từ chối phần cuối (409 «batches-missing») khi còn phần trước chưa ghi; lần nhập vẫn mở và chưa học gì (01dc882d)
 - S4-r10 t5 · A row left out stores the text of columns the person dropped, the owner's name and phone column too — cột đã bỏ không bao giờ được giữ, ở mọi loại dòng (kể cả dòng căn đã có tin, chỗ hở có từ trước); bảng viết trước thêm cột số chủ và cột ghi chú đã bỏ (74378218)
 - S4-r10 t7 · the 500 body is only forbidden two substrings — bài ghim đúng lời lỗi «server-error» (74378218)
 - S4-r10 t8 · the llm scan's planted relative path matched by the word «llm» — ca gieo đường dẫn tương đối nay không có chữ ấy (74378218)
@@ -139,6 +140,10 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
+- S4-r11 t1, t2, t3 · checks red, the PR description out of date, the second number 015 and its grant without a decision page → thủ tục trước khi gộp; cặp tệp 015/020 có ở trang 0055 và dòng sổ d-…-102
+- S4-r11 t4 · custom-field values of the last batch outside the table fingerprint → mục «Siết cửa máy chủ của nhập tệp» (ghi giá trị trường riêng khác với bảng đã xem)
+- S4-r11 t6 · the import record keeps raw cell text that can hold names and phones, not marked pii → #21 (Ngoài-3)
+- S4-r11 t7 · ListingPendingUnit ontology does not match its table → #23
 - S4-r10 t1 · Personal data: an owner's name or phone column is caught only by the words of its header → #21
 - S4-r10 t2 · the app role can UPDATE every column of import_runs → mục «Siết cửa máy chủ của nhập tệp»
 - S4-r10 t3, t4 · the card does not list SP-1 among the rules touched; CI not green on the commit under review → thủ tục trước khi gộp
