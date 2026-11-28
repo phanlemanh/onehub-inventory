@@ -34,6 +34,13 @@
   severity: medium
   Đề xuất: new-contract
 
+- **The import screen's address and state codes are Vietnamese, against the owner's English-names decision of 23/11 (VP11 r1)**
+  Người dùng thấy gì: Địa chỉ màn Nạp tệp là «/nhap-tep», và 12 mã trạng thái của màn (ST-nhap-tep-…) cũng viết tiếng Việt, trong khi các màn khác đã đổi sang tiếng Anh theo quyết định của anh ngày 23/11. Người dùng vẫn vào và dùng bình thường; chỉ là địa chỉ không đồng nhất.
+  Căn cứ: Hàng 11 được duyệt Phạm vi ngày 17/11, trước quyết định 23/11, nên màn đã dựng với tên tiếng Việt. Đổi tên chạm khoảng 15 tệp, sổ màn, bảng Vai × Màn × Nút, các bài kiểm và ảnh bằng chứng của màn, và phải chấm lại phần màn. Khuyến nghị của giám sát: gộp hàng 11 như đang có, đổi địa chỉ ở một hàng riêng ngay sau, tên gợi ý «Địa chỉ màn Nạp tệp bằng tiếng Anh», trước khi bản thật có người dùng.
+  file: `src/app/(app)/nhap-tep/page.tsx`
+  severity: medium
+  Đề xuất: new-contract
+
 - **Numbers and states the screen shows (gồm #30, #38, #50, #51)**
   Người dùng thấy gì: Có lúc màn báo con số lệch với thật: số ô giữ chữ gốc lớn hơn số được lưu, số mục ngừng dùng sau hoàn tác có thể cao hơn thực tế, và cách viết được nhớ có thể hiện bằng chữ thường không dấu. Khi danh sách Đầu chủ tải lỗi, Trưởng nhóm thấy ô chọn trống mà không có lời giải thích.
   Căn cứ: Không mất tin rao nào. Dữ liệu chính vẫn đúng, chỉ phần tóm tắt và cách hiển thị lệch nhẹ, người dùng tải lại hay sửa tay được.
@@ -67,13 +74,6 @@
   Căn cứ: Chưa thấy tệp thật nào đọc sai; đây là chỗ bài kiểm chưa phủ. Việc cần làm trước khi bản thật có dữ liệu của sàn thật: thử nhập bằng vài tệp lưu thật từ Excel và Google Sheets, tên gợi ý «Thử nhập bằng tệp thật của Excel và Google Sheets». Khuyến nghị của giám sát: nên xong trước khi bản thật có dữ liệu của sàn thật — hôm nay kho chưa lên bản thật.
   file: `tests/fixtures/nhap-excel/tao.mjs`
   severity: low
-  Đề xuất: known-limits
-
-- **The import screen's address is Vietnamese while the rule says English (VP11 r1)**
-  Người dùng thấy gì: Địa chỉ màn Nạp tệp là «/nhap-tep», trong khi các màn khác đã đổi địa chỉ sang tiếng Anh. Người dùng vẫn vào và dùng bình thường; chỉ là địa chỉ không đồng nhất.
-  Căn cứ: Đổi địa chỉ chạm khoảng 15 tệp, sổ màn và ảnh bằng chứng của màn, nên làm thành một việc riêng như lần đổi địa chỉ trước, tên gợi ý «Địa chỉ màn Nạp tệp bằng tiếng Anh»; không mất dữ liệu, đổi sau vẫn rẻ.
-  file: `src/app/(app)/nhap-tep/page.tsx`
-  severity: medium
   Đề xuất: known-limits
 
 - **The import screen's 'fixed' mark has the same colour as the 'Đã bán' status (VP11 r1)**
