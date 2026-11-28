@@ -60,12 +60,14 @@ async function reset(page: Page): Promise<void> {
 
 /** AC-4: Enter on an editable cell edits it; on another cell it opens that row's record. */
 function checkEnter(cell: { editable: boolean; row: string }, got: Outcome): void {
-  if (cell.editable && !got.editor && got.record)
-    throw new Error("Enter opened the record on an editable cell");
-  if (!cell.editable && got.editor) throw new Error("Enter opened an editor on a locked cell");
-  if (cell.editable && got.record) throw new Error("Enter opened the record and an editor");
-  if (!cell.editable && got.record !== cell.row)
-    throw new Error(`Enter did not open the record of ${cell.row}`);
+  if (cell.editable) {
+    if (got.record && !got.editor) throw new Error("Enter opened the record on an editable cell");
+    if (got.record) throw new Error("Enter opened the record and an editor");
+    if (!got.editor) throw new Error("Enter did not open the editor on an editable cell");
+    return;
+  }
+  if (got.editor) throw new Error("Enter opened an editor on a locked cell");
+  if (got.record !== cell.row) throw new Error(`Enter did not open the record of ${cell.row}`);
 }
 
 test.describe("AC-4 · Enter edits", () => {
@@ -114,6 +116,13 @@ test.describe("AC-4 · Enter edits", () => {
     expect(() => checkEnter({ editable: false, row: "a" }, { editor: true, record: null })).toThrow(
       "Enter opened an editor on a locked cell",
     );
+    // Enter that does nothing on an editable cell: neither the record nor the editor.
+    expect(() => checkEnter({ editable: true, row: "a" }, { editor: false, record: null })).toThrow(
+      "Enter did not open the editor on an editable cell",
+    );
+    expect(() =>
+      checkEnter({ editable: false, row: "a" }, { editor: false, record: null }),
+    ).toThrow("Enter did not open the record of a");
   });
 });
 
@@ -227,12 +236,14 @@ test.describe("AC-6 · a pencil on editable cells", () => {
       ["1101", "Diện tích", false],
       ["1101", "Listing.unitNumber", false],
     ];
+    // Counted on the page: a cell whose pencil the page showed, not a row of the table above.
     let editable = 0;
     for (const [dong, cot, can] of cases) {
       await (await oCua(page, { dong, cot })).hover({ position: { x: 3, y: 3 } });
       await page.waitForTimeout(250);
-      checkPencil(can, await pencilOf(page, dong, cot), `${dong} ${cot}`);
-      if (can) editable += 1;
+      const seen = await pencilOf(page, dong, cot);
+      checkPencil(can, seen, `${dong} ${cot}`);
+      if (seen.shown) editable += 1;
     }
     expect(editable, "no editable cell found").toBeGreaterThan(0);
   });

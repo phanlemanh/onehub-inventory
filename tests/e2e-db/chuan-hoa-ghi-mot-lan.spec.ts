@@ -182,6 +182,75 @@ test("AC-7 · one write for one edit, by clicking away, by Enter; none by Esc or
   checkReload("2,9 tỷ", await (await oCua(page, { dong: ROW.unit, cot: "Giá chào" })).innerText());
 });
 
+// ---- AC-4 · Enter on a screen without a record (Tuỳ chỉnh của sàn) ------------------------------------------------------
+// The screen is signed in, so it is measured here. E5 runs this case with the AC-4 cases of tests/e2e/chuan-hoa-sua-o.
+
+type Moved = { from: string; to: string | null; editor: boolean; record: boolean };
+
+/** AC-4 on a screen with no record: Enter on a selected cell selects the cell below, opens nothing. */
+function checkEnterDown(got: Moved, below: string): void {
+  if (got.editor) throw new Error("Enter opened an editor on a screen without a record");
+  if (got.record) throw new Error("Enter opened a record on a screen without a record");
+  if (got.to !== below)
+    throw new Error(
+      `Enter did not move to the cell below: on row ${got.to ?? "none"}, want ${below}`,
+    );
+}
+
+test("AC-4 · on Tuỳ chỉnh của sàn Enter selects the cell below", async ({ page }, info) => {
+  test.skip(info.project.name !== "1440", "measured at 1440");
+  const w = await world(info);
+  await signIn(page, w.email, w.name);
+  // A new company has no label of its own: two rows, so there is a cell below to move to.
+  for (const [concept, label] of [
+    ["Building", "Block"],
+    ["Subdivision", "Phân khu"],
+  ]) {
+    const r = await page.request.post("/api/v1/company-layer/labels", { data: { concept, label } });
+    expect(r.ok(), `label ${concept}: ${r.status()}`).toBe(true);
+  }
+  await page.goto("/company-layer?part=labels");
+  await expect(page.locator('[data-part="labels"][data-state="ready"]')).toBeVisible();
+  const rows = page.locator('[data-slot="data-region-body"] tbody tr[data-row-id]');
+  expect(await rows.count(), "fewer than two rows: nothing to move to").toBeGreaterThan(1);
+  const [from, below] = await Promise.all(
+    [0, 1].map((i) => rows.nth(i).getAttribute("data-row-id")),
+  );
+  const cell = rows
+    .nth(0)
+    .locator('td[data-col-id]:not([data-col-id="row-number"]):not([data-col-id="row-actions"])')
+    .first();
+  await cell.click({ position: { x: 3, y: 3 } });
+  await expect(cell).toHaveAttribute("data-cell-focused", /.*/);
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(300);
+  const to = await page
+    .locator('[data-slot="data-region-body"] td[data-cell-focused]')
+    .evaluate((td) => td.closest("tr")?.getAttribute("data-row-id") ?? null)
+    .catch(() => null);
+  checkEnterDown(
+    {
+      from: from!,
+      to,
+      editor: await page.locator('[data-slot="cell-editor"]').isVisible(),
+      record: (await page.locator('[data-slot="record-panel"]').count()) > 0,
+    },
+    below!,
+  );
+});
+
+test("AC-4 · the check fails when Enter stays, opens an editor or a record", () => {
+  const base = { from: "a", to: "b", editor: false, record: false };
+  expect(() => checkEnterDown({ ...base, to: "a" }, "b")).toThrow(
+    "Enter did not move to the cell below",
+  );
+  expect(() => checkEnterDown({ ...base, to: null }, "b")).toThrow(
+    "Enter did not move to the cell below",
+  );
+  expect(() => checkEnterDown({ ...base, editor: true }, "b")).toThrow("opened an editor");
+  expect(() => checkEnterDown({ ...base, record: true }, "b")).toThrow("opened a record");
+});
+
 test("AC-7 · the checks fail on a second write and on a value lost after reload", () => {
   expect(() => checkWrites("click away", 1, 2)).toThrow("two writes for one edit");
   expect(() => checkWrites("click away", 1, 0)).toThrow("value lost: no write");

@@ -265,37 +265,70 @@ test.describe("AC-2 · one colour per status everywhere", () => {
 
 // ---- AC-3 · no padlock where the status says it ------------------------------------------------------------------------
 
-type Locked = { unit: string; col: string; svg: number; title: string; described: string };
+type Locked = {
+  unit: string;
+  status: string;
+  col: string;
+  present: boolean;
+  svg: number;
+  title: string;
+  described: string;
+};
+
+/**
+ * The cells AC-3 names, written before the page is read (edit-rules.ts, signed by rows 4 and 3g): a sold row locks its
+ * status, price, fee and the company's own columns; a withdrawn row locks its status and the company's own columns.
+ */
+const LOCKED_COLUMNS: Record<"Closed" | "Withdrawn", readonly string[]> = {
+  Closed: ["Listing.standardStatus", "Listing.listPrice", "Listing.feeInclusion", "custom"],
+  Withdrawn: ["Listing.standardStatus", "custom"],
+};
 
 async function lockedCells(page: Page): Promise<Locked[]> {
-  return page.locator(`${BODY} tbody tr[data-row-id]`).evaluateAll((trs) =>
-    trs
-      .filter((tr) =>
-        ["Closed", "Withdrawn"].includes(
-          tr
-            .querySelector('td[data-col-id="Listing.standardStatus"] [data-status]')
-            ?.getAttribute("data-status") ?? "",
-        ),
-      )
-      .flatMap((tr) =>
-        [...tr.querySelectorAll('[data-slot="typed-cell"][title]')].map((cell) => ({
+  return page.locator(`${BODY} tbody tr[data-row-id]`).evaluateAll((trs, matrix) => {
+    const heads = [
+      ...document.querySelectorAll('[data-slot="data-region-body"] thead th[data-col-id]'),
+    ].map((th) => th.getAttribute("data-col-id") ?? "");
+    // The company's own columns; the net-to-seller column is worked out from the price (row 19), never typed, so no lock
+    // is about it.
+    const custom = heads.filter((id) => id.startsWith("custom.") && id !== "custom.netToSeller");
+    // A column of the matrix the person has hidden (the fee is hidden by default) has no cell to look at.
+    const onGrid = (col: string) => heads.includes(col);
+    return trs.flatMap((tr) => {
+      const badge = tr.querySelector('td[data-col-id="Listing.standardStatus"] [data-status]');
+      const code = (badge?.getAttribute("data-status") ?? "") as keyof typeof matrix;
+      if (!(code in matrix)) return [];
+      const cols = matrix[code].flatMap((c) => (c === "custom" ? custom : onGrid(c) ? [c] : []));
+      return cols.map((col) => {
+        const cell = tr.querySelector(`td[data-col-id="${col}"] [data-slot="typed-cell"]`);
+        return {
           unit: tr.querySelector("[data-record-open]")?.textContent ?? "",
-          col: cell.closest("td")?.getAttribute("data-col-id") ?? "",
-          svg: cell.querySelectorAll("svg").length,
-          title: cell.getAttribute("title") ?? "",
-          described: cell.getAttribute("aria-description") ?? "",
-        })),
-      ),
-  );
+          status: badge?.textContent?.trim() ?? "",
+          col,
+          present: cell !== null,
+          svg: cell?.querySelectorAll("svg").length ?? 0,
+          title: cell?.getAttribute("title") ?? "",
+          described: cell?.getAttribute("aria-description") ?? "",
+        };
+      });
+    });
+  }, LOCKED_COLUMNS);
 }
 
 function checkLocks(cells: readonly Locked[]): number {
   if (cells.length === 0) throw new Error("no locked row found");
+  // A sold row's price is always on the grid. The sample grid has no column of the company's own (only the worked-out
+  // net to seller), so those cells are checked when present; their lock is held by lockedReasons' unit test.
+  if (!cells.some((c) => c.col === "Listing.listPrice"))
+    throw new Error("no locked row found with a price");
   for (const c of cells) {
-    if (c.svg > 0)
-      throw new Error(`padlock where the status explains the lock: ${c.unit} ${c.col}`);
+    const where = `${c.unit} ${c.col}`;
+    if (!c.present) throw new Error(`locked cell missing from the grid: ${where}`);
+    if (c.svg > 0) throw new Error(`padlock where the status explains the lock: ${where}`);
     if (!c.described.startsWith("Ô đang khoá") || !c.title.startsWith("Ô đang khoá"))
-      throw new Error(`locked cell gives no reason: ${c.unit} ${c.col}`);
+      throw new Error(`locked cell gives no reason: ${where}`);
+    if (!c.status || !c.described.includes(c.status) || !c.title.includes(c.status))
+      throw new Error(`lock reason does not name the row's status «${c.status}»: ${where}`);
   }
   return cells.length;
 }
@@ -335,20 +368,27 @@ for (const width of ["1024", "1440"]) {
     at(width);
     await open(page, "light");
     const cells = await lockedCells(page);
-    expect(() => checkLocks([{ ...cells[0]!, svg: 1 }])).toThrow(
+    expect(() => checkLocks([...cells, { ...cells[0]!, svg: 1 }])).toThrow(
       "padlock where the status explains the lock",
     );
-    // The reason taken off the real cell.
-    await suaTrang(page, () => {
-      const cell = document.querySelector(
-        '[data-slot="data-region-body"] tbody [data-slot="typed-cell"][aria-description]',
-      );
-      cell?.removeAttribute("aria-description");
-    });
-    expect(() => checkLocks(cells.map((c, i) => (i === 0 ? { ...c, described: "" } : c)))).toThrow(
-      "locked cell gives no reason",
+    // Another status's reason on a sold row's cell.
+    expect(() =>
+      checkLocks(cells.map((c, i) => (i === 0 ? { ...c, status: "Đang bán" } : c))),
+    ).toThrow("lock reason does not name the row's status");
+    // A cell of the matrix the grid does not draw.
+    expect(() => checkLocks([...cells, { ...cells[0]!, present: false }])).toThrow(
+      "locked cell missing from the grid",
     );
     expect(() => checkLocks([])).toThrow("no locked row found");
+    // The reason taken off the real cells, then read back from the page.
+    await suaTrang(page, () => {
+      for (const cell of document.querySelectorAll(
+        '[data-slot="data-region-body"] tbody [data-slot="typed-cell"][aria-description]',
+      ))
+        cell.removeAttribute("aria-description");
+    });
+    const bare = await lockedCells(page);
+    expect(() => checkLocks(bare)).toThrow("locked cell gives no reason");
   });
 }
 
@@ -423,6 +463,21 @@ function checkDarkSurfaces(g: Greys): void {
     throw new Error(`menu hover equals the menu: ${g.hover.toFixed(1)} vs ${g.menu.toFixed(1)}`);
 }
 
+/**
+ * Light before this round, at 1440 with the record of 0905 open (same sampling as greys()). The round changes no light
+ * grey: `git diff ae33fce6 -- src/app/globals.css` touches only `--info` in :root, so these are the values of the
+ * approved record's tree, pinned here so a light grey that moves fails even when it moves with its neighbour.
+ */
+const LIGHT_BEFORE: Greys = { page: 255, grid: 255, panel: 255, menu: 255, hover: 241.2 };
+
+function checkLightUnchanged(g: Greys): void {
+  for (const k of Object.keys(LIGHT_BEFORE) as (keyof Greys)[])
+    if (Math.abs(g[k] - LIGHT_BEFORE[k]) > 1.5)
+      throw new Error(
+        `light ${k} changed: ${g[k].toFixed(1)}, before the round ${LIGHT_BEFORE[k].toFixed(1)}`,
+      );
+}
+
 test.describe("AC-11 · floating surface stands off the grid in dark", () => {
   test("the record is half a step above the grid, the menu's hover still shows; light unchanged", async ({
     page,
@@ -433,9 +488,8 @@ test.describe("AC-11 · floating surface stands off the grid in dark", () => {
     checkDarkSurfaces(dark);
     const light = await greys(page, "light");
     test.info().annotations.push({ type: "greys light", description: JSON.stringify(light) });
-    // Light keeps the white record on the white grid, and a hover that shows.
-    expect(Math.abs(light.panel - light.grid), "light record surface changed").toBeLessThan(2);
-    expect(light.hover - light.menu, "light menu hover").toBeLessThan(-2);
+    // Light keeps every grey it had before the round.
+    checkLightUnchanged(light);
   });
 
   test("the check fails on the record at the grid's grey, a hover at the menu's grey, no record", async ({
@@ -454,5 +508,12 @@ test.describe("AC-11 · floating surface stands off the grid in dark", () => {
     );
     expect(() => checkDarkSurfaces(step)).toThrow("menu hover equals the menu");
     await expect(greys(page, "dark", undefined, false)).rejects.toThrow("no record open");
+    // Light: the grid and the record moved together off white still fails.
+    const moved = await greys(
+      page,
+      "light",
+      ":root:not(.dark) { --card: var(--color-neutral-100) !important; --popover: var(--color-neutral-100) !important; }",
+    );
+    expect(() => checkLightUnchanged(moved)).toThrow("light grid changed");
   });
 });
