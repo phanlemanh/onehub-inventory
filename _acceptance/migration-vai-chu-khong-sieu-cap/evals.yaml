@@ -116,9 +116,11 @@ evals:
     layer: backend-effect
     paths: ["_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"]
     expected: >-
-      exit 0, dòng cuối «tu-kiem: 5/5 ca đúng»: dữ liệu CI thật vừa đọc xanh; bốn bản phá trên chính dữ liệu ấy đỏ với
-      đúng thông điệp ghim — e2e-db bị huỷ, dùng lại lượt có mã khác, nhật ký thiếu «ci-db: 6/6 bước đạt», lượt chưa
-      xong.
+      exit 0, dòng cuối «tu-kiem: 13/13 ca đúng»: dữ liệu CI thật vừa đọc xanh; «doc-dong-dung-lai-that» tách đúng run và
+      commit từ chính dòng «not run again: same inputs as run <URL> at commit <sha>» CI in ra; mười một bản phá trên
+      chính dữ liệu ấy đỏ, mỗi dòng đỏ của phép đo một bản (e2e-db bị huỷ, thiếu việc check, chưa xong, thiếu 6/6, thiếu
+      bài mới, không phải postgres:16, dùng lại có mã khác, không chứa commit mã, lượt dùng lại đỏ, sai commit, lượt dùng
+      lại cũng dùng lại). Lượt CI đầu nhánh chưa có → «tu-kiem: không chạy được …», exit 1.
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E8
     criterion: AC-8
