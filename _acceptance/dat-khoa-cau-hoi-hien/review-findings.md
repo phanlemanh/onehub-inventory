@@ -1,58 +1,60 @@
-# Review findings: dat-khoa-cau-hoi-hien (round 1)
+# Review findings: dat-khoa-cau-hoi-hien (round 2)
 
 ## Trong hợp đồng
 
-- **Intent / Criteria: the scope check is looser than AC-5**
-  AC: AC-5
-  file: `_acceptance/dat-khoa-cau-hoi-hien/rang/pham-vi.mjs:19`
-  severity: medium
-  source: invariants
-  detail: AC-5 in contract.md says that, apart from the record and one wiki/log/ file, the PR may change only tools/deploy/dat-khoa.mjs and the new test. OK_GLOBS in pham-vi.mjs also allows PRODUCT-MAP.md and LO-TRINH.html, and the real diff (b9fcdd11...HEAD) does change both. E5 goes green on a scope the signed contract does not allow, so the check does not measure the criterion as written. Fix: either add the two machine-drawn pages to the AC-5 wording at the gate, or remove them from OK_GLOBS and keep them out of the measured diff.
+Không có finding nào map được vào AC.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Criteria: the 'changes stay inside the asking function' check covers lines outside the function**
-  Người dùng thấy gì: Phép đo có thể bỏ lọt một thay đổi nằm sát ngay trên hàm hỏi khoá. Bản hiện tại không có thay đổi nào ở đó, nên người dùng không thấy ảnh hưởng.
-  Căn cứ: Nhẹ với người dùng vì chỉ là độ chặt của phép đo, bản giao không bị sai; sửa sau cũng rẻ nhưng không cần gấp.
-  file: `_acceptance/dat-khoa-cau-hoi-hien/rang/pham-vi.mjs`
-  severity: low
-  Đề xuất: known-limits
+- **Secrets: harness writes the whole process environment to disk**
+  Người dùng thấy gì: Khi chạy phép đo, các bí mật có sẵn trong máy người chấm (như khoá dịch vụ) có thể bị chép ra tệp thường trên máy. Tệp nằm ngoài phần được đưa lên kho nên không bị lộ ra ngoài, nhưng vẫn là bí mật nằm trần trên đĩa.
+  Căn cứ: Hậu quả nhẹ vì tệp chỉ ở máy người chấm và không bao giờ được đưa lên kho, nhưng nó trái nguyên tắc máy không giữ giá trị bí mật; sửa rẻ nên đáng làm thành việc riêng.
+  file: `_acceptance/dat-khoa-cau-hoi-hien/rang/kiem.mjs`
+  severity: medium
+  Đề xuất: new-contract
 
-- **Design: terminalAsk only half-uses the injected input/output**
-  Người dùng thấy gì: Khi chạy lệnh đặt khoá bằng ống dẫn, lệnh vẫn đọc đầu vào thật của máy chứ không đọc luồng được truyền vào. Người chủ kho chạy lệnh bình thường không gặp điều này.
-  Căn cứ: Nhẹ vì lệnh thật dùng đúng đầu vào mặc định và chạy đúng; chỉ ảnh hưởng người viết bài kiểm sau này, không mất dữ liệu.
+- **Design: terminalAsk injection only half applied**
+  Người dùng thấy gì: Người chạy lệnh bình thường không bị ảnh hưởng, lệnh vẫn hỏi và nhận đủ câu trả lời như trước. Chỉ khi sau này có người dùng hàm hỏi này với một nguồn nhập khác thì nó mới đọc nhầm nguồn.
+  Căn cứ: Không ảnh hưởng người dùng hiện nay vì lệnh chạy đúng như trước, không mất hay lộ dữ liệu; chỉ là bẫy tiềm ẩn cho người viết mã sau, ghi lại là đủ.
   file: `tools/deploy/dat-khoa.mjs`
   severity: low
   Đề xuất: known-limits
 
-- **Tier: high (tools/**), needs a code owner**
-  Người dùng thấy gì: Thay đổi này thuộc hạng cao nên không tự gộp được mà cần chủ kho ký. Đây là quy trình bình thường, không gây lỗi cho người dùng.
-  Căn cứ: Không có hậu quả cho người dùng, chỉ là bước ký theo luật kho đã định sẵn.
+- **Criteria and tests: echo check weak in the resize case**
+  Người dùng thấy gì: Trong ca đổi cỡ màn hình giữa lúc dán, phép đo có thể bỏ sót việc chuỗi kết nối bị hiện lại trên màn. Ca terminal thật không đổi cỡ vẫn kiểm đủ điều này.
+  Căn cứ: Rủi ro thấp vì ca còn lại đã phủ đúng điều cần chứng, và lệnh không có lý do hiện lại giá trị dán; có thể ghi giới hạn rồi siết sau.
+  file: `_acceptance/dat-khoa-cau-hoi-hien/rang/kiem.mjs`
+  severity: low
+  Đề xuất: known-limits
+
+- **Intent and scope: UI design artifacts in a CLI-only record**
+  Người dùng thấy gì: Hồ sơ của một thay đổi chỉ chạy trên dòng lệnh lại mang hai tệp về giao diện không liên quan, và một đường dẫn tạm của máy người chấm. Người dùng sản phẩm không thấy gì.
+  Căn cứ: Chỉ là tệp thừa trong hồ sơ, không ảnh hưởng người dùng hay dữ liệu; sửa không đáng công.
+  file: `_acceptance/dat-khoa-cau-hoi-hien/design-floor.json`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Tier: high, needs a code owner**
+  Người dùng thấy gì: Thay đổi này thuộc hạng cao nên phải có chủ mã duyệt gộp, đúng như hợp đồng đã ghi. Không có gì hỏng với người dùng.
+  Căn cứ: Đây là điều đã biết và đúng quy trình, không phải lỗi, nên không cần mở việc nào.
   file: `tools/deploy/dat-khoa.mjs`
   severity: low
   Đề xuất: wont-fix
 
-- **terminalAsk: the pipe branch ignores the input and output it is given**
-  Người dùng thấy gì: Nhánh đọc từ ống dẫn bỏ qua luồng được đưa vào và luôn đọc đầu vào thật. Lệnh chạy thật hôm nay không bị ảnh hưởng.
-  Căn cứ: Nhẹ vì lệnh thật chạy đúng với giá trị mặc định; chỉ là điểm yếu cho bài kiểm tương lai, sửa sau không mất gì.
+- **terminalAsk ignores the injected input/output when the input is not a terminal**
+  Người dùng thấy gì: Lệnh chạy bình thường vẫn đúng. Chỉ khi ai đó sau này truyền một nguồn nhập khác vào, lệnh sẽ bỏ qua nó và đọc đầu vào thật của máy.
+  Căn cứ: Không gây mất hay lộ dữ liệu cho người dùng hôm nay, người dùng chạy lại được; chỉ là bẫy cho mã viết sau, ghi nhận là đủ.
   file: `tools/deploy/dat-khoa.mjs`
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 4 — assertion âm tính một mình: ca ban-cu-mat-cau-hoi chỉ đếm câu hỏi bị mất, bỏ qua mọi dấu hiệu bản cũ đã thực sự chạy**
-  Người dùng thấy gì: Phép chứng minh rằng bản cũ làm mất câu hỏi có thể xanh cả khi bản cũ không chạy được. Bản sửa của người dùng không bị ảnh hưởng.
-  Căn cứ: Nhẹ với người dùng vì chỉ làm bằng chứng đối chứng yếu hơn, không làm lệnh thật sai; sửa sau không tốn nhiều.
+- **Self-test pha-khong-doi-co cannot show that the redraw count check works**
+  Người dùng thấy gì: Một ca tự kiểm của phép đo báo đỏ vì cách dựng chứ không chứng minh được việc đếm lần vẽ lại hoạt động. Lệnh dán khoá không bị ảnh hưởng.
+  Căn cứ: Chỉ làm bằng chứng của phép đo yếu hơn một chút, không đụng người dùng; ghi giới hạn rồi siết khi có dịp.
   file: `_acceptance/dat-khoa-cau-hoi-hien/rang/kiem.mjs`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Hình dạng 6 — đo thứ khác cây đang kiểm: ci.mjs ghim cứng PR 134 và đọc đầu nhánh trên GitHub, không đối chiếu với HEAD đang chấm**
-  Người dùng thấy gì: Bằng chứng CI xanh có thể thuộc về một bản khác với bản đang được chấm nếu nhánh đã đi tiếp. Hiện chưa thấy lệch như vậy.
-  Căn cứ: Nhẹ vì chỉ gây nhầm lẫn khi có bản chưa đẩy, người ký xem lại được trên GitHub; sửa sau rẻ.
-  file: `_acceptance/dat-khoa-cau-hoi-hien/rang/ci.mjs`
-  severity: medium
+  severity: low
   Đề xuất: known-limits
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
