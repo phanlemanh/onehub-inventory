@@ -59,7 +59,7 @@ Lát 2 và 3 chạm cùng tệp với VP10 lát 2 (`data-region.tsx`, `region-he
 | Bút chì khi rê | ô sửa được không có dấu gì | rê lên ô sửa được (người có quyền, dòng không khoá) thì hiện bút ở mép phải ô, có chữ gợi ý; ô khoá, ô không quyền không có | `data-region.tsx` (ô của lưới) |
 | Bấm ra ngoài là lưu | bấm ra ngoài khung sửa là huỷ, mất chữ đã gõ | bấm ra ngoài là ghi như Enter (đọc lại, hỏi lại khi giá đổi quá 20 %, thông báo «Hoàn tác»); giá trị chưa hiểu thì khung ở lại và báo ở ô | `cell-editor.tsx` |
 | Bộ trợ giúp cho 3h | mỗi bài tự mở sửa bằng F2 hay bấm đúp | một hàm dùng chung mở sửa một ô bằng Enter và trả khung sửa; đỏ có tên khi ô không mở sửa hay bộ chọn không khớp ô nào | `tests/e2e/support/` |
-| Sổ hành vi | dòng «Sửa dữ liệu», «Phím trong lưới», «Chữ mở trong ô», «Ô không sửa được» theo luật cũ | đổi đúng lời chủ kho, có ngày 2026-11-27; ghi quyết định `wiki/decisions/0052-chuan-hoa-he-design.md` | `design/behaviors.md` |
+| Sổ hành vi | dòng «Sửa dữ liệu», «Phím trong lưới», «Chữ mở trong ô», «Ô không sửa được» theo luật cũ | đổi đúng lời chủ kho, có ngày 2026-11-27; ghi quyết định `wiki/decisions/0053-chuan-hoa-he-design.md` | `design/behaviors.md` |
 
 ### Đo màu trên màn thật (bước thiết kế, 28/11)
 
