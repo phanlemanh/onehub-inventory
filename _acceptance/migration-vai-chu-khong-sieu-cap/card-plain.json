@@ -1,0 +1,38 @@
+{
+  "feature_plain": "Lần đưa bản thử lên kế tiếp sẽ đi qua bước nâng cấp cơ sở dữ liệu thay vì dừng ở tệp 002 như ngày 28/11, vì PR #135 thêm hai tệp nâng cấp mới chạy được trên tài khoản quản trị của Supabase (tài khoản này không có quyền siêu cấp).",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ tái hiện đúng lỗi của bản thử: bỏ hai tệp mới thì việc nâng cấp dừng ở tệp 002 với đúng câu lỗi ngày 28/11 (đối chứng)."},
+    {"id": "AC-2", "p": "Sẽ nâng cấp trọn trên Postgres 17 bằng tài khoản giống Supabase, cả khi bắt đầu từ cơ sở trống (như bản thật) lẫn khi nối tiếp chỗ bản thử đã dừng."},
+    {"id": "AC-3", "p": "Sẽ cho ra đúng quyền và chủ của mọi bảng, hàm, kiểu, các vai và thành viên của vai như khi chạy bằng siêu vai; chỗ khác duy nhất là tài khoản quản trị giữ thêm đúng các quyền đã khai."},
+    {"id": "AC-4", "p": "Sẽ không đổi gì ở cơ sở đã nâng cấp từ trước (máy dãy, CI): chạy lại chỉ áp bù hai tệp mới ở cuối, kết quả như cũ, không phải dựng lại."},
+    {"id": "AC-5", "p": "Sẽ giữ bộ kiểm cách ly sàn mà lệnh đưa bản lên chạy (bộ chỉ đọc) xanh khi chạy bằng tài khoản giống Supabase."},
+    {"id": "AC-6", "p": "Sẽ chỉ thêm tệp nâng cấp mới, không sửa tệp nào đã có; ngoài hồ sơ, PR chỉ đổi đúng các tệp của thiết kế."},
+    {"id": "AC-7", "p": "Sẽ có CI thật của PR xanh: bộ kiểm cơ sở dữ liệu chạy thật trên Postgres 16 và có chạy bài kiểm mới."},
+    {"id": "AC-8", "p": "Sẽ giữ kho xanh: bài kiểm mới, cùng bộ đo chạy lại trên Postgres 16, kiểm tra chung, dựng bản và kiểm giao diện ở bốn khổ màn."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Không sửa tệp nâng cấp đã có, luật quản trị hay tệp tự chạy CI (kể cả đổi CI sang Postgres 17)."},
+    {"id": "OOS-2", "p": "Không sửa hai ca của bài kiểm cách ly đang đỏ trên Postgres 17 vì ghim câu báo của bản 16."},
+    {"id": "OOS-3", "p": "Không tự đưa bản thử lên lại: chủ kho làm sau khi gộp."},
+    {"id": "OOS-4", "p": "Không chứng những điểm riêng của Supabase ngoài bốn quyền của tài khoản quản trị; lần đưa bản kế mới chứng được."}
+  ],
+  "scope_plain": "Bốn việc cố ý để ngoài vòng này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Trục · phần tử · tiêu chí phủ."},
+    {"i": 1, "p": "Ai chạy nâng cấp: tài khoản giống Supabase (AC-1 đến AC-5) và siêu vai của máy dãy, CI (AC-3, AC-4)."},
+    {"i": 2, "p": "Bản Postgres: 17 như Supabase (AC-1 đến AC-5) và 16 như CI, máy dãy (AC-7, AC-8)."},
+    {"i": 3, "p": "Trạng thái trước khi chạy: cơ sở trống như bản thật, dừng giữa chừng như bản thử (AC-2), đã nâng cấp từ trước (AC-4)."},
+    {"i": 4, "p": "Hai việc của tệp chuẩn bị đều được chứng là cần: thiếu quyền đổi vai thì dừng (AC-1), thiếu quyền tạo tạm cũng dừng (bản phá của AC-3)."},
+    {"i": 5, "p": "Kết quả sau nâng cấp: chủ, quyền, quyền mặc định, vai và thành viên của vai, vai danh tính không giữ quyền tạo (AC-3, AC-4)."},
+    {"i": 6, "p": "Cách ly sàn sau nâng cấp: bộ kiểm chỉ đọc của lệnh đưa bản lên (AC-5)."},
+    {"i": 7, "p": "Luật kho: chỉ thêm tệp mới, PR gọn (AC-6), kho xanh (AC-8)."},
+    {"i": 8, "p": "Các trục lấy từ chính hai tệp mới và ba trạng thái thật đã đọc ngày 28/11 — bản thử dừng sau tệp đầu, bản thật còn trống."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Việc gộp bước duyệt kế hoạch vào Cổng Phạm vi từng dựa vào lời của một hồ sơ khác; nay thành câu hỏi Hỏi-1 cho anh."},
+    {"i": 1, "p": "Phép so kết quả chưa nhìn vai và thành viên của vai; đã thêm phép so với một cụm chỉ siêu vai chạy, kê đích danh quyền tài khoản quản trị giữ thêm, và một bản phá phải đỏ."},
+    {"i": 2, "p": "Dữ liệu mẫu cho bộ kiểm cách ly chưa rõ ai ghi; nay ghi bằng chính tài khoản giống Supabase."},
+    {"i": 3, "p": "Chưa đọc bản thật; đã đọc chỉ đọc: Postgres 17.11, cùng bốn quyền, chưa nâng cấp gì — đúng ca cơ sở trống đã đo."}
+  ],
+  "decisions_plain": []
+}
