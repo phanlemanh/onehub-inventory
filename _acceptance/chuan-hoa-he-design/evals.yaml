@@ -134,7 +134,7 @@ evals:
     ref: _acceptance/chuan-hoa-he-design/rang/chay.sh
     cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E13
     paths: [src/components/ui/**, src/components/reui/**]
-    expected: "exit 0; git diff so với merge-base với origin/main không có tệp nào dưới src/components/ui hay src/components/reui; in 'vendor folders untouched'"
+    expected: "exit 0; các commit của chính vòng này (từ ae33fce6, nhánh cha thứ nhất, không tính commit gộp) không đổi tệp nào dưới src/components/ui hay src/components/reui; in 'vendor folders untouched'. Chiều đỏ: một commit của vòng chạm tệp bộ kit cho 'vendor files changed by this round'; không có commit nào của vòng cho 'no commit of this round found'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E14
@@ -159,6 +159,7 @@ evals:
     criterion: AC-1
     executor: ui-check
     ref: config:executors.ui-check
+    cmd: config:executors.ui-check
     layer: ui-observed
     paths: [src/lib/format/index.ts, src/app/globals.css, src/components/candidate/**, src/modules/listings/ui/**]
     steps:

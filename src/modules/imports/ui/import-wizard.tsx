@@ -48,7 +48,7 @@ const MARK_VARIANT: Record<
   "success-light" | "primary-light" | "warning-light" | "destructive-light"
 > = {
   keep: "success-light",
-  // Not info: that tone is the «Đang giao dịch» status alone (VP11, AC-1), so a mark never reads as a status.
+  // Not info: that tone is the Pending status alone (VP11, AC-1), so a mark never reads as a status.
   fixed: "primary-light",
   ask: "warning-light",
   block: "destructive-light",

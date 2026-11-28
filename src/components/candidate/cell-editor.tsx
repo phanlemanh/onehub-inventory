@@ -65,6 +65,18 @@ export function CellEditor({
     [anchor, find],
   );
   const saveRef = useRef<(() => void) | null>(null);
+  // Whether a pointer is down anywhere on the page, read when the editor is left.
+  const pressing = useRef(false);
+  useEffect(() => {
+    const down = () => (pressing.current = true);
+    const up = () => (pressing.current = false);
+    window.addEventListener("pointerdown", down, true);
+    window.addEventListener("pointerup", up, true);
+    return () => {
+      window.removeEventListener("pointerdown", down, true);
+      window.removeEventListener("pointerup", up, true);
+    };
+  }, []);
   const hand = useCallback((save: (() => void) | null) => {
     saveRef.current = save;
   }, []);
@@ -77,8 +89,13 @@ export function CellEditor({
       onOpenChange={(open, details) => {
         if (open) return;
         const save = saveRef.current;
-        if (details.reason === "outside-press" && save) save();
-        else onClose();
+        // A press outside, or focus leaving for another cell (the grid takes it on mouse down), is «away».
+        if ((details.reason !== "outside-press" && details.reason !== "focus-out") || !save)
+          return onClose();
+        // While the pointer is down on another cell the grid is selecting and does not draw its rows again, so a value
+        // saved then would not show: save once the press ends (a grid's own mouse up runs first).
+        if (!pressing.current) return save();
+        window.addEventListener("pointerup", () => setTimeout(save, 0), { once: true });
       }}
     >
       <PopoverPrimitive.Portal>

@@ -228,7 +228,7 @@ function checkPlaces(byScheme: Record<Scheme, Map<string, Lab>>): number {
       const d = deltaE2000(got, m.get(`grid ${status}`)!);
       if (d > 3)
         throw new Error(
-          `status ${status} differs between grid and ${place}, ${scheme}: ${d.toFixed(1)}`,
+          `status ${status} differs between grid and ${place === "head" ? "record head" : place}, ${scheme}: ${d.toFixed(1)}`,
         );
     }
   }
@@ -253,7 +253,7 @@ test.describe("AC-2 · one colour per status everywhere", () => {
     const other = new Map(by.light);
     other.set("head Active", by.light.get("grid Withdrawn")!);
     expect(() => checkPlaces({ ...by, light: other })).toThrow(
-      "status Active differs between grid and head, light",
+      "status Active differs between grid and record head, light",
     );
     const missing = new Map(by.dark);
     missing.delete("history Pending 0905");

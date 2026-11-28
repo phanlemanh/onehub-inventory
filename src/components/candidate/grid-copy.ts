@@ -14,7 +14,7 @@ export const GRID_COPY = {
   clearFilter: "Xoá lọc",
   lockedPrefix: "Ô đang khoá",
   /** The pencil on a cell the session may edit in place (VP11): what hovering it says. */
-  editHint: "Sửa ô này — Enter",
+  editHint: "Bấm Enter để đổi ô này",
   empty: {
     title: "Chưa có dữ liệu ở đây",
     why: "Vùng này chưa có dòng nào vì chưa ai thêm hay nhập dữ liệu vào.",
