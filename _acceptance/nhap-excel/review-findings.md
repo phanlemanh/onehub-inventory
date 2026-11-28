@@ -110,6 +110,9 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Đã sửa trên nhánh:
 
+- S4-r10 t5 · A row left out stores the text of columns the person dropped, the owner's name and phone column too — cột đã bỏ không bao giờ được giữ, ở mọi loại dòng (kể cả dòng căn đã có tin, chỗ hở có từ trước); bảng viết trước thêm cột số chủ và cột ghi chú đã bỏ (74378218)
+- S4-r10 t7 · the 500 body is only forbidden two substrings — bài ghim đúng lời lỗi «server-error» (74378218)
+- S4-r10 t8 · the llm scan's planted relative path matched by the word «llm» — ca gieo đường dẫn tương đối nay không có chữ ấy (74378218)
 - VP11 r2 · (9) a row whose unit code names several units, unanswered, is left out with nothing kept — mọi ô có chữ của dòng ấy, kể cả mã căn, nay giữ trong bản ghi lần nhập; màn xem trước và màn Xong nói «M dòng chưa nhập — mã căn trỏ nhiều căn mà chưa chọn»; số «ô giữ chữ gốc» của màn là số của bản ghi (một luật chung, table.ts keptCellsOf); bảng viết trước thêm loại dòng thứ năm (e6364f7a)
 - VP11 r2 · (12) a .csv not in UTF-8 is read with replacement characters — tệp ấy nay rơi vào «tệp lỗi» với câu nói rõ cách lưu lại bằng CSV UTF-8 (e6364f7a)
 - VP11 r2 · (2) new dependencies of imports without a decision page — wiki/decisions/0055-mo-dun-nhap-tep-dua-vao-bon-mo-dun.md (e6364f7a)
@@ -136,6 +139,9 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
+- S4-r10 t1 · Personal data: an owner's name or phone column is caught only by the words of its header → #21
+- S4-r10 t2 · the app role can UPDATE every column of import_runs → mục «Siết cửa máy chủ của nhập tệp»
+- S4-r10 t3, t4 · the card does not list SP-1 among the rules touched; CI not green on the commit under review → thủ tục trước khi gộp
 - S4-r9 t5 · Domain: the ontology does not match the new columns → #23
 - S4-r9 t6 · import ids built from Math.random → nhóm «Notes, review process and small choices»
 - S4-r9 t1, t2 · CI gate red on the head graded; the PR's «Human decisions needed» section is stale → thủ tục trước khi gộp: ghim lại các hồ sơ cũ, viết lại mô tả PR
@@ -162,6 +168,7 @@ Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
 Thuộc hồ sơ khác, nhánh này không viết dòng nào của tệp:
 
+- S4-r10 t6 · the «share abort → nothing» case of tests/hoi-dau-chu-bao-sai.test.tsx waits one tick — bài của hồ sơ hoi-dau-chu-bao-sai (bản sửa của dãy N), đã báo giám sát
 - S4-r9 t4 · decision 0052 not updated for the 015_vai / 020 pair — trang của PR #135; hàng 11 ghi cặp tệp ấy ở dòng sổ của mình và ở trang 0055
 - S4-r9 t7 · the measure of migration-vai-chu-khong-sieu-cap pins only the first grant/revoke pair — phép đo của hồ sơ PR #135
 - S4-r8 t6, t10 · the «Khớp» column and the author's kit path in _acceptance/khung-luoi-va-ngan-chi-tiet/rang/dung-lai-mang-sang.mjs — công cụ của hồ sơ VP10
