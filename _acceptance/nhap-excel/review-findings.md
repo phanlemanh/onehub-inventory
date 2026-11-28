@@ -22,14 +22,14 @@
 
 - **Personal data beyond header names (gồm #21, #33, #46, #11)**
   Người dùng thấy gì: Nếu sàn để số điện thoại hay tên chủ nhà trong một cột đặt tên khác thì chúng vẫn được nạp và lưu lại trong lần nhập, không có dấu là dữ liệu cá nhân, không xoá được khi xoá liên hệ. Bài kiểm việc chặn cột chủ nhà cũng chưa thử hết các cách viết tên cột.
-  Căn cứ: Số chủ nhà có thể lộ trong nội bộ sàn khi tên cột viết lệch. Sửa đúng cần một tính năng kiểm giá trị ô, đánh dấu và xoá dữ liệu cá nhân, nên nên làm thành việc riêng.
+  Căn cứ: Số chủ nhà có thể lộ trong nội bộ sàn khi tên cột viết lệch. Sửa đúng cần một tính năng kiểm giá trị ô, đánh dấu và xoá dữ liệu cá nhân, nên làm thành việc riêng, tên gợi ý «Dữ liệu cá nhân trong tệp nhập». Khuyến nghị của giám sát: nên xong trước khi bản thật có dữ liệu của sàn thật — hôm nay kho chưa lên bản thật.
   file: `src/modules/imports/targets.ts`
   severity: medium
   Đề xuất: new-contract
 
 - **Rules held only by the screen, not the server or database (gồm #22, #37, #39, #3, #4, #6)**
   Người dùng thấy gì: Người có quyền nhập, nếu gọi thẳng máy chủ hay cơ sở dữ liệu mà không qua màn, có thể mở lại lần nhập đã hoàn tác, đóng lần nhập khi còn thiếu dòng, ghi giá trị trường riêng khác với bảng đã xem, sửa cột bất kỳ của bản ghi lần nhập, hay gửi một yêu cầu rất lớn; cơ sở dữ liệu cũng chưa tự giữ «mỗi lần chào đúng một căn».
-  Căn cứ: Chỉ người đã có quyền trong cùng sàn mới làm được, không lộ sang sàn khác và hoàn tác gỡ được. Siết cho đúng cần đổi cơ sở dữ liệu và cửa máy chủ, nên cần người quyết thành việc riêng.
+  Căn cứ: Điều không xảy ra được: không lọt sang sàn khác, và người không có quyền nhập không làm được gì trong số ấy; hoàn tác vẫn gỡ được. Siết cho đúng cần đổi cơ sở dữ liệu và cửa máy chủ, nên làm thành việc riêng, tên gợi ý «Siết cửa máy chủ của nhập tệp». Khuyến nghị của giám sát: nên xong trước khi bản thật có dữ liệu của sàn thật — hôm nay kho chưa lên bản thật.
   file: `db/migrations/015_nhap_excel.sql`
   severity: medium
   Đề xuất: new-contract
@@ -64,10 +64,10 @@
 
 - **A check of the grid frame's record measures the whole branch (gồm #12)**
   Người dùng thấy gì: Khi chấm lại tính năng khung lưới trên nhánh này, phép «thư mục thành phần cài sẵn không đổi» báo đỏ oan, vì hàng này cài thêm thành phần bước (stepper) đúng cách. Lỗi nằm ở cách đo của hồ sơ khung lưới, không ở màn.
-  Căn cứ: Phép ấy chặn việc gộp hàng này sau khi khung lưới lên nhánh chính; giám sát đã xếp: sau khi khung lưới vào nhánh chính, hàng này ghim mốc đo của phép ấy vào đúng đoạn của khung lưới rồi ghim lại hồ sơ ấy.
+  Căn cứ: Đã có cách xử, làm ngay sau khi khung lưới vào nhánh chính: hàng này ghim mốc đo của phép ấy vào đúng đoạn thay đổi của khung lưới, ghi «sửa sau ký» ở hồ sơ khung lưới và ghim lại riêng hồ sơ ấy (giám sát xếp, G-2811-38). Không cần anh quyết.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh`
   severity: medium
-  Đề xuất: new-contract
+  Đề xuất: known-limits
 
 ## Đã soát lại — không còn là việc người quyết
 
