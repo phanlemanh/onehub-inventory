@@ -48,7 +48,7 @@ thái của vùng giữ như hàng 10 và 3g đã chứng minh.
 | Chữ dài | đạt | tests/e2e/screens/screens.spec.ts (chu-dai); tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts (than-ho-so: hai dòng đều nhau ở 320) |
 | Không đủ quyền | đạt | tests/tin-rao-giu-gia-tri-rieng.test.tsx (nut-theo-quyen E11b: Sửa, Lấy lại theo bảng quyền); tests/db/tin-rao-gia-tri-rieng.db.test.ts (sua-lay-lai-theo-vai: 403 không updateListing) |
 | Xung đột khi lưu | đạt | tests/tin-rao-gia-tri-rieng.test.ts (o-gui-mot-lan: 409 hiện giá trị máy chủ); tests/db/tin-rao-gia-tri-rieng.db.test.ts (hai-nguoi-cung-sua) |
-| Phiên hết hạn | đạt | không đổi từ hàng 3g: tests/sua-thong-tin-can.test.tsx (hop-nam-ket-cuc: phiên hết hạn) — hộp «Sửa» khối căn dùng cùng luật đọc kết cục (src/lib/write-failure.ts) |
+| Phiên hết hạn | đạt | không đổi từ hàng 3g: tests/sua-thong-tin-can.test.tsx (hop-nam-ket-cuc: phiên hết hạn) — hộp «Sửa» khối căn dùng cùng một luật đọc kết cục ghi |
 | Mất mạng khi lưu | đạt | src/modules/listings/ui/http-save-door.test.ts (offline không gửi gì); tests/sua-thong-tin-can.test.tsx (hop-nam-ket-cuc: mất mạng) |
 | Link hết hạn | không áp | Trạng thái của trang khách; Bảng hàng là màn nội bộ |
 
