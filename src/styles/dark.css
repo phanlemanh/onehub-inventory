@@ -6,7 +6,9 @@
   --foreground: var(--color-neutral-50);
   --card: var(--color-neutral-900);
   --card-foreground: var(--color-neutral-50);
-  --popover: var(--color-neutral-900);
+  /* Floating surfaces (record panel, menus, dialogs) stand half a step above the grid's card (VP11, owner 2026-11-28,
+     Hỏi-4): a whole step (neutral-800) would equal the menus' hover mark and hide it. */
+  --popover: color-mix(in oklch, var(--color-neutral-900) 50%, var(--color-neutral-800));
   --popover-foreground: var(--color-neutral-50);
   --primary: color-mix(in oklch, var(--onehub-blue) 60%, white);
   --primary-foreground: var(--color-neutral-950);
@@ -28,7 +30,7 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: color-mix(in oklch, var(--onehub-blue) 60%, white);
   /* Status tones read on a dark surface: the 500 and 600 steps fall under 4.5:1 there. */
-  --info: var(--color-violet-400);
+  --info: var(--color-fuchsia-400);
   --destructive: var(--color-red-400);
   color-scheme: dark;
 }

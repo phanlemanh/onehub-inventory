@@ -86,8 +86,10 @@
   --success-foreground: var(--color-green-800);
   --warning: var(--color-amber-500);
   --warning-foreground: var(--color-amber-800);
-  --info: var(--onehub-blue);
-  --info-foreground: var(--color-blue-800);
+  /* «Đang giao dịch» (VP11, owner 2026-11-28, Hỏi-2): fuchsia, so it never reads as the brand blue of «Đã bán». Only the
+     status table uses this tone in the app (tests/mau-trang-thai.test.ts). */
+  --info: var(--color-fuchsia-600);
+  --info-foreground: var(--color-fuchsia-700);
   --invert: var(--color-neutral-900);
   --invert-foreground: var(--color-neutral-50);
   --border: var(--color-neutral-200);
@@ -124,8 +126,8 @@
   --destructive-foreground: var(--color-red-600);
   --success: var(--color-emerald-500);
   --success-foreground: var(--color-emerald-600);
-  --info: var(--color-violet-500);
-  --info-foreground: var(--color-violet-600);
+  --info: var(--color-fuchsia-500);
+  --info-foreground: var(--color-fuchsia-600);
   --warning: var(--color-yellow-500);
   --warning-foreground: var(--color-yellow-600);
   --invert: var(--color-zinc-700);

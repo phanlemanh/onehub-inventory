@@ -337,7 +337,7 @@ describe("continuous run and read-only cells", () => {
 
   function checkLocked(root: HTMLElement): void {
     const reason = root.querySelector('[data-slot="cell-lock-reason"]')?.textContent;
-    if (root.querySelector('[data-slot="cell-lock"]') && !reason) {
+    if (root.getAttribute("aria-description") && !reason) {
       throw new Error("locked cell without reason");
     }
   }
@@ -348,11 +348,12 @@ describe("continuous run and read-only cells", () => {
     expect(root.getAttribute("aria-description")).toBeNull();
   });
 
-  it("shows a locked cell with a lock and its reason", () => {
+  // VP11 (owner 2026-11-27): every lock on the grid comes from the row's status, which the row shows; no padlock is drawn.
+  it("shows a locked cell without a padlock, with its reason", () => {
     const { root } = cellText(
       <TypedCell kind="money" value={4_850_000_000} lockedReason="giá đang được kiểm lại" />,
     );
-    expect(root.querySelector('[data-slot="cell-lock"]')).not.toBeNull();
+    expect(root.querySelector("svg")).toBeNull();
     expect(root.getAttribute("aria-description")).toContain("giá đang được kiểm lại");
     expect(root.getAttribute("title")).toContain("giá đang được kiểm lại");
     expect(() => checkLocked(root)).not.toThrow();
