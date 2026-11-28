@@ -266,7 +266,7 @@ export type Destination =
  */
 export const DESTINATION: Record<StandardTarget, Destination> = {
   unitCode: { unit: "code" },
-  "Unit.buildingName": { unit: "building" },
+  "Unit.buildingName": { unit: "building" }, // on a pending unit the row creates; otherwise kept as unit-attribute
   "Unit.livingArea": { kept: "unit-attribute" },
   "Unit.bedroomsTotal": { kept: "unit-attribute" },
   "Unit.directionFaces": { kept: "unit-attribute" },
@@ -364,22 +364,46 @@ export async function writeBatch(
       )
         kept.push({ row: input.rowOffset + r, header: col.header, raw, why: keptAs ?? cell.why });
     });
-    if (outcome.fate !== "create" || !outcome.unit) continue;
+    // The tower text has a place only on a pending unit this row creates; any other row keeps it as written, like the
+    // unit attributes (VP11 S4-r7 t4: a unit that already exists took nothing of it, and the cell was lost).
+    const buildingRaw = buildingAt === undefined ? "" : (input.rows[r]![buildingAt] ?? "");
+    const keepBuilding = () => {
+      if (
+        buildingAt !== undefined &&
+        buildingRaw.trim() !== "" &&
+        cells[buildingAt]!.mark !== "ask"
+      )
+        kept.push({
+          row: input.rowOffset + r,
+          header: marked.columns[buildingAt]!.header,
+          raw: buildingRaw,
+          why: "unit-attribute",
+        });
+    };
+    if (outcome.fate !== "create" || !outcome.unit) {
+      keepBuilding();
+      continue;
+    }
     let unit: NewListing["unit"];
     if ("unitKey" in outcome.unit) {
+      keepBuilding();
       const u = (
         await c.query(`select upi from catalog_units where unit_key = $1`, [outcome.unit.unitKey])
       ).rows[0] as { upi: string };
       unit = { upi: u.upi };
-    } else if ("pendingUnitId" in outcome.unit)
+    } else if ("pendingUnitId" in outcome.unit) {
+      keepBuilding();
       unit = { pendingUnitId: outcome.unit.pendingUnitId };
-    else {
+    } else {
       const code = outcome.unit.newPending;
       const known = learned.pendingUnits.find((p) => fold(p.rawCode) === fold(code));
-      if (known) unit = { pendingUnitId: known.id };
-      else {
-        const building =
-          buildingAt === undefined ? "" : (input.rows[r]![buildingAt] ?? "").trim().slice(0, 80);
+      if (known) {
+        keepBuilding();
+        unit = { pendingUnitId: known.id };
+      } else {
+        const building = buildingRaw.trim().slice(0, 80);
+        // A tower text longer than the pending unit holds is also kept whole, as written.
+        if (building !== buildingRaw.trim()) keepBuilding();
         const w = await learnFromImport(
           runAs,
           {
