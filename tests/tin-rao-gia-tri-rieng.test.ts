@@ -21,7 +21,9 @@ import { LABELS } from "../src/generated/labels";
 import type { Listing } from "../src/generated/ontology";
 import { formatArea, formatByKind } from "../src/lib/format";
 import { label } from "../src/modules/company-config";
+import { markValue, type LayerView } from "../src/modules/imports";
 import {
+  attributeFits,
   effectiveAttributes,
   sameAttribute,
   type CatalogAttributes,
@@ -514,5 +516,74 @@ describe("hieu-luc-ma-tran (E1)", () => {
       "surface reads catalog instead of listing: card",
     ]);
     expect(() => surfaceErrors({}, "x")).toThrow("no surface measured");
+  });
+});
+
+// G-2811-91: the import's preview and its write ask one rule of what a unit attribute takes (attributeFits). A cell the
+// preview shows with a value is written with that value; one the write would refuse is asked in the preview instead.
+const NO_LAYER: LayerView = { labels: [], fields: [], aliases: [], templates: [] };
+const STANDARD_OF: Record<UnitAttributeField, string> = {
+  livingArea: "Unit.livingArea",
+  bedroomsTotal: "Unit.bedroomsTotal",
+  floor: "Unit.floor",
+  directionFaces: "Unit.directionFaces",
+  propertySubType: "Unit.propertySubType",
+};
+/** The edges of each attribute: zero, below zero, past what the column holds, not a number, and one plain value. */
+const EDGES: Record<UnitAttributeField, string[]> = {
+  livingArea: ["0", "0,0", "-5", "1e400", "ba", "72,5", "100000000"],
+  bedroomsTotal: ["0", "-1", "2,5", "3000000000", "2147483647", "ba", "2"],
+  floor: ["0", "-1", "007", "15a", "tầng", "99999999999"],
+  directionFaces: ["Đông Nam", "giữa", "0"],
+  propertySubType: [label("SubTypeCondominium"), "2PN", "0"],
+};
+
+/** Cells the preview shows with a value that the write, by `fits`, would refuse: named «shown then lost». */
+function shownThenLost(
+  fits: (f: UnitAttributeField, v: unknown) => boolean = attributeFits,
+): string[] {
+  const lost: string[] = [];
+  for (const [field, raws] of Object.entries(EDGES) as [UnitAttributeField, string[]][])
+    for (const raw of raws) {
+      const target = { standard: STANDARD_OF[field] } as Parameters<typeof markValue>[0];
+      const m = markValue(target, raw, { layer: NO_LAYER, today: "2026-11-28" });
+      if (m.mark !== "ask" && m.value !== null && !fits(field, m.value))
+        lost.push(`shown then lost: ${field} «${raw}»`);
+    }
+  return lost;
+}
+
+describe("xem-truoc-bang-ghi (G-2811-91)", () => {
+  it("xem-truoc-bang-ghi: at every edge of the five attributes, what the preview shows is what the write takes", () => {
+    expect(shownThenLost()).toEqual([]);
+    const asked = (field: UnitAttributeField, raw: string) =>
+      markValue({ standard: STANDARD_OF[field] } as Parameters<typeof markValue>[0], raw, {
+        layer: NO_LAYER,
+        today: "2026-11-28",
+      }).mark;
+    // The cells the write would refuse are asked, not shown: an area of 0, a count past the column, not a number.
+    for (const [field, raw] of [
+      ["livingArea", "0"],
+      ["livingArea", "-5"],
+      ["livingArea", "ba"],
+      ["bedroomsTotal", "-1"],
+      ["bedroomsTotal", "2,5"],
+      ["bedroomsTotal", "3000000000"],
+      ["bedroomsTotal", "ba"],
+    ] as [UnitAttributeField, string][])
+      expect(asked(field, raw), `${field} «${raw}»`).toBe("ask");
+    // A plain value at the edge is still read: no bedrooms, the largest count the column holds, a large area.
+    for (const [field, raw] of [
+      ["bedroomsTotal", "0"],
+      ["bedroomsTotal", "2147483647"],
+      ["livingArea", "100000000"],
+    ] as [UnitAttributeField, string][])
+      expect(asked(field, raw), `${field} «${raw}»`).not.toBe("ask");
+  });
+
+  it("break: a write rule stricter than the preview's names each value shown then lost", () => {
+    const stricter = (f: UnitAttributeField, v: unknown) =>
+      f === "bedroomsTotal" ? attributeFits(f, v) && v !== 0 : attributeFits(f, v);
+    expect(shownThenLost(stricter)).toEqual(["shown then lost: bedroomsTotal «0»"]);
   });
 });

@@ -3,7 +3,7 @@
 // server call the same functions, so the numbers on the screen are the numbers the server writes. Unit codes are looked
 // up on the server (lookupInCompany) and passed in as `units`.
 import { isFloor } from "@/modules/catalog";
-import { canMove, readPrice } from "@/modules/listings";
+import { attributeFits, canMove, readPrice } from "@/modules/listings";
 import {
   PENDING_CODE_LIMIT,
   checkCustomValue,
@@ -17,6 +17,7 @@ import {
 import type { ListingStandardStatus } from "@/generated/ontology";
 
 import {
+  FILE_VALUE_OF,
   HEADER_DICTIONARY,
   isOwnerFolded,
   STANDARD_HEADER_CONCEPTS,
@@ -347,8 +348,20 @@ function closedValue(
   return ask("unknown-value");
 }
 
-/** The mark and value of one cell of a column with a target (unit codes excepted: see markUnit). */
+/**
+ * The mark and value of one cell of a column with a target (unit codes excepted: see markUnit). A unit attribute's value
+ * is one the write takes, by the same rule the write asks (attributeFits of the listings module, row 3h): a value it
+ * would refuse — an area of 0, a bedroom count past what the column holds — is asked here, never shown and then lost.
+ */
 export function markValue(target: Target, raw: string, ctx: ValueContext): CellMark {
+  const out = readValue(target, raw, ctx);
+  const field = "standard" in target ? FILE_VALUE_OF[target.standard] : undefined;
+  if (field && out.mark !== "ask" && out.value !== null && !attributeFits(field, out.value))
+    return ask("attribute-unfit");
+  return out;
+}
+
+function readValue(target: Target, raw: string, ctx: ValueContext): CellMark {
   if (raw.trim() === "") return { mark: "keep", value: null, why: "empty" };
   if ("skip" in target) return { mark: "keep", value: null, why: "column-skipped" };
   if ("standard" in target) {

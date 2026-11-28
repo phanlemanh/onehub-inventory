@@ -203,13 +203,20 @@ export function readDirection(raw: string): AttributeRead<DirectionValue> {
 export const isPropertySubType = (v: unknown): v is ListingPropertySubType =>
   (PROPERTY_SUB_TYPES as readonly unknown[]).includes(v);
 
-/** Whether a stored value is one the save door takes for that attribute (the server checks with the same readers). */
+/** The largest value of a Postgres integer column (listings.bedrooms_total). */
+const MAX_INT = 2_147_483_647;
+
+/**
+ * Whether a stored value is one the save door takes for that attribute (the server checks with the same readers). The
+ * import's preview asks the same rule (markValue), so a value it shows is the value written.
+ */
 export function attributeFits(field: UnitAttributeField, value: unknown): boolean {
   switch (field) {
     case "livingArea":
       return typeof value === "number" && Number.isFinite(value) && value > 0;
     case "bedroomsTotal":
-      return typeof value === "number" && Number.isInteger(value) && value >= 0;
+      // The column is an integer: a count past it is refused here, not by the database at write.
+      return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= MAX_INT;
     case "floor":
       return typeof value === "string" && isFloor(value);
     case "directionFaces":
