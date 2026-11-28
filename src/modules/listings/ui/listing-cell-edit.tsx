@@ -6,6 +6,7 @@
 // Every rule is called from ../edit-rules; nothing here compares numbers or lists moves by itself.
 import { useState, type KeyboardEvent } from "react";
 
+import { useSaveOnAway } from "@/components/candidate/cell-editor";
 import type { CellEditSession, GridRow } from "@/components/candidate/data-region";
 import { GRID_COPY } from "@/components/candidate/grid-copy";
 import { FormDialog } from "@/components/candidate/form-dialog";
@@ -118,6 +119,8 @@ function PriceEditor({
     if (priceAsksAgain(previous, read.value)) return setAsking(read.value);
     save(read.value, move);
   };
+  // Clicking away saves like Enter (VP11): a value not understood keeps the editor open and says so.
+  useSaveOnAway(() => submit());
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -373,6 +376,8 @@ function CustomTextEditor({
     if (own && read.value === null && !attribute?.hasOwn) return;
     if (!sameCustomValue(read.value, stored)) save(read.value);
   };
+  // Clicking away saves like Enter (VP11): a value not understood keeps the editor open and says so.
+  useSaveOnAway(() => submit());
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();

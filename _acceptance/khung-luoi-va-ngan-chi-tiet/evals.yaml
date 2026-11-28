@@ -141,13 +141,14 @@ evals:
   - id: E18
     criterion: AC-1
     executor: ui-check
+    cmd: config:executors.ui-check
     layer: ui-observed
     paths: [src/components/candidate/**, src/components/templates/app-shell/**, src/modules/listings/ui/**]
     steps:
       - "Open _acceptance/khung-luoi-va-ngan-chi-tiet/evidence/truoc/ (frames taken on main before this round) and _acceptance/khung-luoi-va-ngan-chi-tiet/evidence/sau/ (same screens, same sizes, same data, after this round)."
       - "For each of 360, 414, 1024, 1440, light and dark, compare Bảng hàng with the record of one unit open, the phone toolbar, the filter row and the record head."
-      - "Open evidence/pha/ngan-1440-light-khong-tach.png and evidence/pha/ngan-1440-dark-khong-tach.png (the same screen with the record's border, shadow and surface removed) beside sau/ngan-1440-light.png and sau/ngan-1440-dark.png: say for each of the four whether the record stands apart from the grid by eye; the two khong-tach frames must read as not apart."
-    expected: "Sau: ngăn nổi từ dưới thanh trên tới đáy và TÁCH khỏi lưới thấy được bằng mắt ở CẢ nền sáng lẫn tối — nền sáng: viền trái thấy được và dải bóng tối dần đổ sang lưới ngay bên trái ngăn (nền ngăn trắng như trang); nền tối: nền ngăn sáng hơn trang và viền trái thấy được; chiều đỏ: hai khung evidence/pha/ngan-1440-{light,dark}-khong-tach.png (bỏ viền, bóng, nền riêng) phải bị chấm là KHÔNG tách — chấm chúng là tách thì phép nhìn không phân biệt được; thanh công cụ dừng trước ngăn, nút chỉ hình; đầu ngăn một dòng, nút góc phải trên; lưới khít màn; điện thoại: «Lọc» có chữ, nút to, «Lưu góc nhìn» hiện thẳng; ô lọc thẳng hàng; không nút «Bỏ ghim» trên tiêu đề; tối đọc được; ngoài các chỗ ấy màn không đổi dáng"
+      - "Open evidence/pha/ngan-1440-light-khong-tach.png and evidence/pha/ngan-1440-dark-khong-tach.png (the same screen with the record's border, shadow and surface removed) beside sau/ngan-1440-light.png and sau/ngan-1440-dark.png: say for each of the four whether the record stands apart from the grid by eye; the two khong-tach frames must read as not apart. In dark the record's surface is the grid card's own colour in the current palette, so there the record stands apart by its left line alone; the dark khong-tach frame keeps that surface and drops the line and shadow."
+    expected: "Sau: ngăn nổi từ dưới thanh trên tới đáy và TÁCH khỏi lưới thấy được bằng mắt ở CẢ nền sáng lẫn tối — nền sáng: viền trái thấy được và dải bóng tối dần đổ sang lưới ngay bên trái ngăn (nền ngăn trắng như trang); nền tối: viền trái thấy được; nền ngăn là nền lớp nổi — ở bảng màu hiện nay bằng nền thẻ lưới và sáng hơn nền trang; bóng gần như không thấy (G-2811-16; nền ngăn sáng hơn lưới là câu của VP11); chiều đỏ: hai khung evidence/pha/ngan-1440-{light,dark}-khong-tach.png phải bị chấm là KHÔNG tách — nền sáng: bỏ viền, bóng, nền riêng; nền tối: giữ nền ngăn bằng nền lưới, bỏ viền và bóng — chấm chúng là tách thì phép nhìn không phân biệt được; thanh công cụ dừng trước ngăn, nút chỉ hình; đầu ngăn một dòng, nút góc phải trên; lưới khít màn; điện thoại: «Lọc» có chữ, nút to, «Lưu góc nhìn» hiện thẳng; ô lọc thẳng hàng; không nút «Bỏ ghim» trên tiêu đề; tối đọc được; ngoài các chỗ ấy màn không đổi dáng"
     evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
 
   - id: E19

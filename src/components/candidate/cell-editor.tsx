@@ -1,14 +1,39 @@
 "use client";
 
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
-import { useMemo, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  type ReactNode,
+} from "react";
 
 /**
  * The editor of one grid cell (row 4), shaped after the ReUI block data-grid-editing-2 (Hỏi-4): it sits exactly on the
  * selected cell, so the input is where the value was, and what the screen adds below it (a read-back line, a list)
- * hangs right under the cell. The region decides when it opens (F2, typing, double-click — Enter keeps opening the
- * record) and gives focus back to the cell when it closes; the screen gives the content.
+ * hangs right under the cell. The region decides when it opens (Enter on a cell that edits in place, F2, typing,
+ * double-click — VP11) and gives focus back to the cell when it closes; the screen gives the content. Esc closes it
+ * without a write; clicking away from it saves like Enter (`onAway`, VP11, owner 2026-11-27).
  */
+/** Where an editor hands over its «save as Enter», for a press outside the editor (VP11). */
+const SaveOnAwayContext = createContext<((save: (() => void) | null) => void) | null>(null);
+
+/**
+ * Clicking away from the editor saves like Enter (VP11, owner 2026-11-27): an editor with typed words calls this with
+ * its Enter, on each of its renders. A value not understood keeps the editor open, as Enter does. An editor that calls
+ * nothing (a list of choices: nothing typed) is closed without a write, as before.
+ */
+export function useSaveOnAway(save: () => void): void {
+  const hand = useContext(SaveOnAwayContext);
+  useEffect(() => {
+    hand?.(save);
+    return () => hand?.(null);
+  });
+}
+
 /** The widest thing an editor hangs below its cell (20rem), in px. */
 const HANGING_WIDTH = 320;
 
@@ -39,14 +64,38 @@ export function CellEditor({
     }),
     [anchor, find],
   );
+  const saveRef = useRef<(() => void) | null>(null);
+  // Whether a pointer is down anywhere on the page, read when the editor is left.
+  const pressing = useRef(false);
+  useEffect(() => {
+    const down = () => (pressing.current = true);
+    const up = () => (pressing.current = false);
+    window.addEventListener("pointerdown", down, true);
+    window.addEventListener("pointerup", up, true);
+    return () => {
+      window.removeEventListener("pointerdown", down, true);
+      window.removeEventListener("pointerup", up, true);
+    };
+  }, []);
+  const hand = useCallback((save: (() => void) | null) => {
+    saveRef.current = save;
+  }, []);
   // What hangs below may be up to 20rem wide: near the right edge it lines up with the cell's right side instead.
   const box = anchor.getBoundingClientRect();
   const edge = box.left + HANGING_WIDTH > window.innerWidth ? "end" : "start";
   return (
     <PopoverPrimitive.Root
       open
-      onOpenChange={(open) => {
-        if (!open) onClose();
+      onOpenChange={(open, details) => {
+        if (open) return;
+        const save = saveRef.current;
+        // A press outside, or focus leaving for another cell (the grid takes it on mouse down), is «away».
+        if ((details.reason !== "outside-press" && details.reason !== "focus-out") || !save)
+          return onClose();
+        // While the pointer is down on another cell the grid is selecting and does not draw its rows again, so a value
+        // saved then would not show: save once the press ends (a grid's own mouse up runs first).
+        if (!pressing.current) return save();
+        window.addEventListener("pointerup", () => setTimeout(save, 0), { once: true });
       }}
     >
       <PopoverPrimitive.Portal>
@@ -66,7 +115,7 @@ export function CellEditor({
             data-edge={edge}
             className="group/cell-editor relative flex w-(--anchor-width) flex-col text-sm outline-hidden"
           >
-            {children}
+            <SaveOnAwayContext.Provider value={hand}>{children}</SaveOnAwayContext.Provider>
           </PopoverPrimitive.Popup>
         </PopoverPrimitive.Positioner>
       </PopoverPrimitive.Portal>

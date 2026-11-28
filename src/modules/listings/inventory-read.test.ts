@@ -61,7 +61,7 @@ const unitRow = (upi: string, unitKey: string, livingArea: string) => ({
 function client(): DbClient {
   return {
     query: async (text: string, values?: unknown[]) => {
-      if (text.includes("listings l\n"))
+      if (text.includes("union all"))
         return {
           rows: [
             listingRow({ id: "on-catalog", upi: "upi-1" }),

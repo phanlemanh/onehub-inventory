@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "khung-luoi-va-ngan-chi-tiet",
-  "ghi_luc": "2026-11-27T17:47:39Z",
-  "vong_cham": 4,
+  "ghi_luc": "2026-11-27T23:26:51Z",
+  "vong_cham": 8,
   "luot": [
     {
       "vong": 1,
@@ -29,6 +29,31 @@
       "vong": 4,
       "verdict": "PASS",
       "tang": []
+    },
+    {
+      "vong": 5,
+      "verdict": "REJECT",
+      "tang": [
+        "hop-dong-yeu-cau",
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 6,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 7,
+      "verdict": "PASS",
+      "tang": []
+    },
+    {
+      "vong": 8,
+      "verdict": "PASS",
+      "tang": []
     }
   ],
   "lam_lai": [
@@ -43,16 +68,28 @@
     {
       "nguon": "r3",
       "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r5",
+      "tang": "hop-dong-yeu-cau"
+    },
+    {
+      "nguon": "r5",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r6",
+      "tang": "bai-kiem-ha-tang"
     }
   ],
   "theo_tang": {
-    "bai-kiem-ha-tang": 3,
+    "bai-kiem-ha-tang": 5,
     "trang-thai-hanh-vi": 0,
     "du-lieu-api": 0,
     "nghiep-vu": 0,
     "thanh-phan": 0,
     "bo-cuc": 0,
-    "hop-dong-yeu-cau": 0,
+    "hop-dong-yeu-cau": 1,
     "link": 0,
     "chu-dinh-dang": 0,
     "mau-token": 0,

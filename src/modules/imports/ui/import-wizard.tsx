@@ -56,10 +56,11 @@ import { IMPORT_COPY as C, MARK_WORDS, PROBLEM_WORDS, STEP_WORDS, WHY_WORDS } fr
 
 const MARK_VARIANT: Record<
   Mark,
-  "success-light" | "info-light" | "warning-light" | "destructive-light"
+  "success-light" | "primary-light" | "warning-light" | "destructive-light"
 > = {
   keep: "success-light",
-  fixed: "info-light",
+  // Not info: that tone is the Pending status alone (VP11, AC-1), so a mark never reads as a status.
+  fixed: "primary-light",
   ask: "warning-light",
   block: "destructive-light",
 };
