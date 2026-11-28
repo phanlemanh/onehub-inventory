@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "bac": "M2",
+  "ly_do": "nguồn design/tokens.json · design/component-registry.json",
+  "tri_thuc": {
+    "trang_thai": "doc-duoc",
+    "ly_do": "",
+    "goc": "/var/folders/6x/1dlzszm51wzbt20dn5y1lgzh0000gn/T/design-floor-tri-thuc/a7ad5f1e650321ac325734e9199f266c9b990212",
+    "chi_muc": {
+      "path": "knowledge/index.json",
+      "byte": 21239,
+      "token": 5310
+    },
+    "tep": [
+      {
+        "id": "designmd-format",
+        "path": "knowledge/designmd-format.md",
+        "diem": 1,
+        "byte": 10778,
+        "token": 2695
+      },
+      {
+        "id": "mode-constraints",
+        "path": "knowledge/mode-constraints.md",
+        "diem": 1,
+        "byte": 18334,
+        "token": 4584
+      }
+    ]
+  },
+  "reuse_plan": null,
+  "flow": null,
+  "dong": [
+    "Bậc kho: M2 — nguồn design/tokens.json · design/component-registry.json",
+    "Tri thức thiết kế: chỉ mục (5310 token) + knowledge/designmd-format.md (2695 token), knowledge/mode-constraints.md (4584 token)"
+  ]
+}
