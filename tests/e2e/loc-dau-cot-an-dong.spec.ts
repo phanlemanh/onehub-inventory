@@ -136,7 +136,29 @@ test.describe("at 1440 with the CPU slowed 8 times", () => {
         });
       },
     };
-    const { grows, run } = await measured(page, old);
-    expect(grows, `the run grew back ${grows} times: ${run.join(" → ")}`).toBeGreaterThan(1);
+    // The old way never settles, so the case does not wait for the check: it watches the run while the check scrolls
+    // and stops as soon as the run has grown back twice (on GitHub the whole check ran past two minutes, ca8e9110).
+    const wrapped: Break = {
+      ...old,
+      apply: async (ctx) => {
+        await recordRun(ctx.page);
+        await old.apply?.(ctx);
+      },
+    };
+    // Left running: the test closes the page under it, and its end is not what this case measures.
+    void runBreak(page, URL, RECIPE, wrapped, SLOW).catch(() => undefined);
+    const grows = async () =>
+      growsBack(
+        (await page
+          .evaluate(() => (window as unknown as { __run?: number[] }).__run ?? [])
+          .catch(() => [])) as number[],
+      );
+    await expect
+      .poll(grows, {
+        timeout: 90_000,
+        intervals: [1_000],
+        message: "the run did not grow back over and over",
+      })
+      .toBeGreaterThan(1);
   });
 });
