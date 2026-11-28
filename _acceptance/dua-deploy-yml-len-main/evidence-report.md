@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 2aaa5641ae535f74372bc4f7d67be8eb24268927
-human_signoff:
+human_signoff: Manh Phan 2026-11-28
 ---
 
 # Evidence Report: dua-deploy-yml-len-main

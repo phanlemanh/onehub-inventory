@@ -5,7 +5,7 @@ slug: dua-deploy-yml-len-main
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ci]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-28
 design_doc: _acceptance/dua-deploy-yml-len-main/design.md
@@ -69,3 +69,6 @@ Không có `[CE chưa kiểm chứng]`: các trục liệt kê từ chính tệp
 
 - Bước kiểm `conventional-commits` (không bắt buộc) đỏ vì tiêu đề commit của chủ kho; gộp kiểu squash với tiêu đề PR đúng
   khuôn thì main không mang commit ấy.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-28:
+  - Ngoài-1: phép đo tên biến ở nhánh biến kho chỉ đòi tên có mặt trong sổ tay, nên một tên chỉ được nhắc trong lời văn
+    cũng qua; hiện chỉ `DEPLOY_ENABLED` đi qua nhánh này và nó đúng.
