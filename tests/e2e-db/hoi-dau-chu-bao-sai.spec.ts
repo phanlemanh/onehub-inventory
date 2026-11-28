@@ -272,13 +272,14 @@ test("company admin: reads the record and asks its keeper (row 10, Hỏi-1 A)", 
   );
 });
 
-test("a unit nobody keeps: the button is off and says why", async ({ page }, info) => {
+test("a unit nobody keeps: a quiet line says why, no button", async ({ page }, info) => {
   await recordShares(page);
   await signIn(page, await person(info, "e4", ["BuyerAgent"]));
   await openRecord(page, rowKept("none").id);
-  const button = page.locator('[data-slot="ask-list-agent"]');
-  await expect(button).toBeDisabled();
-  await expect(button).toHaveText(ASK_COPY.unheld(label("Unit"), label("ListAgent")));
+  // Row 3h (C2, owner «Theo luật mới»): no dimmed button — one quiet line in its place says why.
+  await expect(page.locator('[data-slot="ask-list-agent"]')).toHaveCount(0);
+  const line = page.locator('[data-slot="ask-locked-reason"]').filter({ visible: true });
+  await expect(line).toHaveText(ASK_COPY.unheld(label("Unit"), label("ListAgent")));
   if (["1440", "360"].includes(info.project.name)) await frame(page, info, "chua-ai-giu", "light");
 });
 

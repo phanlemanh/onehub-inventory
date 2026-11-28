@@ -31,8 +31,9 @@ test("AC-8 · opens the editor on the cell it names", async ({ page }) => {
 });
 
 test("AC-8 · a cell that does not edit fails with its name", async ({ page }) => {
-  await expect(moSuaO(page, { dong: "0905", cot: "Diện tích" })).rejects.toThrow(
-    "cell «0905» · «Diện tích» did not open for editing",
+  // Row 3h made the area editable in its cell; the building is a column that never edits.
+  await expect(moSuaO(page, { dong: "0905", cot: "Toà" })).rejects.toThrow(
+    "cell «0905» · «Toà» did not open for editing",
   );
 });
 

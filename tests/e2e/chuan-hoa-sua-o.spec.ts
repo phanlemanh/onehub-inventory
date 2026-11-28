@@ -76,7 +76,9 @@ test.describe("AC-4 · Enter edits", () => {
       ["1101", "Giá chào", true],
       ["1101", "Listing.unitNumber", false],
       ["0606", "Giá chào", false],
-      ["1101", "Diện tích", false],
+      // Row 3h: the area is the listing's own value and edits in its cell; the building stays read only.
+      ["1101", "Diện tích", true],
+      ["1101", "Toà", false],
     ];
     for (const [dong, cot, editable] of cases) {
       await select(page, dong, cot);
@@ -224,7 +226,9 @@ test.describe("AC-6 · a pencil on editable cells", () => {
     const cases: [string, string, boolean][] = [
       ["1101", "Giá chào", true],
       ["0606", "Giá chào", false],
-      ["1101", "Diện tích", false],
+      // Row 3h: the area is the listing's own value and edits in its cell; the building stays read only.
+      ["1101", "Diện tích", true],
+      ["1101", "Toà", false],
       ["1101", "Listing.unitNumber", false],
     ];
     let editable = 0;
