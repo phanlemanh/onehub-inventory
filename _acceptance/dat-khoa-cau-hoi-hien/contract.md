@@ -5,9 +5,7 @@ slug: dat-khoa-cau-hoi-hien
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
-status: approved
-approved_by: Manh Phan
-approved_at: 2026-11-28
+status: draft
 design_doc: _acceptance/dat-khoa-cau-hoi-hien/design.md
 ---
 
@@ -44,12 +42,13 @@ cùng giá trị mỗi khoá được đặt vào sổ của lượt đo, không
   `tools/deploy/dat-khoa-ask.test.ts` trên bản sao mã mang thứ tự ấy, và (b) chạy mã ở điểm rẽ của nhánh với `origin/main`
   (bản trước PR) trên terminal thật như AC-1, Then (a) bài kiểm đỏ đúng ở chỗ đòi câu hỏi nằm trên dòng riêng, còn bản sao
   mã của PR thì xanh; (b) cả năm câu hỏi bị xoá khỏi màn — đúng lỗi chủ kho gặp.
-- AC-5: Given PR #134, When liệt kê tệp đổi so với điểm rẽ của nhánh với `origin/main`, Then ngoài hồ sơ này và một tệp
-  `wiki/log/` chỉ có `tools/deploy/dat-khoa.mjs` và bài kiểm mới; mọi dòng đổi của `dat-khoa.mjs` nằm trong hàm hỏi
+- AC-5: Given PR #134, When liệt kê tệp đổi so với điểm rẽ của nhánh với `origin/main`, Then ngoài hồ sơ này, một tệp
+  `wiki/log/` và hai trang máy vẽ lại khi cổng đóng (`PRODUCT-MAP.md`, `LO-TRINH.html`) chỉ có `tools/deploy/dat-khoa.mjs`
+  và bài kiểm mới; mọi dòng đổi của `dat-khoa.mjs` nằm trong hàm hỏi
   `terminalAsk` (cách kiểm, câu hỏi và đường đưa giá trị vào `gh secret set` không đổi).
 - AC-6: Given nhánh ở HEAD, When chạy mọi bài kiểm của `tools/deploy/` rồi các lệnh chung của kho (`make check`,
   `npm run build`, `make e2e`), Then tất cả thoát 0.
-- AC-7 (cross-layer): Given PR #134 trên GitHub, When đọc CI ở đầu nhánh (chỉ đọc), Then các việc quick, e2e, e2e-db đã
+- AC-7 (cross-layer): Given PR #134 trên GitHub, When đọc CI ở đầu nhánh (chỉ đọc), và đầu nhánh ấy đúng là bản đang chấm, Then các việc quick, e2e, e2e-db đã
   xong và xanh.
 
 ## Coverage

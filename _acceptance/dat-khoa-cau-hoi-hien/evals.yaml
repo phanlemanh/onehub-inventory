@@ -85,7 +85,8 @@ evals:
     expected: >-
       exit 0; in «ok ban-cu-mat-cau-hoi — bản trước PR (<điểm rẽ>) trên cùng terminal: 5/5 câu hỏi bị xoá khỏi màn».
       Chiều đỏ: bản ở điểm rẽ không mất đủ năm câu → «DO ban-cu-mat-cau-hoi: bản trước PR không mất câu hỏi như lúc hỏng
-      (mất <k>/5)».
+      (mất <k>/5)»; bản ở điểm rẽ không chạy trọn (không nhận đủ câu trả lời, khoá sai, thoát khác 0) → «DO
+      ban-cu-mat-cau-hoi: bản trước PR không chạy trọn: <lỗi>» — một lần chạy hỏng cũng không để câu hỏi nào trên màn.
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E5
     criterion: AC-5
@@ -93,8 +94,8 @@ evals:
     cmd: node _acceptance/dat-khoa-cau-hoi-hien/rang/pham-vi.mjs
     layer: backend-effect
     expected: >-
-      exit 0, in «pham-vi ok: <n> tệp so với <điểm rẽ>; ngoài hồ sơ chỉ dat-khoa.mjs, bài kiểm mới và một dòng nhật ký; mọi
-      dòng đổi của dat-khoa.mjs nằm trong hàm hỏi (dòng <a>–<b>)». Chiều đỏ (ca của E5t, trên chính đầu ra git thật đã phá
+      exit 0, in «pham-vi ok: <n> tệp so với <điểm rẽ>; ngoài hồ sơ, một dòng nhật ký và hai trang máy vẽ chỉ dat-khoa.mjs và bài
+      kiểm mới; mọi dòng đổi của dat-khoa.mjs nằm trong hàm hỏi (dòng <a>–<b>)». Chiều đỏ (ca của E5t, trên chính đầu ra git thật đã phá
       một chỗ): «PR chạm tệp ngoài phạm vi: <tệp>», «PR thiếu tệp của thiết kế: <tệp>», «dat-khoa.mjs đổi ngoài hàm hỏi:
       dòng <a>–<b>».
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
@@ -104,11 +105,12 @@ evals:
     cmd: node _acceptance/dat-khoa-cau-hoi-hien/rang/pham-vi.mjs --tu-kiem
     layer: backend-effect
     expected: >-
-      exit 0, dòng cuối «tu-kiem: 4/4 ca đúng»: vật lành xanh, ba bản phá trên đầu ra git thật đỏ đúng ba thông điệp ghim
+      exit 0, dòng cuối «tu-kiem: 5/5 ca đúng»: vật lành xanh, bốn bản phá trên đầu ra git thật đỏ đúng thông điệp ghim
       của E5 — PR đổi một tệp ngoài danh sách cho phép thì KHÔNG qua (pha-tep-ngoai: «PR chạm tệp ngoài phạm vi:
       mk/deploy.mk»), thiếu bài kiểm mới thì KHÔNG qua (pha-thieu-bai-kiem: «PR thiếu tệp của thiết kế:
       tools/deploy/dat-khoa-ask.test.ts»), một dòng đổi ngoài hàm hỏi thì KHÔNG qua (pha-doi-ngoai-ham: «dat-khoa.mjs đổi
-      ngoài hàm hỏi: dòng 20–20»).
+      ngoài hàm hỏi: dòng 20–20»), một dòng đổi ngay sát trên chú thích của hàm hỏi thì KHÔNG qua (pha-doi-sat-tren-ham:
+      «dat-khoa.mjs đổi ngoài hàm hỏi: dòng <a>–<a>», <a> là dòng ngay trên «/**» của hàm).
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E6
     criterion: AC-6
@@ -152,7 +154,8 @@ evals:
     expected: >-
       exit 0, in «ci ok: đầu nhánh <sha> quick, e2e, e2e-db xanh (gate: <trạng thái>)» — đọc bằng gh, chỉ đọc. Chiều đỏ
       (ca của E7t): «ci: <việc> trên đầu nhánh <sha> không xanh (<kết>)», «ci: <việc> trên đầu nhánh <sha> chưa xong
-      (<trạng thái>)», «ci: thiếu việc <việc> trên đầu nhánh <sha>».
+      (<trạng thái>)», «ci: thiếu việc <việc> trên đầu nhánh <sha>», «ci: đầu nhánh trên GitHub <sha> không phải bản đang
+      chấm <sha>» (đầu nhánh khác `git rev-parse HEAD` của cây đang chấm).
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E7t
     criterion: AC-7
@@ -161,7 +164,7 @@ evals:
     layer: backend-effect
     paths: ["_acceptance/dat-khoa-cau-hoi-hien/rang/ci.mjs"]
     expected: >-
-      exit 0, dòng cuối «tu-kiem: 4/4 ca đúng»: dữ liệu CI thật vừa đọc xanh; ba bản phá trên chính dữ liệu ấy (e2e-db đỏ,
-      e2e chưa xong, thiếu quick) đỏ đúng ba thông điệp ghim của E7. Dữ liệu thật chưa xanh → «tu-kiem: không chạy được —
+      exit 0, dòng cuối «tu-kiem: 5/5 ca đúng»: dữ liệu CI thật vừa đọc xanh và là của bản đang chấm; bốn bản phá trên chính
+      dữ liệu ấy (e2e-db đỏ, e2e chưa xong, thiếu quick, đầu nhánh khác bản đang chấm) đỏ đúng bốn thông điệp ghim của E7. Dữ liệu thật chưa xanh → «tu-kiem: không chạy được —
       dữ liệu CI thật chưa xanh: …», exit 1.
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

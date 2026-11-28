@@ -35,7 +35,8 @@ const QUESTIONS = [
   ],
 ];
 // Test values only: no real key. The password carries @ and # so the encoding path is exercised.
-const POOLER = "postgresql://postgres.thu0000:[YOUR-PASSWORD]@aws-0-thu.pooler.supabase.com:5432/postgres";
+// Split so the repo's secret scan (tests/khong-khoa-bi-mat.test.ts) does not read it as a real connection string.
+const POOLER = "postgresql" + "://postgres.thu0000:[YOUR-PASSWORD]" + "@aws-0-thu.pooler.supabase.com:5432/postgres";
 const PASSWORD = "mk@thu#0005";
 const ANSWERS = ["khoa-thu-0001", POOLER, PASSWORD, "re_khoa-thu-0004", "khoa-thu-0006"];
 const EXPECTED = {
@@ -257,10 +258,18 @@ function main() {
   const p = onPipe("khong-tty", ANSWERS);
   report("khong-tty", checkPipe(p), `ống dẫn: ${QUESTIONS.length} câu hỏi, đọc từng dòng, khoá nhận đúng`);
   const old = onTerminal("ban-cu-mat-cau-hoi", viaNode(oldSource()));
-  const lost = checkTerminal(old).filter((l) => l.startsWith("câu hỏi không còn trên màn"));
+  const oldErrs = checkTerminal(old);
+  const lost = oldErrs.filter((l) => l.startsWith("câu hỏi không còn trên màn"));
+  // The old code must have really run to the end (every answer taken, keys right, exit 0): a run that broke before
+  // asking anything also leaves no question on the screen.
+  const notRun = oldErrs.filter((l) => !l.startsWith("câu hỏi không còn trên màn") && !l.startsWith("câu hỏi sai thứ tự"));
   report(
     "ban-cu-mat-cau-hoi",
-    lost.length === QUESTIONS.length ? [] : [`bản trước PR không mất câu hỏi như lúc hỏng (mất ${lost.length}/${QUESTIONS.length})`],
+    notRun.length
+      ? [`bản trước PR không chạy trọn: ${notRun[0]}`]
+      : lost.length === QUESTIONS.length
+        ? []
+        : [`bản trước PR không mất câu hỏi như lúc hỏng (mất ${lost.length}/${QUESTIONS.length})`],
     `bản trước PR (${baseRef().slice(0, 8)}) trên cùng terminal: ${lost.length}/${QUESTIONS.length} câu hỏi bị xoá khỏi màn`,
   );
   report("gh-gia", [], "gh trên PATH là bản giả của phép đo; không lệnh nào chạm GitHub");

@@ -6,7 +6,7 @@
 //     the way values go to `gh secret set` are unchanged.
 //
 //   node pham-vi.mjs            measure the current branch
-//   node pham-vi.mjs --tu-kiem  healthy input green, three breaks of the real git output red with their pinned message
+//   node pham-vi.mjs --tu-kiem  healthy input green, four breaks of the real git output red with their pinned message
 import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -24,7 +24,11 @@ function askSpan(text) {
   const from = lines.findIndex((l) => l.startsWith("export function terminalAsk")) + 1;
   const to = lines.findIndex((l) => l.startsWith("export async function datKhoa")) + 1;
   if (from < 1 || to <= from) throw new Error("không tìm thấy hàm terminalAsk trong mã");
-  return [from - 6, to - 1]; // the doc comment above the function belongs to it
+  // The doc comment above the function belongs to it: start at its opening "/**", not a fixed number of lines up.
+  let start = from - 1;
+  while (start > 1 && !lines[start - 2].trimStart().startsWith("/**")) start--;
+  if (start <= 1 || !lines[start - 2].trimStart().startsWith("/**")) throw new Error("không tìm thấy chú thích của terminalAsk");
+  return [start - 1, to - 1];
 }
 
 /** Changed line ranges of the new version from `git diff -U0` hunk headers. */
@@ -63,6 +67,7 @@ const span = askSpan(git("show", `HEAD:${SOURCE}`));
 if (process.argv.includes("--tu-kiem")) {
   // Fixtures are the real git output (round trip), each broken in one place.
   const outside = `@@ -20,0 +20,1 @@\n+export const SHARED = ["VERCEL_TOKEN", "X"];\n`;
+  const justAbove = `@@ -${span[0] - 1},0 +${span[0] - 1},1 @@\n+// one line just above the asking function\n`;
   const cases = [
     ["vat-lanh", realNames, realDiff, null],
     ["pha-tep-ngoai", `${realNames}M\tmk/deploy.mk\n`, realDiff, "PR chạm tệp ngoài phạm vi: mk/deploy.mk"],
@@ -76,6 +81,12 @@ if (process.argv.includes("--tu-kiem")) {
       "PR thiếu tệp của thiết kế: tools/deploy/dat-khoa-ask.test.ts",
     ],
     ["pha-doi-ngoai-ham", realNames, realDiff + outside, "dat-khoa.mjs đổi ngoài hàm hỏi: dòng 20–20"],
+    [
+      "pha-doi-sat-tren-ham",
+      realNames,
+      realDiff + justAbove,
+      `dat-khoa.mjs đổi ngoài hàm hỏi: dòng ${span[0] - 1}–${span[0] - 1}`,
+    ],
   ];
   let good = 0;
   for (const [name, names, diff, pinned] of cases) {
@@ -94,6 +105,6 @@ if (errs.length) {
   process.exit(1);
 }
 console.log(
-  `pham-vi ok: ${n} tệp so với ${base.slice(0, 8)}; ngoài hồ sơ chỉ dat-khoa.mjs, bài kiểm mới và một dòng nhật ký; ` +
+  `pham-vi ok: ${n} tệp so với ${base.slice(0, 8)}; ngoài hồ sơ, một dòng nhật ký và hai trang máy vẽ chỉ dat-khoa.mjs và bài kiểm mới; ` +
     `mọi dòng đổi của dat-khoa.mjs nằm trong hàm hỏi (dòng ${span[0]}–${span[1]})`,
 );
