@@ -336,6 +336,10 @@ function useWidthInCh() {
   const [widthCh, setWidthCh] = useState<number | null>(null);
   const [chPx, setChPx] = useState(8);
   const [denseChPx, setDenseChPx] = useState(7);
+  // True once the width was read on the grid's own scroll viewport, the room the columns really get. Until then the
+  // width is the outer box's, and the density chosen from it may still flip (normal to dense), which starts the virtual
+  // body again: rows drawn anew, the selected cell lost. The region reports itself ready only after this.
+  const [onViewport, setOnViewport] = useState(false);
   useEffect(() => {
     const box = boxRef.current;
     const ch = chRef.current;
@@ -354,6 +358,7 @@ function useWidthInCh() {
         observer.observe(viewport);
       }
       setWidthCh((viewport ? viewport.clientWidth : box.getBoundingClientRect().width) / one);
+      setOnViewport(viewport !== null);
     };
     const observer = new ResizeObserver(measure);
     const mounts = new MutationObserver(() => {
@@ -367,7 +372,7 @@ function useWidthInCh() {
       mounts.disconnect();
     };
   }, []);
-  return { boxRef, chRef, denseChRef, widthCh, chPx, denseChPx };
+  return { boxRef, chRef, denseChRef, widthCh, chPx, denseChPx, onViewport };
 }
 
 /** The values a value column holds, in the order a reader expects: statuses in STATUS_ORDER, others as they come. */
@@ -500,12 +505,20 @@ export function DataRegion({
     initialText?: string;
     anchor: Element;
   } | null>(null);
+  // Screens build `cellEdit` anew on each of their renders (its editor closes over their state), so the rule below keeps
+  // the one it was made from until what it decides changes — the action and the fields. Changing with every new object
+  // made the columns new, and new columns draw every cell's content again: right after the grid opened (the screen
+  // hears the first arrangement and renders once more) a cell a person or a test was on was replaced (VP11, G-2811-25).
+  // `mine` is the session's own rule and does not change while the action and fields stay.
+  const editRule = cellEdit ? `${cellEdit.action}|${cellEdit.fields.join(",")}` : "";
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- kept by what it decides: `editRule`
+  const ruleEdit = useMemo(() => cellEdit, [editRule]);
   const canEdit = useCallback(
     (row: GridRow, field: FieldKey): boolean => {
-      if (!cellEdit || !cellEdit.fields.includes(field) || row.locked?.[field]) return false;
-      return permitted(cellEdit.action, cellEdit.mine ? cellEdit.mine(row) : true);
+      if (!ruleEdit || !ruleEdit.fields.includes(field) || row.locked?.[field]) return false;
+      return permitted(ruleEdit.action, ruleEdit.mine ? ruleEdit.mine(row) : true);
     },
-    [permitted, cellEdit],
+    [permitted, ruleEdit],
   );
   // Full screen, like a sheet's: the whole page goes full screen (browser bars hidden, menus still open on top) and the
   // App Shell steps aside, so the region alone fills the screen. Esc, handled by the browser, leaves it.
@@ -553,7 +566,15 @@ export function DataRegion({
       () => undefined,
     );
   };
-  const { boxRef, chRef, denseChRef, widthCh, chPx: baseChPx, denseChPx } = useWidthInCh();
+  const {
+    boxRef,
+    chRef,
+    denseChRef,
+    widthCh,
+    chPx: baseChPx,
+    denseChPx,
+    onViewport,
+  } = useWidthInCh();
 
   const filters = useMemo(() => filtersFrom(columnFilters), [columnFilters]);
   const activeFilterCount = columns.filter((c) => !filterIsEmpty(filters[c.field])).length;
@@ -1463,7 +1484,13 @@ export function DataRegion({
         data-slot="data-region"
         // VP4: set once the browser has taken over the server's HTML and drawn one layout only. Tests that read the
         // region wait for it (tests/e2e/phone-list.ts); the frames before it are watched by tests/e2e/bang-loe.spec.ts.
-        data-hydrated={phoneLayout === undefined ? undefined : ""}
+        // A table also waits for its width read on its own scroll viewport (VP11, G-2811-25): before that its density
+        // may still flip and draw every row anew, and a test holding a cell from before would hold a dead one.
+        data-hydrated={
+          phoneLayout === undefined || (gridShown && !(phoneList && isPhone) && !onViewport)
+            ? undefined
+            : ""
+        }
         data-full-screen={fullScreen || undefined}
         style={REGION_HEIGHTS}
         className={`group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background ${PINNED_EDGE_CLASS}`}
