@@ -39,6 +39,9 @@ nhiêu căn, sàn học được gì từ lựa chọn của người, ô nào g
 - Hoàn tác gỡ các căn của lần nhập chưa ai sửa, ngừng dùng những gì chính lần nhập dạy, và liệt kê căn được giữ.
 - Cột thuộc tính căn (diện tích, phòng ngủ, hướng, tầng, loại hình) được nhận nhưng không ghi vào căn hay danh mục
   chung: chữ gốc giữ nguyên văn trong bản ghi lần nhập (`kept`, lý do `unit-attribute`) cho hàng 3h đọc lại (G-2711-4).
+- Cột giá bán và ngày bán được đọc (để hỏi khi thiếu) nhưng không ghi lên căn, vì lần chào do nhập tạo ra không ở «Đã
+  bán»: chữ gốc giữ trong bản ghi lần nhập (`kept`, lý do `close-field`).
+- Giá trị người chọn cho một ô của trường chọn-một mới tạo khi nhập được ghi lên căn dù người không bấm «nhớ».
 - Không AI.
 
 ## Where in the code
@@ -54,3 +57,5 @@ qua cửa server của `src/modules/listings/`; phần học qua `src/modules/co
   giữ giá trị riêng»); Bảng hàng có nút «Nạp tệp» cho vai được nhập và liên kết trong câu trạng thái trống.
 - 2026-11-27 — Sau lượt chấm 1: gói gắn với bảng đã mở (migration 017), dòng bỏ theo vị trí trong tệp, cột chủ nhà
   chỉ bỏ được, Trưởng nhóm chọn Đầu chủ trên màn, chặn mã quá dài và trường riêng bị từ chối ở bước xem trước.
+- 2026-11-28 — Từ hai phát hiện của lượt chấm 1 hàng VP11: giá trị đã chọn cho trường chọn-một mới không còn mất khi
+  không bấm «nhớ»; ô giá bán, ngày bán giữ chữ gốc trong bản ghi lần nhập thay vì bị bỏ.

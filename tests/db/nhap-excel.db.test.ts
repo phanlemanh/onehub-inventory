@@ -1,6 +1,7 @@
 // Row 11 (nhap-excel), evals E4, E6, E8, E9, E12, E13, E14 on this lane's Postgres: the routes of /api/v1/imports
 // through the real handlers, the identity door and withCompany under the API role. Company A holds the people of the
 // permission-table world (LA, BA, TL, CA, X); Y is CompanyAdmin of B. Each block ends with its break, pinned.
+import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -26,6 +27,8 @@ import {
   type MarkedTable,
   type Question,
 } from "@/modules/imports";
+import { listingIdOf } from "@/modules/imports/server";
+import { DESTINATION } from "@/modules/imports/store";
 import { openDoor } from "@/modules/identity/action-door";
 import { createAuthHandlers, tokenFrom } from "@/modules/identity/http";
 import type { LoginDeps } from "@/modules/identity/login";
@@ -1388,3 +1391,309 @@ describe("hoan tac (E14) — audit", () => {
     expect(undoFault([edited], edited, false)).toBe("undo removed an edited listing");
   });
 });
+
+// ---- Two findings of VP11's round 1 (chuan-hoa-he-design, out of contract), fixed on row 11 ---------------------------
+
+describe("gia tri khong mat (VP11 r1)", () => {
+  it("what the preview promised is what was written, for every kind of cell of one row (ruling G-2811-65, break pinned)", async () => {
+    const e = await importWorld("moi_loai_o");
+    await e.w.db.owner.query(
+      `insert into company_fields (company_id, code, name, kind, position, options)
+         values ($1, 'huong_nhin', 'Hướng nhìn', 'single_select', 0, '["Biển", "Phố"]')`,
+      [e.w.A],
+    );
+    const cells: [string, string, Choices["columns"][number]["target"] | null][] = [
+      ["Mã căn", e.codes[0]!, null],
+      ["Block", "[MAU] Toà", { standard: "Unit.buildingName" }],
+      ["Diện tích", "75,2 m²", { standard: "Unit.livingArea" }],
+      ["PN", "2", { standard: "Unit.bedroomsTotal" }],
+      ["Hướng", "Đông Nam", { standard: "Unit.directionFaces" }],
+      ["Tầng", "Tầng 07", { standard: "Unit.floor" }],
+      ["Loại căn", label("SubTypeCondominium"), { standard: "Unit.propertySubType" }],
+      ["Giá chào", "4,65 tỷ", { standard: "Listing.listPrice" }],
+      ["Phí", "KBP", { standard: "Listing.feeInclusion" }],
+      ["Trạng thái", label("StatusWithdrawn"), { standard: "Listing.standardStatus" }],
+      ["Lý do ngừng", label("WithdrawnUnreachable"), { standard: "Listing.withdrawnReason" }],
+      ["Giá bán", "4,2 tỷ", { standard: "Listing.closePrice" }],
+      ["Ngày bán", "10/11/2026", { standard: "Listing.closeDate" }],
+      ["Nội thất", label("FurnishedFull"), { standard: "Listing.furnished" }],
+      ["Người ở", label("OccupantVacant"), { standard: "Listing.occupantType" }],
+      ["Pháp lý", "Sổ hồng", { standard: "Listing.legalStatus" }],
+      ["Vay", "Vay 70%", { standard: "Listing.financing" }],
+      ["Ngày check", "15/11/2026", { standard: "Listing.lastConfirmedAt" }],
+      ["Hướng nhìn", "hướng ra biển", { custom: "huong_nhin" }],
+      [
+        "View",
+        "nhìn phố",
+        { newField: { name: "View", kind: "single_select", options: ["Biển", "Phố"] } },
+      ],
+    ];
+    const headers = cells.map((c) => c[0]);
+    const rows = [cells.map((c) => c[1])];
+    const OWN = 18;
+    const NEW = 19;
+    const choices: Choices = {
+      ...NO_CHOICES,
+      columns: Object.fromEntries(
+        cells.flatMap((c, j) => (c[2] ? [[j, { target: c[2] }]] : [])),
+      ) as Choices["columns"],
+      values: {
+        [`${OWN}|${fold("hướng ra biển")}`]: { value: "Biển", remember: false },
+        [`${NEW}|${fold("nhìn phố")}`]: { value: "Phố", remember: false },
+      },
+    };
+    const p = await preview(e, "LA", rows, choices, headers);
+    expect(p.status).toBe(200);
+    const promised = marked(p);
+    // Every cell of this row reads: the sweep below has something to compare in every column.
+    expect(
+      promised.cells[0]!.map((c) => c.mark).filter((m) => m === "ask" || m === "block"),
+    ).toEqual([]);
+    const open = await e.h.open(
+      req(
+        URL_,
+        "POST",
+        {
+          headers,
+          rows,
+          choices,
+          fileName: "bang-hang.xlsx",
+          sheetName: "Sheet1",
+          expected: { ...p.body.counts, createCount: p.body.createCount },
+        },
+        await e.cookie("LA"),
+      ),
+    );
+    expect(open.status).toBe(201);
+    const { id } = (await open.json()) as { id: string };
+    const res = await e.h.batch(
+      req(
+        `${URL_}/${id}/batches`,
+        "POST",
+        {
+          headers,
+          rows,
+          choices,
+          batchNo: 0,
+          rowOffset: 0,
+          last: true,
+          allNewFieldCells: { [`0:${NEW}`]: rows[0]![NEW]! },
+        },
+        await e.cookie("LA"),
+      ),
+      id,
+    );
+    expect(res.status).toBe(200);
+    const listing = (
+      await e.w.db.owner.query<Record<string, unknown>>(
+        `select list_price::text as "listPrice", fee_inclusion as "feeInclusion", standard_status as "standardStatus",
+                withdrawn_reason as "withdrawnReason", furnished, occupant_type as "occupantType",
+                legal_status as "legalStatus", financing, last_confirmed_at::date::text as "lastConfirmedAt",
+                custom_fields
+           from listings where id = $1`,
+        [listingIdOf(id, 0)],
+      )
+    ).rows[0]!;
+    const run = (
+      await e.w.db.owner.query<{
+        kept: { row: number; header: string; raw: string; why: string }[];
+      }>(`select kept from import_runs where id = $1`, [id])
+    ).rows[0]!;
+    const newCode = (
+      await e.w.db.owner.query<{ code: string }>(
+        `select code from company_fields where company_id = $1 and name = 'View'`,
+        [e.w.A],
+      )
+    ).rows[0]!.code;
+    const written = { listing, kept: run.kept, newCode };
+    expect(lostCells(promised, headers, rows[0]!, written)).toEqual([]);
+    // Each kind of place took part: 9 listing columns, 7 kept as written, 2 custom fields.
+    expect(
+      run.kept.filter((k) => k.why === "unit-attribute" || k.why === "close-field"),
+    ).toHaveLength(7);
+    // Break: a value the preview promised and the write lost is named by its column.
+    const lost = { ...written, listing: { ...listing, furnished: null } };
+    expect(lostCells(promised, headers, rows[0]!, lost)).toEqual(["Nội thất"]);
+    const lostNew = { ...written, listing: { ...listing, custom_fields: { huong_nhin: "Biển" } } };
+    expect(lostCells(promised, headers, rows[0]!, lostNew)).toEqual(["View"]);
+  });
+
+  it("a value the person chose for a new single choice field, without «remember», is written onto the listing", async () => {
+    const e = await importWorld("truong_moi_chon");
+    const headers = [...HEADERS, "View"];
+    const base = rowsOf(e.codes);
+    const rows = [
+      [...base[0]!, "Hướng biển"],
+      [...base[1]!, "Phố"],
+      [...base[2]!, ""],
+    ];
+    const VIEW = 5;
+    const choices: Choices = {
+      ...CHOICES,
+      columns: {
+        ...CHOICES.columns,
+        [VIEW]: {
+          target: { newField: { name: "View", kind: "single_select", options: ["Biển", "Phố"] } },
+        },
+      },
+      values: { [`${VIEW}|${fold("Hướng biển")}`]: { value: "Biển", remember: false } },
+    };
+    const p = await preview(e, "LA", rows, choices, headers);
+    expect(p.status).toBe(200);
+    // What the preview promised: the chosen value for the first row, the option as written for the second.
+    expect([cellAt(p, 0, VIEW), cellAt(p, 1, VIEW)].map((x) => [x.mark, x.value, x.why])).toEqual([
+      ["fixed", "Biển", "chosen"],
+      ["keep", "Phố", "standard"],
+    ]);
+    const open = await e.h.open(
+      req(
+        URL_,
+        "POST",
+        {
+          headers,
+          rows,
+          choices,
+          fileName: "bang-hang.xlsx",
+          sheetName: "Sheet1",
+          expected: { ...p.body.counts, createCount: p.body.createCount },
+        },
+        await e.cookie("LA"),
+      ),
+    );
+    expect(open.status).toBe(201);
+    const { id } = (await open.json()) as { id: string };
+    const allNewFieldCells = Object.fromEntries(rows.map((r, i) => [`${i}:${VIEW}`, r[VIEW]!]));
+    const res = await e.h.batch(
+      req(
+        `${URL_}/${id}/batches`,
+        "POST",
+        { headers, rows, choices, batchNo: 0, rowOffset: 0, last: true, allNewFieldCells },
+        await e.cookie("LA"),
+      ),
+      id,
+    );
+    expect(res.status).toBe(200);
+    const written = (
+      await e.w.db.owner.query<{ v: string | null }>(
+        `select (select value #>> '{}' from jsonb_each(custom_fields) limit 1) as v
+           from listings where import_run_id = $1 order by id`,
+        [id],
+      )
+    ).rows.map((r) => r.v);
+    // Rows 0 and 1 by their id order are not the file's order; compare as a set, and nothing chosen is lost.
+    expect(written.filter((v) => v !== null).sort()).toEqual(["Biển", "Phố"]);
+  });
+
+  it("close price and close date cells are kept as written on the import, never dropped in silence", async () => {
+    const e = await importWorld("gia_ban");
+    const headers = [...HEADERS, "Giá bán", "Ngày bán"];
+    const base = rowsOf(e.codes);
+    const rows = [
+      [...base[0]!, "4,2 tỷ", "10/11/2026"],
+      [...base[1]!, "", ""],
+      [...base[2]!, "", ""],
+    ];
+    const choices: Choices = {
+      ...CHOICES,
+      columns: {
+        ...CHOICES.columns,
+        5: { target: { standard: "Listing.closePrice" } },
+        6: { target: { standard: "Listing.closeDate" } },
+      },
+    };
+    const p = await preview(e, "LA", rows, choices, headers);
+    expect(p.status).toBe(200);
+    expect([cellAt(p, 0, 5).value, cellAt(p, 0, 6).value]).not.toContain(null);
+    const r = await applyAll(e, "LA", rows, choices, undefined, headers);
+    expect([r.status, r.body?.created]).toEqual([200, 3]);
+    const kept = (
+      await e.w.db.owner.query<{
+        kept: { row: number; header: string; raw: string; why: string }[];
+      }>(`select kept from import_runs where id = $1`, [r.id])
+    ).rows[0]!.kept.filter((k) => k.why === "close-field");
+    expect(kept.map((k) => [k.row, k.header, k.raw])).toEqual([
+      [0, "Giá bán", "4,2 tỷ"],
+      [0, "Ngày bán", "10/11/2026"],
+    ]);
+  });
+});
+
+/** The columns of row 0 whose value the preview promised and the write did not keep, by header (G-2811-65). */
+function lostCells(
+  promised: MarkedTable,
+  headers: readonly string[],
+  raw: readonly string[],
+  written: {
+    listing: Record<string, unknown>;
+    kept: { row: number; header: string; raw: string }[];
+    newCode: string;
+  },
+): string[] {
+  const same = (a: unknown, b: unknown) => String(a) === String(b);
+  const custom = (written.listing.custom_fields ?? {}) as Record<string, unknown>;
+  return promised.columns.flatMap((col, j) => {
+    const cell = promised.cells[0]![j]!;
+    if (!col.target || cell.value === null) return [];
+    const t = col.target;
+    let ok = true;
+    if ("standard" in t) {
+      const place = DESTINATION[t.standard];
+      if ("listing" in place) ok = same(written.listing[place.listing], cell.value);
+      else if ("kept" in place)
+        ok = written.kept.some((k) => k.row === 0 && k.header === headers[j] && k.raw === raw[j]);
+    } else if ("custom" in t) ok = same(custom[t.custom], cell.value);
+    else if ("newField" in t) ok = same(custom[written.newCode], cell.value);
+    return ok ? [] : [headers[j]!];
+  });
+}
+
+// ---- VP11 S4-r1 finding (Shape 1): ImportRun against the table Postgres really has, not the migration text -----------
+
+describe("mo hinh khop bang that (VP11 r1)", () => {
+  it("ImportRun's properties and the columns of import_runs in Postgres are the same set (break pinned)", async () => {
+    const e = await importWorld("mo_hinh");
+    const columns = new Set(
+      (
+        await e.w.db.owner.query<{ c: string }>(
+          `select column_name as c from information_schema.columns
+            where table_schema = 'public' and table_name = 'import_runs'`,
+        )
+      ).rows.map((r) => r.c),
+    );
+    const entity = JSON.parse(
+      execFileSync(
+        "python3",
+        [
+          "-c",
+          "import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1]))))",
+          join(import.meta.dirname, "..", "..", "ontology", "entities", "ImportRun.yaml"),
+        ],
+        { encoding: "utf8" },
+      ),
+    ) as { properties: Record<string, unknown> };
+    const properties = Object.keys(entity.properties);
+    expect(columns.size).toBe(18);
+    expect(tableFaults(properties, columns)).toEqual([]);
+    // Break: a column the table gains without a property, and a property the table lost, are named.
+    const more = new Set([...columns, "secret_notes"]);
+    more.delete("file_name");
+    expect(tableFaults(properties, more)).toEqual([
+      "ontology property without column: ImportRun.fileName",
+      "column without ontology property: secret_notes",
+    ]);
+  });
+});
+
+/** Each ImportRun property without its column and each column without its property, named. */
+function tableFaults(properties: readonly string[], columns: ReadonlySet<string>): string[] {
+  const snake = (camel: string) => camel.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
+  const wanted = new Set(properties.map(snake));
+  return [
+    ...properties
+      .filter((p) => !columns.has(snake(p)))
+      .map((p) => `ontology property without column: ImportRun.${p}`),
+    ...[...columns]
+      .filter((c) => !wanted.has(c))
+      .map((c) => `column without ontology property: ${c}`),
+  ];
+}

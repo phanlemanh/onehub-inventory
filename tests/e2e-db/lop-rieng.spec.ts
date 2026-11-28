@@ -567,6 +567,11 @@ test.describe("lop rieng tren bang hang", () => {
           );
         } else {
           await more.click();
+          // The menu opens a moment after the press: reading its items at once read an empty list (VP11 round 1).
+          await expect(
+            p.getByRole("menu"),
+            `${role} ${part}: the row menu did not open`,
+          ).toBeVisible();
           const items = (await p.getByRole("menuitem").allInnerTexts()).map((t) => t.trim());
           expect(items, `${role} ${part}`).toEqual(want.row);
           expect(
