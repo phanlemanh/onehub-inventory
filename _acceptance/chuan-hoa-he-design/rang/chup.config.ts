@@ -13,7 +13,7 @@ const server = Array.isArray(base.webServer) ? base.webServer[0]! : base.webServ
 export default {
   ...base,
   testDir: HERE,
-  testMatch: "chup.spec.ts",
+  testMatch: "chup.pw.ts",
   globalSetup: join(ROOT, "tests", "e2e-db", "don-dung-tam.ts"),
   reporter: "list",
   projects: [{ name: "chup" }],
