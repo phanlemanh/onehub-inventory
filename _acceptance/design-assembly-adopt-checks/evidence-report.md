@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 91c68290cfd77d563b8fe21864f9876ce52195be
+verified_commit: 9c415b4f8c004cec4847d23e0f55a09ba6666c0a
 human_signoff:
 ---
 
@@ -133,3 +133,7 @@ none — every multi-run eval is uniform (moi eval chay 1 lan, deterministic)
 
 Round 1: E4, E6 failed — kế hoạch của hồ sơ nằm ngoài danh sách tệp được phép của ma trận (AC-4). Returned to implementation.
 Round 2: E4, E6 chạy lại sau bản sửa, đạt; E1, E2, E3, E5, E7 carry-forward từ round 1 vì delta không chạm paths của chúng. Verdict PASS.
+
+### Re-pin lần 1 — 2026-11-28, do VP11 lát 1 (PR #136): phép đo E4, E6, E7 sửa theo lỗi cũ đã hết trên main và khoảng commit cố định của PR #111 (G-2811-116)
+run_id: repin-20261128T132730Z-54026
+sha: 9c415b4f8c004cec4847d23e0f55a09ba6666c0a · suites: 3 lệnh exit 0 · evals: 7/7 eval máy đạt kỳ vọng
