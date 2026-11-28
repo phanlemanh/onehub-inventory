@@ -1752,7 +1752,8 @@ describe("mo hinh khop bang that (VP11 r1)", () => {
       ),
     ) as { properties: Record<string, unknown> };
     const properties = Object.keys(entity.properties);
-    expect(columns.size).toBe(18);
+    // Row 3h added file_values_read_at (migration 021): the one-time reading of older imports marks each import read.
+    expect(columns.size).toBe(19);
     expect(tableFaults(properties, columns)).toEqual([]);
     // Break: a column the table gains without a property, and a property the table lost, are named.
     const more = new Set([...columns, "secret_notes"]);
