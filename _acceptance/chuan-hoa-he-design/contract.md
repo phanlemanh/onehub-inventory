@@ -121,6 +121,7 @@ nào và không đổi ai vào màn nào. Bảng quyền giữ nguyên: ô chỉ
 - Dựng chồng lên nhánh VP10 lát 1 (`feat/khung-luoi-va-ngan-chi-tiet` @a1aa19c6), theo G-2811-15; gộp sau VP10 lát 1.
 - Hồ sơ đã ký có bài đổi kỳ vọng vì Enter thôi mở hồ sơ ở ô sửa được (dự kiến; S3 xác định danh sách đúng): 2a
   `bang-hang-dung-tay-nhu-sheet`, 3 `ho-so-can`, 4 `sua-tren-o`, 3g `sua-thong-tin-can`. Mỗi hồ sơ một dòng «sửa sau ký»
-  và ghim lại một làn trước khi gộp.
+  và ghim lại một làn trước khi gộp. S3 xác định danh sách thật: tám hồ sơ (danh sách ở `design.md`, mục hồ sơ đã ký);
+  `sua-thong-tin-can` không có bài nào đổi kỳ vọng.
 - Mọi bài đo trên một tập phần tử phải đỏ khi tập rỗng; bài đo điểm ảnh hay màu thử trong ảnh Linux của Playwright trước khi
   coi là xanh (sổ đợt, 28/11).

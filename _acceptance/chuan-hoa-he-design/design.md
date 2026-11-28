@@ -56,9 +56,11 @@ Lát 2 và 3 chạm cùng tệp với VP10 lát 2 (`data-region.tsx`, `region-he
 | Không ổ khoá ở chỗ trạng thái đã nói căn bị khoá | căn đã bán, ngừng hẳn: ổ khoá ở ô trạng thái, giá, phí, mọi cột riêng; hiện cả với người không quyền | không ổ khoá nào: hôm nay mọi khoá đều do trạng thái; lý do khoá vẫn có khi rê và cho trình đọc màn hình; ô vẫn không mở sửa | `typed-cell.tsx`, `lockedReasons` |
 | Enter là sửa | Enter mở hồ sơ ở mọi ô (luật 2a, phân xử D-1211-19); F2, gõ, bấm đúp mở sửa | Enter trên ô sửa được mở sửa; trên ô không sửa được mở hồ sơ; màn không có hồ sơ vẫn đi xuống | `data-region.tsx` `onGridKeyDownCapture` |
 | Space là mở hồ sơ | phím cách không làm gì | phím cách trên ô đang chọn mở hồ sơ dòng ấy, ở mọi ô; đang sửa thì gõ dấu cách | `data-region.tsx` |
-| Bút chì khi rê | ô sửa được không có dấu gì | rê lên ô sửa được (người có quyền, dòng không khoá) thì hiện bút ở mép phải ô, có chữ gợi ý; ô khoá, ô không quyền không có | `data-region.tsx` (ô của lưới) |
+| Bút chì khi rê | ô sửa được không có dấu gì | rê lên ô sửa được (người có quyền, dòng không khoá) thì hiện bút ở mép phải ô, có chữ gợi ý «Bấm Enter để đổi ô này» (chữ: máy chọn, chờ chủ kho veto, d-20261128T010409Z-56); ô khoá, ô không quyền không có | `data-region.tsx` (ô của lưới) |
 | Bấm ra ngoài là lưu | bấm ra ngoài khung sửa là huỷ, mất chữ đã gõ | bấm ra ngoài là ghi như Enter (đọc lại, hỏi lại khi giá đổi quá 20 %, thông báo «Hoàn tác»); giá trị chưa hiểu thì khung ở lại và báo ở ô | `cell-editor.tsx` |
 | Nền tối: lớp nổi sáng hơn lưới nửa nấc (Hỏi-4, chủ kho 2026-11-28) | trang 10, lưới 23, ngăn chi tiết 23: ngăn chỉ tách khỏi lưới bằng viền 1 px; trình đơn cùng màu lưới | ngăn chi tiết, trình đơn, hộp thoại, ô gợi ý sáng hơn lưới nửa nấc (nửa đường từ `neutral-900` tới `neutral-800`); dấu rê trong trình đơn vẫn sáng hơn nền trình đơn; nền sáng giữ như trước vòng | `src/styles/dark.css` (`--popover`) |
+| Tín hiệu sẵn sàng chỉ bật khi lưới đã yên (giám sát đòi, G-2811-25 — chờ chủ kho veto) | lưới vẽ lại mọi ô ngay sau tín hiệu sẵn sàng: mất ô vừa bấm | tín hiệu chỉ bật khi lưới đã đo khung cuộn; cách sửa trên ô không dựng lại mỗi lần vẽ | `data-region.tsx` |
+| Dấu «đã sửa» ở màn nhập tệp thôi dùng sắc info (máy chọn, chờ chủ kho veto) | `info-light`, nay là màu «Đang giao dịch» | `primary-light` — vẫn trùng «Đã bán»; hướng cho lát 2: badge `outline` vì «đã sửa» không phải trạng thái (giới hạn đã biết) | `src/modules/imports/ui/import-wizard.tsx` |
 | Bộ trợ giúp cho 3h | mỗi bài tự mở sửa bằng F2 hay bấm đúp | một hàm dùng chung mở sửa một ô bằng Enter và trả khung sửa; đỏ có tên khi ô không mở sửa hay bộ chọn không khớp ô nào | `tests/e2e/support/` |
 | Sổ hành vi | dòng «Sửa dữ liệu», «Phím trong lưới», «Chữ mở trong ô», «Ô không sửa được» theo luật cũ | đổi đúng lời chủ kho, có ngày 2026-11-27; ghi quyết định `wiki/decisions/0053-chuan-hoa-he-design.md` | `design/behaviors.md` |
 
@@ -84,6 +86,9 @@ của 3h đã hẹn chọn màu khác.
 Các hồ sơ đã ký có bài đổi kỳ vọng vì Enter thôi mở hồ sơ ở ô sửa được (dự kiến, S3 xác định danh sách đúng): 2a
 `bang-hang-dung-tay-nhu-sheet`, 3 `ho-so-can`, 4 `sua-tren-o`, 3g `sua-thong-tin-can`. Mỗi hồ sơ một dòng «sửa sau ký» và
 ghim lại một làn trước khi gộp, như VP10.
+S3 xác định danh sách thật: **tám** hồ sơ đã ký mang dòng «sửa sau ký» của vòng này — `bang-hang-dung-tay-nhu-sheet`,
+`dan-tu-excel`, `design-assembly-adopt-checks`, `hanh-vi-trong-luoi-khung`, `ho-so-can`, `khung-va-giao-dien`,
+`luoi-va-o-theo-kieu`, `sua-tren-o`; `sua-thong-tin-can` không có bài nào đổi kỳ vọng.
 
 ## Mười bảy câu của bàn giao — máy trả lời 15, hỏi 2
 
@@ -98,7 +103,7 @@ ghim lại một làn trước khi gộp, như VP10.
 | K4 | Enter ghi xong thì đứng yên hay xuống dòng? | Đứng yên trên ô vừa sửa, như luật đã ký | Luật hàng 4 «Enter ghi … đóng khung thì tiêu điểm về ô vừa sửa»; lời duyệt không đổi điều này |
 | K5 | Ngăn đi theo dòng khi đang sửa dở? | Không xảy ra: sửa nhiều trường đi qua hộp thoại chặn lưới; ngăn đi theo dòng là lát 2 | `listing-details-edit.tsx` là hộp thoại |
 | K6 | Hoàn tác sau khi bấm ra ngoài đã ghi? | Cùng thông báo «Hoàn tác» như Enter | Luật lưu và hoàn tác của hàng 4 |
-| K7 | Máy không rê được (máy tính bảng)? | Bút chì hiện trên ô đang chọn; nút mở ở ô số thứ tự hiện trên dòng đang chọn (lát 2) | Không rê thì dấu chỉ-khi-rê không bao giờ hiện — chỉ một lối sống |
+| K7 | Máy không rê được (máy tính bảng)? | Bút chì hiện trên ô đang chọn; nút mở ở ô số thứ tự hiện trên dòng đang chọn (lát 2) | Không rê thì dấu chỉ-khi-rê không bao giờ hiện — chỉ một lối sống — máy chọn, chờ chủ kho veto (d-20261127T211358Z-17) |
 | L1 | Tên người trong địa chỉ? | Lọc theo người dùng mã mờ, không dùng tên | Luật riêng tư của kho (không dữ liệu cá nhân trong tham số), lưu ý của G |
 | L2 | Đường dẫn gửi người khác vai, có lọc cột họ không xem được? | Bỏ lọc ấy và hiện chip «không áp được» | Nguyên tắc «không biến mất câm» của chuẩn nút câu 2 |
 | L3 | ⌘K làm gì với lọc đang có? | Giữ luật đã ký: về Bảng hàng ở cách xem ban đầu, mã điền ở cột Căn | Lời chủ kho ở hàng «lối vào hồ sơ» (`loi-vao-ho-so`, Cổng Phạm vi) |
