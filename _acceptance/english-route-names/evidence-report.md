@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: fe25c1bd0271c39109b24f8bad2aa7b65cc8a94b
+verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
 human_signoff: Manh Phan 2026-11-23
 ---
 
@@ -213,3 +213,7 @@ Round 3: E1-pha, E2, E3, E5, E6, E8 va hai lenh suite chay lai tren commit 2a4be
 ### Re-pin lần 1 — 2026-11-23, do main merged into the branch (PR #111): design/decisions.yaml, design/theme.json, .claude/rules/design-assembly.md
 run_id: repin-20261123T090056Z-70218
 sha: fe25c1bd0271c39109b24f8bad2aa7b65cc8a94b · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E14-ui
+
+### Re-pin lần 2 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
+run_id: repin-20261128T091000Z-36001
+sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E14-ui · diff chạm vật đo ngoài làn máy: E14-ui — chưa chứng lại, đi vòng S4 delta

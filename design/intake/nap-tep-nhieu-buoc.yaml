@@ -1,0 +1,7 @@
+ten: ImportWizard
+tep: src/modules/imports/ui/import-wizard.tsx
+nguon: solution-crm-6
+nhu_cau: nap-tep-nhieu-buoc
+mo_ta: Khung năm bước để nạp một tệp hàng — chọn tệp, ghép cột, giá trị và căn, xem trước từng ô với dấu, áp và hoàn tác
+ho_so: nhap-excel
+duyet: 2026-11-17

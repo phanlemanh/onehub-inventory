@@ -13,7 +13,7 @@ import { registerSuite } from "../../tools/e2e_templates/suite";
  * Written before the code: the screens this run measures (built, staff or public, less the signed-out list), in the
  * order of their ids — the order the ledger of screens is read in since design-assembly 0.7.0 (one file per screen).
  */
-const MEASURED = ["company-layer", "inventory", "members", "sent", "today"];
+const MEASURED = ["company-layer", "inventory", "members", "nhap-tep", "sent", "today"];
 
 test("tap man do co phien", () => {
   const register = loadRegister();

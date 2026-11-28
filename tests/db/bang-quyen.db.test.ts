@@ -39,8 +39,11 @@ type Seen = "company" | "own" | null;
 // 7e's company layer: five tables read and added (10 doors), changed by edit and retire on four tables and by retire
 // and match on pending units (10 action doors) — 20 × 4 roles — 80; plus row 19's fee items: read by readFeeSchedule,
 // added and changed by setFeeSchedule (3 action doors) × 4 roles — 12; plus row 10's listings: two tables read by
-// viewListings and listings changed by updateListing (3 doors) × 4 roles — 12.
-const DB_CELLS = 192;
+// viewListings and listings changed by updateListing (3 doors) × 4 roles — 12; plus row 11: the pending-unit links read
+// by viewListings, three tables added to by createListing, the import table added to and the list agents of
+// importListings, the import table read by viewImports and written by continueImport, and the import table and the
+// listings of undoImport (10 doors) × 4 roles — 40.
+const DB_CELLS = 232;
 // Written before the code (evals.yaml): the exempt database doors.
 const EXEMPT_DB = [
   "function app.current_company_id()",
@@ -105,6 +108,89 @@ function listingFixture(w: World): Promise<string> {
     listingsOf.set(w, p);
   }
   return p;
+}
+
+// Row 11: for each person of A, an import they made for themselves and the listing it created (version 1, on no unit
+// yet), one pending unit of A, and one listing on a pending unit in A and in B — loaded once per world by the owner.
+interface ImportRows {
+  run: Record<string, string>;
+  listing: Record<string, string>;
+  pendingA: string;
+}
+const importsOf = new WeakMap<World, Promise<ImportRows>>();
+function importFixture(w: World): Promise<ImportRows> {
+  let p = importsOf.get(w);
+  if (!p) {
+    p = (async () => {
+      const q = (sql: string, v: unknown[]) => w.db.owner.query(sql, v);
+      const newRun = async (company: string, by: string) => {
+        const id = crypto.randomUUID();
+        await q(
+          `insert into import_runs (id, company_id, imported_by, list_agent_user_id, file_name, signature, row_count)
+           values ($1, $2, $3, $3, 'bang.xlsx', '{ma can}', 1)`,
+          [id, company, by],
+        );
+        return id;
+      };
+      const newListing = async (company: string, keeper: string, run: string | null) => {
+        const id = crypto.randomUUID();
+        await q(
+          `insert into listings (id, company_id, standard_status, list_price, list_agent_user_id, list_agent_full_name,
+                                 import_run_id)
+           values ($1, $2, 'Incomplete', 3000000000, $3, '[Tên]', $4)`,
+          [id, company, keeper, run],
+        );
+        return id;
+      };
+      const newPending = async (company: string) =>
+        (
+          (
+            await q(
+              "insert into company_pending_units (company_id, raw_code) values ($1, 'ZZ-' || floor(random() * 1e6)::int) returning id::text",
+              [company],
+            )
+          ).rows[0] as { id: string }
+        ).id;
+      const run: Record<string, string> = {};
+      const listing: Record<string, string> = {};
+      for (const who of ["LA", "BA", "TL", "CA", "X"] as const) {
+        run[who] = await newRun(w.A, w.id[who]);
+        listing[who] = await newListing(w.A, w.id[who], run[who]!);
+      }
+      await newRun(w.B, w.id.Y);
+      const pendingA = await newPending(w.A);
+      for (const company of [w.A, w.B]) {
+        const on = await newListing(company, company === w.A ? w.id.LA : w.id.Y, null);
+        await q(
+          "insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values ($1, $2, $3, false)",
+          [on, company, await newPending(company)],
+        );
+      }
+      return { run, listing, pendingA };
+    })();
+    importsOf.set(w, p);
+  }
+  return p;
+}
+
+/** A write tried for oneself and for someone else of A: own when only one's own goes through, company when both do. */
+async function ownOrCompany(
+  w: World,
+  who: Person,
+  write: (c: DbClient, target: Person) => Promise<number>,
+): Promise<Seen> {
+  const tryOne = (target: Person) =>
+    asPerson(w, who, w.A, async (c) => {
+      try {
+        return await write(c, target);
+      } catch (err) {
+        if (code(err) === "42501") return 0;
+        throw err;
+      }
+    });
+  const own = await tryOne(who);
+  const other = await tryOne(otherOf(who));
+  return (own === 1 ? (other === 1 ? "company" : "own") : other === 1 ? "?" : null) as Seen;
 }
 
 // Row 7e: one row of A and one of B in each table of the company layer, loaded once per world by the owner.
@@ -416,6 +502,105 @@ async function observe(w: World, who: Person, door: string): Promise<Seen> {
         return (r.rowCount === 1 ? "company" : r.rowCount === 0 ? null : "?") as Seen;
       });
     }
+    // Row 11: listings added (by an import or by hand) and linked to their unit; imports opened, read, written on and
+    // undone; the listings of an undone import removed; the list agents a company-wide importer picks from.
+    case "table listings insert":
+      return ownOrCompany(
+        w,
+        who,
+        async (c, target) =>
+          (
+            await c.query(
+              `insert into listings (id, company_id, standard_status, list_price, list_agent_user_id, list_agent_full_name)
+               values ($1, $2, 'Incomplete', 3000000000, $3, '[Tên]')`,
+              [crypto.randomUUID(), A, w.id[target]],
+            )
+          ).rowCount ?? 0,
+      );
+    case "table listing_units insert": {
+      const f = await importFixture(w);
+      const { units } = await catalogFixture(w).then(() => sampleCatalog());
+      return ownOrCompany(
+        w,
+        who,
+        async (c, target) =>
+          (
+            await c.query(
+              "insert into listing_units (listing_id, company_id, upi, open) values ($1, $2, $3, false)",
+              [f.listing[target], A, units[2]!.upi],
+            )
+          ).rowCount ?? 0,
+      );
+    }
+    case "table listing_pending_units insert": {
+      const f = await importFixture(w);
+      return ownOrCompany(
+        w,
+        who,
+        async (c, target) =>
+          (
+            await c.query(
+              "insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values ($1, $2, $3, false)",
+              [f.listing[target], A, f.pendingA],
+            )
+          ).rowCount ?? 0,
+      );
+    }
+    case "table listing_pending_units select":
+    case "table import_runs select": {
+      await importFixture(w);
+      const table = door.split(" ")[1]!;
+      return asPerson(w, who, A, async (c) => {
+        const { rows } = await c.query(`select company_id from ${table}`);
+        const r = rows as { company_id: string }[];
+        if (r.some((x) => x.company_id !== A)) return "?" as Seen;
+        return (r.length >= 1 ? "company" : null) as Seen;
+      });
+    }
+    case "table import_runs insert":
+      // The importer is always the caller (the rule); the list agent is oneself, or someone else of A.
+      return ownOrCompany(
+        w,
+        who,
+        async (c, target) =>
+          (
+            await c.query(
+              `insert into import_runs (id, company_id, imported_by, list_agent_user_id, file_name, signature, row_count)
+               values ($1, $2, $3, $4, 'bang.xlsx', '{ma can}', 1)`,
+              [crypto.randomUUID(), A, w.id[who], w.id[target]],
+            )
+          ).rowCount ?? 0,
+      );
+    case "table import_runs update": {
+      const f = await importFixture(w);
+      return ownOrCompany(
+        w,
+        who,
+        async (c, target) =>
+          (
+            await c.query("update import_runs set batches_done = batches_done where id = $1", [
+              f.run[target],
+            ])
+          ).rowCount ?? 0,
+      );
+    }
+    case "table listings delete": {
+      const f = await importFixture(w);
+      return ownOrCompany(
+        w,
+        who,
+        async (c, target) =>
+          (await c.query("delete from listings where id = $1", [f.listing[target]])).rowCount ?? 0,
+      );
+    }
+    case "function app.import_list_agents()":
+      return asPerson(w, who, A, async (c) => {
+        const { rows } = await c.query("select user_id from app.import_list_agents()");
+        const ids = (rows as { user_id: string }[]).map((r) => r.user_id);
+        if (ids.length === 0) return null;
+        if (ids.length === 1 && ids[0] === w.id[who]) return "own" as Seen;
+        return (ids.length > 1 ? "company" : `?${ids.length}`) as Seen;
+      });
     // Row 2c: the saved view table; each person keeps to their own views.
     case "table saved_view select": {
       await viewFixture(w);
@@ -684,7 +869,8 @@ describe("quan-tri-nguoi-qua-bang", () => {
     const r = await checkPeopleFunctions(w);
     console.log(`quan-tri-nguoi-qua-bang: đã quét ${r.scanned} hàm`);
     expect(r.failures).toEqual([]);
-    expect(r.scanned).toBe(12);
+    // Twelve, plus row 11's app.import_list_agents (migration 016, REVIEWED_DEFINERS above): thirteen.
+    expect(r.scanned).toBe(13);
   });
 
   it("the rule of Member points at the permission table", () => {
@@ -813,6 +999,13 @@ describe("thoa-thuan-chi-quan-tri", () => {
 
 // ---- bang-quyen-dung-chung: a shared catalog the API role only reads; no new privileged function
 
+/**
+ * Privileged functions added after migration 005 that a person reviewed, each with its decision. Row 11 (migration
+ * 016): the list agents a company-wide importer picks from — ids and names only (owner's choice «Cho thấy (lối A)»,
+ * _acceptance/nhap-excel/decisions.jsonl d-20261117T064233Z-63; isolation case 19 names it).
+ */
+const REVIEWED_DEFINERS = ["app.import_list_agents"];
+
 async function secDefiners(w: World): Promise<string[]> {
   const { rows } = await w.db.owner.query<{ f: string }>(`
     select n.nspname || '.' || p.proname as f from pg_proc p join pg_namespace n on n.oid = p.pronamespace
@@ -852,8 +1045,11 @@ async function checkCatalog(w: World, before: string[]): Promise<string[]> {
   )
     failures.push("bang-quyen-dung-chung: app.allowed không ghim search_path");
   const after = await secDefiners(w);
-  const added = after.filter((f) => !before.includes(f));
+  const added = after.filter((f) => !before.includes(f) && !REVIEWED_DEFINERS.includes(f));
   if (added.length) failures.push(`bang-quyen-dung-chung: hàm vượt luật mới ${added.join(", ")}`);
+  const gone = REVIEWED_DEFINERS.filter((f) => !after.includes(f));
+  if (gone.length)
+    failures.push(`bang-quyen-dung-chung: hàm đã duyệt không còn ${gone.join(", ")}`);
   return failures;
 }
 

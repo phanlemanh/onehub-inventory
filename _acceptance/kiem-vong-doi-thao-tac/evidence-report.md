@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 356dd6365b86919a558cfe552d66843e3dffb7af
+verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
 human_signoff: Manh Phan 2026-11-15
 ---
 
@@ -157,3 +157,7 @@ sha: 5315e508b8e42480439d0065c679c494a5e54e5a · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-16, do hàng 19 sửa công cụ kiểm vòng đời (sửa sau ký N-1511-3)
 run_id: repin-20261116T040653Z-53403
 sha: 356dd6365b86919a558cfe552d66843e3dffb7af · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng
+
+### Re-pin lần 3 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
+run_id: repin-20261128T091000Z-36001
+sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng

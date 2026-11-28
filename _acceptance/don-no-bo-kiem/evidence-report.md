@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: a00b21736339730f558224a83be763d05479bd38
+verified_commit: 32846d3dfbb6c896860b183b45a59d09f5fbd82f
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -183,3 +183,7 @@ sha: fa302e8e94c40cfc7ce6e51b3d53271d13cab48a · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 5 — 2026-11-16, do hang 22: Next 16.4.6 va cau in khoi-phuc-thu.sh, ghim lai 1u
 run_id: repin-20261116T203737Z-82999
 sha: a00b21736339730f558224a83be763d05479bd38 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
+
+### Re-pin lần 6 — 2026-11-28, do bài E6 sửa sau ký (G-2811-101): bản phá gieo liên kết cũ vào mục nhật ký git còn theo dõi
+run_id: repin-20261128T112057Z-86956
+sha: 32846d3dfbb6c896860b183b45a59d09f5fbd82f · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)

@@ -321,7 +321,14 @@ describe("AC-5 the sample data is byte-identical to the signed sample-data row",
 // owner's plan approval 2026-11-13): company-config goes through the same door and uses the catalog's code lookup.
 // Row 10 (decision 0039, owner's plan approval 2026-11-15): the inventory read takes the units a listing offers from the
 // catalog's own reader, on the listings module's client.
+// Row 11 (nhap-excel, owner's scope and plan approval 2026-11-17): the imports module opens the identity door, looks
+// unit codes up in the catalog, writes what an import teaches through company-config and creates listings through the
+// listings module's server door.
 const APPROVED_DEPENDENCIES = new Set([
+  "imports → identity",
+  "imports → catalog",
+  "imports → company-config",
+  "imports → listings",
   "listings → identity",
   "listings → catalog",
   "company-config → identity",

@@ -24,7 +24,7 @@ modules:
     depends_on: []
   - name: listings
     description: Listings, status, pricing and fees, freshness, events, photos
-    owns: [Listing, ListingUnit, SavedView]
+    owns: [Listing, ListingUnit, SavedView, ListingPendingUnit]
     depends_on: [identity, catalog] # saved views (row 2c): the shared action door and withCompany, decision 0026; row 10: the catalog units a listing offers, decision 0039
   - name: contacts
     description: Contacts, phones and duplicate detection
@@ -36,8 +36,8 @@ modules:
     depends_on: []
   - name: imports
     description: Data import, including the AI-assisted planning call
-    owns: []
-    depends_on: []
+    owns: [ImportRun]
+    depends_on: [identity, catalog, company-config, listings]
   - name: workspace
     description: Today queues, navigation and team views
     owns: []

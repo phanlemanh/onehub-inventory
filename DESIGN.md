@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: "onehub-inventory"
-description: "The design system of onehub-inventory, written from the design ledgers at 871f9e446b70. Do not change it here: change a ledger, then write it again with make design-exports."
+description: "The design system of onehub-inventory, written from the design ledgers at db402503d0d7. Do not change it here: change a ledger, then write it again with make design-exports."
 colors:
   accent: "#ebf2ff"
   accent-foreground: "#171717"
@@ -127,7 +127,7 @@ spacing:
 
 ## Overview
 
-The design system of onehub-inventory, as its design ledgers hold it at 871f9e446b70. Product type: not decided; conformance level: not decided.
+The design system of onehub-inventory, as its design ledgers hold it at db402503d0d7. Product type: not decided; conformance level: not decided.
 
 ## Colors
 

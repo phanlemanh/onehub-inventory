@@ -109,6 +109,10 @@ function workingCopy() {
     const clone = sh("cp", ["-cR", join(ROOT, "node_modules"), join(dir, "node_modules")]);
     if (clone.status !== 0) throw new Error(`khong nhan ban duoc node_modules: ${clone.stderr}`);
     rmSync(join(dir, "node_modules", ".cache"), { recursive: true, force: true });
+    // The design files kept out of git (design/screens.yaml and the role × screen × button table among them,
+    // design-assembly 0.7.0) are drawn again in the copy, the way the repository draws them before anything reads one.
+    const derived = sh("make", ["design-role-table"], { cwd: dir });
+    if (derived.status !== 0) throw new Error(`khong ve lai duoc tep thiet ke: ${derived.stderr}`);
   } catch (e) {
     sh("git", ["-C", ROOT, "worktree", "remove", "--force", dir]);
     throw e;
