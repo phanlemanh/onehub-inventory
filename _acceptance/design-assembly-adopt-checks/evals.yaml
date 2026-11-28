@@ -55,7 +55,7 @@ evals:
     cmd: bash _acceptance/design-assembly-adopt-checks/rang/chay.sh shape
     layer: backend-effect
     paths: [design/decisions.yaml, _acceptance/design-assembly-adopt-checks/rang/**]
-    expected: "exit 0; dòng 'shape: 8 rows gained a check, 2 rows added, no other row changed; files changed: 5' (ba sổ thiết kế, tài liệu thiết kế của hồ sơ, một dòng nhật ký wiki). Chiều đỏ: E4 (nguồn của format-number-date đổi → 'shape: row format-number-date changed beyond its check'; src/app/globals.css trong danh sách đổi → 'shape: file changed outside the matrix: src/app/globals.css'; một tệp khác trong docs/ → 'shape: file changed outside the matrix: docs/superpowers/specs/2026-11-23-other-design.md')"
+    expected: "exit 0; dòng 'shape: 8 rows gained a check, 2 rows added, no other row changed; files changed: 5' (ba sổ thiết kế, tài liệu thiết kế của hồ sơ, một dòng nhật ký wiki), đo trên khoảng commit cố định BASE..TIP của PR #111 đã đưa hồ sơ vào (sửa sau ký ở PR #136, G-2811-116). Chiều đỏ: E4 (nguồn của format-number-date đổi → 'shape: row format-number-date changed beyond its check'; src/app/globals.css trong danh sách đổi → 'shape: file changed outside the matrix: src/app/globals.css'; một tệp khác trong docs/ → 'shape: file changed outside the matrix: docs/superpowers/specs/2026-11-23-other-design.md')"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E7
     criterion: AC-5
@@ -63,5 +63,5 @@ evals:
     cmd: bash _acceptance/design-assembly-adopt-checks/rang/chay.sh rules
     layer: backend-effect
     paths: [.claude/rules/design-assembly.md, design/theme.json, _acceptance/design-assembly-adopt-checks/rang/**]
-    expected: "exit 0; dòng 'rules: Controls says 24px as design/theme.json holds; Type says headings in var(--font-sans) as design/theme.json holds; one known wrong line'. Chiều đỏ: E4 (Controls nói 20px → 'rules: Controls says 20px, design/theme.json holds 24px'; thêm một dòng sai → 'rules: 2 lines say undefined, the known defect is one'; mục Controls mất → 'rules: section Controls missing')"
+    expected: "exit 0; dòng 'rules: Controls says 24px as design/theme.json holds; Type says headings in var(--font-sans) as design/theme.json holds; no line says undefined' (dòng sai cũ duy nhất đã được main sửa ở 6d5d332d; sửa sau ký ở PR #136, G-2811-116). Chiều đỏ: E4 (Controls nói 20px → 'rules: Controls says 20px, design/theme.json holds 24px'; thêm một dòng sai → 'rules: 1 lines say undefined, none may'; mục Controls mất → 'rules: section Controls missing')"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
