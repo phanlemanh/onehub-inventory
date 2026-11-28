@@ -155,7 +155,8 @@ export const actionOf = (change: ListingChange): ActionName =>
 
 /**
  * Moves the listing's unit link (row 3h, AC-10), or says why not: the unit is not in the catalog or is the same one, or
- * the company already has an open listing on it (named by its unit number). The unique index of 013 still guards a race.
+ * the company already has an open listing on it, on the catalog link or on a pending unit matched to it (named by its unit
+ * number). The unique index of 013 still guards a race on the catalog link.
  */
 async function moveUnit(
   c: DbClient,
@@ -167,8 +168,16 @@ async function moveUnit(
   if (to === from || from.startsWith(PENDING_UNIT)) return { rule: "unit" };
   const [unit] = await readCatalogUnits(c, [to]);
   if (!unit) return { rule: "unit" };
+  // A pending unit matched to the catalog since keeps its open listing on the pending link: it counts for that catalog
+  // unit too, as it does for the import (Listing rule one-open-listing).
   const taken = await c.query(
-    "select 1 from listing_units where upi = $1 and open and listing_id <> $2 limit 1",
+    `select 1 from listing_units where upi = $1 and open and listing_id <> $2
+     union all
+     select 1 from listing_pending_units p
+       join company_pending_units cpu on cpu.id = p.pending_unit_id
+       join catalog_units u on u.unit_key = cpu.unit_key
+      where u.upi = $1 and p.open and p.listing_id <> $2
+     limit 1`,
     [to, id],
   );
   if ((taken.rowCount ?? 0) > 0) return { rule: "unit-open", unitNumber: unit.unitNumber };

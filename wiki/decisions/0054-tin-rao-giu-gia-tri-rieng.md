@@ -55,6 +55,11 @@ onehub-invest đều cho tin rao giữ giá trị của chính nó, còn danh m�
 - Migration `020` thêm mười cột vào `listings`. Bộ cách ly có thêm ca 27 và 28, mỗi ca kèm bản phá.
 - Nhập tệp ghi giá trị nguồn «tệp». Lệnh `make tin-rao-doc-lai` đọc lại những lần nhập cũ; mỗi lần nhập đã đọc được
   đánh dấu (migration 021), nên chạy lại không điền lại giá trị người đã «Lấy lại».
+- Lệnh đọc lại ghi qua cửa `withCompany`, với tư cách người đã nhập, trong sàn của lần nhập ấy (SP-1). Quyền chủ cơ sở
+  dữ liệu chỉ dùng để liệt kê lần nhập nào chưa đọc, không ghi gì. Người nhập không còn xem được lần nhập (rời sàn, hay
+  vai không có quyền) thì lần nhập ấy để nguyên, chưa đọc, và được đếm riêng.
+- «Gắn sang căn khác» đếm cả tin đang mở trên căn chờ đã khớp danh mục, như bước nhập đếm, nên một căn không có hai tin
+  đang mở.
 - Lật một số luật đã ký, mỗi chỗ có dòng sửa sau ký trong sổ của hồ sơ ấy:
   - hàng 4 và hàng 5: nay Diện tích, Phòng ngủ sửa và dán được;
   - hàng 3, 3b và 3g: đầu và thân hồ sơ đổi dáng;

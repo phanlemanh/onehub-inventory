@@ -11,9 +11,9 @@ export { listingIdOf, BATCH_ROWS } from "./store";
 // Row 3h: read the unit attributes older imports kept as written once more (make tin-rao-doc-lai).
 export {
   KeptShapeUnread,
-  layerThroughDoor,
+  asImporter,
   rereadImportValues,
-  type LayerOf,
+  type RunAsImporter,
   type RereadSummary,
 } from "./reread";
 

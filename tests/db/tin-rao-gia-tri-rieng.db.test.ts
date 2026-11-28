@@ -15,7 +15,12 @@ import { withCompany } from "@/modules/identity/with-company";
 import { matchPendingUnits } from "@/modules/company-config/server";
 import { createImportsHandlers } from "@/modules/imports/imports-http";
 import { NO_CHOICES, valueKey } from "@/modules/imports";
-import { layerThroughDoor, listingIdOf, rereadImportValues } from "@/modules/imports/server";
+import {
+  asImporter,
+  listingIdOf,
+  rereadImportValues,
+  type RunAsImporter,
+} from "@/modules/imports/server";
 import { readInventory } from "@/modules/listings/inventory-read";
 import { createListingsHandlers } from "@/modules/listings/listings-http";
 import {
@@ -543,7 +548,7 @@ describe("doc-lai-lan-nhap-cu (E7)", () => {
       "update listings set standard_status = 'Withdrawn', withdrawn_reason = 'unreachable' where id = $1",
       [ids[2]],
     );
-    const first = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    const first = await rereadImportValues(e.w.db.owner, asImporter(e.w.pool));
     expect(first).toMatchObject({ imports: 1, listingsSet: 1, typedKept: 1, lockedKept: 1 });
     expect(await ownOf(e.w, ids[2]!)).toMatchObject({ living_area: null, bedrooms_total: null });
     expect(await ownOf(e.w, ids[0]!)).toMatchObject({
@@ -562,7 +567,7 @@ describe("doc-lai-lan-nhap-cu (E7)", () => {
     expect(await e.version(ids[0]!)).toBe(1);
     const before = await e.w.db.owner.query(`select ${OWN_COLUMNS} from listings order by id`);
     // Read once (021): the second run skips the import it has read.
-    const second = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    const second = await rereadImportValues(e.w.db.owner, asImporter(e.w.pool));
     expect(second).toMatchObject({ imports: 0, listingsSet: 0, typedKept: 0, lockedKept: 0 });
     expect(
       (await e.w.db.owner.query(`select ${OWN_COLUMNS} from listings order by id`)).rows,
@@ -573,7 +578,7 @@ describe("doc-lai-lan-nhap-cu (E7)", () => {
          'why', 'unit-attribute')), file_values_read_at = null where id = $1`,
       [id],
     );
-    await expect(rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool))).rejects.toThrow(
+    await expect(rereadImportValues(e.w.db.owner, asImporter(e.w.pool))).rejects.toThrow(
       `kept shape unread: import ${id}`,
     );
   });
@@ -588,13 +593,14 @@ describe("can-cho-khop (E9)", () => {
     const target = (
       await e.w.db.owner.query<{
         unit_key: string;
+        upi: string;
         living_area: string;
         bedrooms_total: number;
         floor: string;
         direction_faces: string;
         property_sub_type: string;
       }>(
-        `select unit_key, living_area::text, bedrooms_total, floor, direction_faces, property_sub_type
+        `select unit_key, upi, living_area::text, bedrooms_total, floor, direction_faces, property_sub_type
            from catalog_units
           where living_area is not null and bedrooms_total is not null and floor is not null
             and direction_faces is not null and property_sub_type is not null and upi <> all($1)
@@ -653,6 +659,14 @@ describe("can-cho-khop (E9)", () => {
     const differing = UNIT_ATTRIBUTE_FIELDS.filter((f) => after.a[f].differs);
     expect(differing).toEqual(["livingArea"]);
     expect(after.a.livingArea.catalogValue).toBe(Number(target.living_area));
+    // The matched pending unit keeps its open listing on the pending link: it counts for the catalog unit too, so
+    // «Gắn sang căn khác» refuses to put a second open listing there (Listing rule one-open-listing; S4-r1).
+    const onto = await e.patch("LA", ids[0]!, {
+      version: await e.version(ids[0]!),
+      change: { field: "unit", upi: target.upi },
+    });
+    expect(onto.status, "a second open listing on the matched unit").toBe(400);
+    expect(((await onto.json()) as { why: { rule: string } }).why.rule).toBe("unit-open");
   });
 });
 
@@ -726,11 +740,11 @@ describe("doc-lai-mot-lan (E7, G-2811-69)", () => {
         .rows[0].file_values_read_at,
       "an import of today is marked read",
     ).not.toBeNull();
-    expect(await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool))).toMatchObject({
+    expect(await rereadImportValues(e.w.db.owner, asImporter(e.w.pool))).toMatchObject({
       imports: 0,
     });
     await asImportBefore3h(e, id);
-    const first = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    const first = await rereadImportValues(e.w.db.owner, asImporter(e.w.pool));
     expect(first).toMatchObject({ imports: 1 });
     expect(await ownOf(e.w, ids[0]!)).toMatchObject({
       living_area: 72.5,
@@ -744,7 +758,7 @@ describe("doc-lai-mot-lan (E7, G-2811-69)", () => {
     expect(back.status).toBe(200);
     const taken = await ownOf(e.w, ids[0]!);
     expect(taken).toMatchObject({ living_area: null, living_area_source: null });
-    const second = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    const second = await rereadImportValues(e.w.db.owner, asImporter(e.w.pool));
     expect(second).toMatchObject({ imports: 0, listingsSet: 0 });
     expect(refilled(taken, await ownOf(e.w, ids[0]!), ids[0]!)).toEqual([]);
   });
@@ -754,7 +768,7 @@ describe("doc-lai-mot-lan (E7, G-2811-69)", () => {
     const units = await codedUnits(e.w);
     const { id, ids } = await importThree(e, units);
     await asImportBefore3h(e, id);
-    await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    await rereadImportValues(e.w.db.owner, asImporter(e.w.pool));
     const back = await e.patch("LA", ids[0]!, {
       version: await e.version(ids[0]!),
       change: { field: "unitAttributes", livingArea: null },
@@ -765,10 +779,63 @@ describe("doc-lai-mot-lan (E7, G-2811-69)", () => {
     await e.w.db.owner.query("update import_runs set file_values_read_at = null where id = $1", [
       id,
     ]);
-    await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    await rereadImportValues(e.w.db.owner, asImporter(e.w.pool));
     expect(refilled(taken, await ownOf(e.w, ids[0]!), ids[0]!)).toEqual([
       `taken-back value filled again: ${ids[0]}`,
     ]);
+  });
+});
+
+describe("doc-lai-qua-cua (SP-1, S4-r1 t1)", () => {
+  it("doc-lai-qua-cua: the re-read writes as the importer through the door — an importer who may no longer see the import leaves it unread, and nothing is written", async () => {
+    const e = await apiWorld("qua_cua");
+    const units = await codedUnits(e.w);
+    const { id, ids } = await importThree(e, units);
+    await asImportBefore3h(e, id);
+    const before = await e.w.db.owner.query(`select ${OWN_COLUMNS} from listings order by id`);
+    // The importer's role changes to one that may not view imports: the door shows them no import to read.
+    await e.w.db.owner.query(
+      "update company_members set roles = '{BuyerAgent}' where company_id = $1 and user_id = $2",
+      [e.w.A, e.w.id.LA],
+    );
+    const refused = await rereadImportValues(e.w.db.owner, asImporter(e.w.pool));
+    expect(refused).toMatchObject({ imports: 1, refused: 1, listingsSet: 0 });
+    expect(
+      (await e.w.db.owner.query(`select ${OWN_COLUMNS} from listings order by id`)).rows,
+    ).toEqual(before.rows);
+    expect(
+      (await e.w.db.owner.query("select file_values_read_at from import_runs where id = $1", [id]))
+        .rows[0].file_values_read_at,
+      "an import refused at the door stays unread",
+    ).toBeNull();
+    // The right given back, the next run reads it.
+    await e.w.db.owner.query(
+      "update company_members set roles = '{ListAgent}' where company_id = $1 and user_id = $2",
+      [e.w.A, e.w.id.LA],
+    );
+    expect(await rereadImportValues(e.w.db.owner, asImporter(e.w.pool))).toMatchObject({
+      imports: 1,
+      refused: 0,
+      listingsSet: 3,
+    });
+    expect(await ownOf(e.w, ids[0]!)).toMatchObject({ living_area_source: "File" });
+  });
+
+  it("break: the same re-read run on the owner's connection, past the door, fills what the door refused", async () => {
+    const e = await apiWorld("qua_cua_pha");
+    const units = await codedUnits(e.w);
+    const { id } = await importThree(e, units);
+    await asImportBefore3h(e, id);
+    await e.w.db.owner.query(
+      "update company_members set roles = '{BuyerAgent}' where company_id = $1 and user_id = $2",
+      [e.w.A, e.w.id.LA],
+    );
+    const pastTheDoor: RunAsImporter = async (_company, _user, fn) =>
+      fn(e.w.db.owner as unknown as Parameters<typeof fn>[0]);
+    expect(await rereadImportValues(e.w.db.owner, pastTheDoor)).toMatchObject({
+      refused: 0,
+      listingsSet: 3,
+    });
   });
 });
 
@@ -788,7 +855,7 @@ describe("doc-lai-gia-tri-da-hien (E7, G-2811-81)", () => {
       "the import keeps the value the preview showed",
     ).toBe("Townhouse");
     await asImportBefore3h(e, id);
-    const read = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    const read = await rereadImportValues(e.w.db.owner, asImporter(e.w.pool));
     expect(read).toMatchObject({ imports: 1 });
     expect(await ownOf(e.w, ids[1]!)).toMatchObject({
       property_sub_type: "Townhouse",

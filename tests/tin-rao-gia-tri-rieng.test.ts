@@ -454,7 +454,7 @@ describe("hieu-luc-ma-tran (E1)", () => {
     attributes: WORDS,
   };
 
-  it("hieu-luc-ma-tran: the grid row, the record, the phone card, ⌘K and the place tree are built from the listing that holds its own value", () => {
+  it("hieu-luc-ma-tran: the grid row, the record and the phone card show the listing's own value; ⌘K and the place tree, which carry no unit attribute, still build from the same rows", () => {
     const id = sampleId(1, 4);
     const own = listingOf(id);
     expect(own.livingAreaSource, "the sample listing types its own area").toBe("Typed");
@@ -499,7 +499,8 @@ describe("hieu-luc-ma-tran (E1)", () => {
     ).toEqual([]);
     expect(row[AREA as keyof GridRow]).toBe(want.value);
     expect(rebuilt[AREA as keyof GridRow]).toBe(want.value);
-    // ⌘K and the place tree carry no unit attribute: they read the code, building and project of the same rows.
+    // ⌘K and the place tree carry no unit attribute, so own-versus-catalog is not theirs to show: this only checks they
+    // still build from the same rows (the code, building and project), not which value they would read.
     const code = String(row["Listing.unitNumber"]);
     expect(searchSuggestions(rows, code).some((x) => x.value === code)).toBe(true);
     expect(geoTree(rows, []).length).toBeGreaterThan(0);

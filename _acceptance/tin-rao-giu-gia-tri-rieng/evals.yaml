@@ -168,7 +168,7 @@ evals:
   - id: E13
     criterion: AC-2
     executor: test
-    cmd: "bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E13"
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E13
     paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/components/candidate/**, src/modules/listings/ui/attribute-cell-edit.test.tsx, src/modules/listings/ui/use-listing-cell-edit.tsx]
     expected: "exit 0; bộ bài của hàng 4 chạy lại không đổi một ca (giá, trạng thái, ô máy tính ra không sửa); cộng ca mới trong src/components/candidate/data-region-cell-edit.test.tsx: dưới 768 px ô Diện tích, Phòng ngủ không mở sửa (mọi lối mở sửa của luật sửa trên ô hiện hành đều không mở khung), từ 768 px mở; ca đối chứng mở sửa ở 360 cho 'phone cell opened for edit'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
