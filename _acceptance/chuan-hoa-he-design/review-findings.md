@@ -31,14 +31,14 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
 
 - **Records — the Listing wiki page was not updated though Listing's behaviour changed**
   Người dùng thấy gì: Tài liệu về lần chào còn nói xoá chỉ là gỡ khỏi danh sách, trong khi hoàn tác nhập Excel xoá hẳn. Người đọc tài liệu có thể hiểu sai.
-  Căn cứ: Chỉ là tài liệu cũ, không ảnh hưởng người dùng cuối; cập nhật lại nhanh và không mất gì.
+  Căn cứ: Chỉ là tài liệu cũ, không ảnh hưởng người dùng cuối; cập nhật lại nhanh và không mất gì. Đối chiếu (dãy N, 28/11, G-2811-105): giám sát chuyển việc cập nhật trang wiki Listing cho dãy R (hàng 3h, hàng đổi hành vi Listing nhiều nhất).
   file: `wiki/entities/listing.md`
   severity: low
   Đề xuất: known-limits
 
 - **Migrations — two migrations share the number 015**
   Người dùng thấy gì: Hai tệp cập nhật cơ sở dữ liệu mang cùng số nên thứ tự chạy dựa vào cách sắp tên. Kết quả cuối vẫn đúng.
-  Căn cứ: Kết quả cuối đúng, không tệp đã chốt nào bị sửa; đổi số lúc này còn rủi ro hơn là để nguyên.
+  Căn cứ: Kết quả cuối đúng, không tệp đã chốt nào bị sửa; đổi số lúc này còn rủi ro hơn là để nguyên. Đối chiếu (dãy N, 28/11, G-2811-105): đây đã là mục Treo-43 chờ chủ kho phê trên thẻ hàng 11 (hồ sơ nhap-excel); thẻ này chỉ dẫn tới đó.
   file: `db/migrations/015_vai_danh_tinh_tam_quyen_tao.sql`
   severity: low
   Đề xuất: wont-fix
@@ -101,7 +101,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
 
 - **Migrations 016 and 019 fail for a non-superuser owner because 004 has already taken back CREATE on schema app (r3)**
   Người dùng thấy gì: Lần đưa lên môi trường thử hoặc thật kế tiếp có thể dừng giữa chừng khi cập nhật cơ sở dữ liệu, nên các tính năng mới chưa lên được. Dữ liệu hiện có không mất.
-  Căn cứ: Chặn việc phát hành chứ không làm mất dữ liệu, thử lại được sau khi sửa, và việc sửa nhỏ nhưng thuộc các tệp của hàng nhập Excel chứ không phải lát màu và phím.
+  Căn cứ: Chặn việc phát hành chứ không làm mất dữ liệu, thử lại được sau khi sửa, và việc sửa nhỏ nhưng thuộc các tệp của hàng nhập Excel chứ không phải lát màu và phím. Đối chiếu sự thật (dãy N, 28/11, G-2811-105): đã sửa ở hàng 11, commit ecdc1ae0 (015 và 020 cấp rồi thu lại quyền tạo quanh 016 và 019), nằm trong HEAD của nhánh này; đây là đối chiếu, chủ kho vẫn quyết mục.
   file: `db/migrations/016_nhap_excel_dau_chu.sql`
   severity: high
   Đề xuất: new-contract
@@ -171,14 +171,14 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
 
 - **Closing price and closing date columns are read and counted, then silently dropped when the import writes (r2 · tệp đã đổi)**
   Người dùng thấy gì: Khi nhập file Excel, cột giá chốt và ngày chốt được tính là đã nhận nhưng không được lưu ở đâu, và không ai báo cho người nhập biết.
-  Căn cứ: Mất dữ liệu thật mà người dùng không hay biết, phải nhập lại từ file gốc mới có lại; nên sửa ở hồ sơ nhập Excel.
+  Căn cứ: Mất dữ liệu thật mà người dùng không hay biết, phải nhập lại từ file gốc mới có lại; nên sửa ở hồ sơ nhập Excel. Đối chiếu sự thật (dãy N, 28/11, G-2811-105): đã sửa ở hàng 11, commit 25311d32 (lần nhập ghi đủ mọi giá trị màn xem trước đã hứa), nằm trong HEAD của nhánh này; đây là đối chiếu, chủ kho vẫn quyết mục.
   file: `src/modules/imports/store.ts`
   severity: high
   Đề xuất: new-contract
 
 - **A row whose unit code points to several units, with the question left unanswered, is dropped without its cells being kept (r2 · tệp đã đổi)**
   Người dùng thấy gì: Dòng có mã căn khớp nhiều căn mà người nhập chưa trả lời thì bị bỏ, dữ liệu của dòng ấy mất, trong khi màn xem trước lại báo là đã giữ.
-  Căn cứ: Màn hình hứa nhiều hơn cái được lưu nên người dùng bị mất dữ liệu mà không hay; người dùng chỉ lấy lại được bằng cách nhập lại file.
+  Căn cứ: Màn hình hứa nhiều hơn cái được lưu nên người dùng bị mất dữ liệu mà không hay; người dùng chỉ lấy lại được bằng cách nhập lại file. Đối chiếu sự thật (dãy N, 28/11, G-2811-105): đã sửa ở hàng 11, commit e6364f7a (dòng bị bỏ ra vẫn giữ ô và được đếm), nằm trong HEAD của nhánh này; đây là đối chiếu, chủ kho vẫn quyết mục.
   file: `src/modules/imports/table.ts`
   severity: medium
   Đề xuất: new-contract
@@ -199,7 +199,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
 
 - **A CSV file that is not UTF-8 is decoded without complaint and imports replacement characters (r2 · tệp đã đổi)**
   Người dùng thấy gì: File CSV lưu bằng bảng mã cũ sẽ bị nhập với chữ có dấu thành ký tự lỗi mà không có cảnh báo nào.
-  Căn cứ: Dữ liệu hỏng được ghi vào kho mà người dùng không biết, phải sửa tay từng ô sau đó; người dùng hay lưu CSV từ Excel nên khá dễ gặp.
+  Căn cứ: Dữ liệu hỏng được ghi vào kho mà người dùng không biết, phải sửa tay từng ô sau đó; người dùng hay lưu CSV từ Excel nên khá dễ gặp. Đối chiếu sự thật (dãy N, 28/11, G-2811-105): đã sửa ở hàng 11, commit e6364f7a (tệp .csv không phải UTF-8 bị từ chối), nằm trong HEAD của nhánh này; đây là đối chiếu, chủ kho vẫn quyết mục.
   file: `src/modules/imports/read-file.ts`
   severity: medium
   Đề xuất: new-contract
