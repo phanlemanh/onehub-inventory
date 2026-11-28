@@ -39,8 +39,10 @@ vừa đổi); lần chào đã bán hay ngừng giữ nguyên. Giá trị trư�
 Giá trị riêng của thuộc tính căn (hàng 3h, `own-value-beats-catalog`): diện tích, tầng, phòng ngủ, hướng, loại hình có
 thể là giá trị riêng của lần chào, cùng tên RESO với căn của danh mục; mỗi giá trị nhớ nguồn (`AttributeSource`: sàn gõ
 hay nhập từ tệp). Không có giá trị riêng thì theo danh mục; sàn gõ thắng tệp, tệp thắng danh mục; danh mục không bao
-giờ đè giá trị riêng và sàn không sửa danh mục. Loại căn vẫn suy từ phòng ngủ hiệu lực. Bản bấm được chỉ ghi vào dữ liệu
-mẫu; cửa `/api/v1` từ chối thay đổi `unitAttributes` (400) tới khi migration của hàng 3h thêm cột.
+giờ đè giá trị riêng và sàn không sửa danh mục. Loại căn vẫn suy từ phòng ngủ hiệu lực. Ghi qua `/api/v1`
+(`unitAttributes`), khoá phiên bản như hàng 4; tin Đã bán hay Ngừng hẳn giữ nguyên. Diện tích và Phòng ngủ sửa trên ô và
+dán theo cùng luật đọc; hồ sơ căn sửa cả năm trường một lần, «Lấy lại» xoá giá trị riêng. Nhập tệp ghi nguồn «tệp»
+([0054](../decisions/0054-tin-rao-giu-gia-tri-rieng.md)).
 
 ## Where in the code
 
@@ -50,7 +52,9 @@ mẫu; cửa `/api/v1` từ chối thay đổi `unitAttributes` (400) tới khi 
 `ui/http-save-door.ts`. Hàng 3g: hộp «Sửa» ở `ui/listing-details-edit.tsx`, bốn cột ở `ui/detail-cells.ts`, đọc giá trị
 gõ hay dán của trường riêng ở `custom-rules.ts`; một luật đọc kết cục ghi ở `src/lib/write-failure.ts`. Hàng 3h: giá
 trị hiệu lực và luật đọc ở `unit-attributes.ts`, ô thuộc tính ở `ui/attribute-cells.ts`, dấu khác danh mục ở
-`ui/attribute-differs-mark.tsx`, hộp «Sửa» của khối căn ở `ui/unit-attributes-edit.tsx`.
+`ui/attribute-differs-mark.tsx`, hộp «Sửa» của khối căn ở `ui/unit-attributes-edit.tsx`, dán ở `ui/listing-paste.ts`,
+ghi giá trị tệp ở `create.ts` (`setFileValues`), đọc lại lần nhập cũ ở `src/modules/imports/reread.ts`; cột ở
+`db/migrations/020_tin_rao_gia_tri_rieng.sql`.
 
 ## History
 
@@ -92,3 +96,7 @@ Hàng 3g, 17/11/2026: sửa bốn phần của lần chào trên ô và trong h�
 
 Hàng 3h, 27/11/2026 (bản bấm được): năm giá trị riêng của thuộc tính căn kèm nguồn, luật `own-value-beats-catalog`, ô
 `vong_doi.rieng.sua_thuoc_tinh_can`. Hồ sơ: `_acceptance/tin-rao-giu-gia-tri-rieng/`.
+
+Hàng 3h, 28/11/2026 (dựng): cột thật và cửa ghi (migration 020), nhập tệp và đọc lại lần nhập cũ, căn chờ khớp, sửa và
+dán trên ô, thân hồ sơ căn bốn nhóm A–D, dòng lý do thay nút bị chặn
+([0054](../decisions/0054-tin-rao-giu-gia-tri-rieng.md)).

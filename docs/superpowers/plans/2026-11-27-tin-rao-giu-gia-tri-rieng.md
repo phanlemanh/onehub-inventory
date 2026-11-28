@@ -286,6 +286,13 @@ AttributeSource): boolean`, đúng khi giá trị mới được ghi);
 - Dựng `_acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh` cho các eval có `cmd` trỏ về nó, và `chung-minh-man.md`.
 - Kiểm: `make check`, `make e2e`, rồi S4.
 - Phục vụ: E12 và mọi eval (S4).
+- **Đã làm phần không cần máy nặng (G-2811-52):**
+  - Dòng sửa-sau-ký ở sổ của hàng 3, 3b, 3g, 3e, 4, 5, 10 và VP10 (`_acceptance/<hồ sơ>/decisions.jsonl`). Bài của hàng 4
+    (`cot-chi-doc`) và hàng 5 (hai ca dòng ngắn) đổi theo luật đã lật cho Diện tích, Phòng ngủ.
+  - Wiki: quyết định 0054, `wiki/entities/listing.md`, một dòng nhật ký, câu «Thân hồ sơ căn» trong `design/behaviors.md`.
+  - E13 chạy qua `rang/chay.sh E13` (khoá `executors.test.tin_rao_sua_tren_o`), đỏ khi không ca điện thoại nào chạy;
+    các phép nhìn khai `ref: config:executors.ui-check`.
+  - Còn lại: ghim lại các hồ sơ trên và lượt chấm, chờ G báo tới lượt R.
 
 ## Bảng tóm tắt cho người duyệt
 

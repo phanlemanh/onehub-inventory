@@ -33,6 +33,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E2b
+    ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; trên Bảng hàng đăng nhập (Postgres dãy R) ở 1024 và 1440: chọn ô Diện tích của một tin đang mở, mở sửa và xác nhận theo luật sửa trên ô hiện hành của kho (rút từ helper e2e dùng chung của sửa trên ô, không viết tay phím), gõ '72,5' → ô hiện '72,5 m²', thông báo đã lưu có Hoàn tác; tải lại trang thì ô vẫn '72,5 m²'; Hoàn tác trả ô về giá trị trước; gõ 'bảy mươi' hiện câu lỗi dưới ô và không có lời gọi PATCH nào (đếm mạng); ảnh evidence/E2b-1024.png, E2b-1440.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
@@ -42,6 +43,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E3
+    ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; ở 360, 414, 1024, 1440 mở hồ sơ căn của một tin đang mở, bấm 'Sửa' ở khối thông tin căn, đổi năm trường (Diện tích, Tầng '15A', Phòng ngủ, Hướng chọn, Loại hình chọn), Lưu → đúng một PATCH mang năm giá trị; khối hiện năm giá trị mới; tầng '07' bị từ chối với câu lỗi ghim và không có PATCH; Hoàn tác trả cả năm; ảnh evidence/E3-<khổ>.png cho mỗi khổ"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
@@ -59,6 +61,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E4
+    ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; dữ liệu mẫu có bốn tin: riêng khác danh mục, riêng bằng danh mục, danh mục trống, căn chờ khớp; ở 1440 và 360 chỉ tin thứ nhất có dấu (đếm phần tử data-slot attribute-differs bằng 1 trên lưới và 1 trong hồ sơ căn), tên truy cập là chữ của khái niệm dấu khác danh mục trong ontology/labels.yaml (đọc từ bảng nhãn, không viết tay) nối giá trị danh mục; màu chữ của ô có dấu bằng ô không dấu (getComputedStyle color); axe không có lỗi ở sáng và tối; ca đối chứng gắn dấu cho ô bằng danh mục cho 'mark on equal value'; ảnh evidence/E4-1440.png, E4-360.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
@@ -68,6 +71,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E5
+    ref: config:executors.ui-check
     paths: [src/modules/listings/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; ở 1440 trên ô có dấu và ở 360 trong hồ sơ căn: chọn lệnh lấy lại (tìm theo chữ đọc từ ontology/labels.yaml, không viết tay) → PATCH mang giá trị null cho đúng thuộc tính ấy; ô hiện giá trị danh mục, dấu tắt; đọc lại từ cơ sở dữ liệu: cột giá trị và cột nguồn đều null; Hoàn tác trả giá trị riêng và nguồn cũ (đọc lại cơ sở dữ liệu); ca tin nguồn File bị gõ đè rồi lấy lại: về thẳng danh mục theo Hỏi-7 (cột giá trị và cột nguồn null); ca đối chứng dùng chữ cứng khác bảng nhãn cho 'label not from labels.yaml'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
@@ -95,6 +99,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E8
+    ref: config:executors.ui-check
     paths: [src/modules/imports/**, src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; ở 1440 và 360 bước xem trước của lần nhập với tệp có một dòng Diện tích khác danh mục của căn khớp và một dòng bằng: đúng một ô có dấu khác Danh bạ (cùng data-slot attribute-differs của lưới) kèm giá trị danh mục; ô ấy vẫn hiện giá trị tệp là giá trị sẽ ghi; ảnh evidence/E8-1440.png, E8-360.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
@@ -122,6 +127,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E10b
+    ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; ở 1440 và 360 trong hồ sơ căn: 'Gắn sang căn khác' mở ô tìm mã căn của hàng 12, chọn căn Y → hồ sơ hiện mã căn Y, Diện tích riêng còn, dấu tính theo Y; chọn căn đã có tin mở → câu lỗi nêu mã căn, hồ sơ không đổi; ảnh evidence/E10b-1440.png, E10b-360.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
@@ -154,8 +160,8 @@ evals:
   - id: E13
     criterion: AC-2
     executor: test
-    cmd: config:executors.test.sua_tren_o
-    paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/components/candidate/**]
+    cmd: config:executors.test.tin_rao_sua_tren_o
+    paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/components/candidate/**, src/modules/listings/ui/attribute-cell-edit.test.tsx, src/modules/listings/ui/use-listing-cell-edit.tsx]
     expected: "exit 0; bộ bài của hàng 4 chạy lại không đổi một ca (giá, trạng thái, ô máy tính ra không sửa); cộng ca mới trong src/components/candidate/data-region-cell-edit.test.tsx: dưới 768 px ô Diện tích, Phòng ngủ không mở sửa (mọi lối mở sửa của luật sửa trên ô hiện hành đều không mở khung), từ 768 px mở; ca đối chứng mở sửa ở 360 cho 'phone cell opened for edit'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
@@ -172,6 +178,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E14b
+    ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 360 và 1440, sáng và tối: hồ sơ căn 0606 (Đã bán) và 1201 (Ngừng hẳn) có dòng chữ nhạt có ổ khoá ở chỗ «Sửa» và dòng nhạt nói lý do ở chỗ «Hỏi đầu chủ»; tin đang mở chưa ai giữ có dòng nhạt nói lý do ở đáy, không nút mờ; tin đang mở có hai nút; ở 360 hộp bao của nút «Sửa» đầu mục cao ít nhất 44px, ở 1440 cao 28px (getBoundingClientRect); axe không có lỗi; ảnh evidence/E14b-<khổ>-<nền>.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
@@ -189,6 +196,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E15b
+    ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 320, 360 và 1440, sáng và tối: dòng trạng thái và giá nằm trên một dòng (hai hộp bao cùng hàng); cột nhãn rộng 120±8px ở 1440 và 104±8px ở 360 (getBoundingClientRect); ở 320 mỗi lần chào đúng hai dòng (chiều cao các mục bằng nhau); bấm một tên trong «Còn thiếu» thì khối ấy mở Sửa và cuộn tới dòng; chấm và dòng quá 14 ngày dùng màu cảnh báo của bảng màu VP11 (không mã màu viết tay); axe không có lỗi; ảnh evidence/E15b-<khổ>-<nền>.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]

@@ -127,6 +127,11 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   chữ nhạt nói lý do như căn đã bán và ngừng hẳn. Giám sát thấy khi soi ảnh VP10 và xếp vào 3h; đây là chính luật chủ kho
   đã duyệt (câu 2 «Chuẩn nút dùng chung», «Duyệt cả ba câu» ở phiên BH; C2 «Theo luật mới» tại phiên R), không hỏi lại. Đo
   bằng E14, E14b.
+- 2026-11-28 · E13 chạy đúng tệp đang giữ ca điện thoại. Ca «dưới 768px ô Diện tích, Phòng ngủ không mở sửa» nằm ở
+  `src/modules/listings/ui/attribute-cell-edit.test.tsx`, không ở tệp bài lưới dùng chung mà E13 gọi tên: luật ranh giới
+  mô-đun không cho bài của khối dùng chung nhập mô-đun nghiệp vụ. Lệnh mới chạy bộ bài của hàng 4 không đổi rồi chạy
+  ca điện thoại, và đỏ khi không ca nào chạy. Câu kỳ vọng và tiêu chí giữ nguyên. Giám sát quyết theo lối R khuyên
+  (G-2811-52); thẻ Cổng Bằng chứng trình điểm này ở khối «chưa duyệt».
 
 ## Out of scope
 

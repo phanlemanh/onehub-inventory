@@ -260,7 +260,14 @@ test.describe("sua-tren-o", () => {
     await openInventory(page);
     const opened: string[] = [];
     for (const field of FIELDS) if (await anyWayOpens(page, "1101", field)) opened.push(field);
-    expect(opened, `cot-chi-doc: ${opened.join(", ")} mở`).toEqual([STATUS, PRICE]);
+    // Row 3h (Cổng Phạm vi 3h, chủ kho 2026-11-27): living area and bedrooms are the listing's own values and edit in
+    // their cells; the unit's code, building, project and the confirmed time stay read only.
+    expect(opened, `cot-chi-doc: ${opened.join(", ")} mở`).toEqual([
+      STATUS,
+      PRICE,
+      "Unit.livingArea",
+      "Unit.bedroomsTotal",
+    ]);
   });
 
   test("phim-giu-nguyen", async ({ page, context }) => {
