@@ -100,11 +100,25 @@ evals:
     executor: script
     cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --cho 60
     layer: backend-effect
+    paths: ["_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"]
     expected: >-
-      exit 0, in «ci ok: commit mã <sha> run <id> e2e-db chạy thật trên postgres:16, 6/6 bước · đầu nhánh <sha> run <id>
-      quick, e2e, e2e-db xanh» — đọc bằng gh, chỉ đọc. Chiều đỏ: «ci: e2e-db trên commit mã <sha> không xanh (<kết>)»,
-      «… dùng lại kết quả cũ, không chạy thật», «nhật ký e2e-db thiếu «ci-db: 6/6 bước đạt»», «… không nhắc tệp
-      chu-khong-sieu-cap.db.test.ts», «<việc> trên đầu nhánh <sha> không xanh», «lượt CI trên <sha> chưa xong».
+      exit 0, in «ci ok: đầu nhánh <sha> run <id> quick, check, e2e, e2e-db xanh · e2e-db <chạy thật ở đầu nhánh | dùng
+      lại run <id> ở <sha>> trên postgres:16, 6/6 bước, có bài chu-khong-sieu-cap» — đọc bằng gh, chỉ đọc. Lượt được
+      dùng lại phải xanh, chạy thật, chứa commit mã của PR và cùng mã với đầu nhánh. Chiều đỏ (ca của E7t): «ci: <việc>
+      trên đầu nhánh <sha> không xanh (<kết>)», «lượt e2e-db được dùng lại ở <sha> có mã khác đầu nhánh», «… không chứa
+      commit mã …», «nhật ký e2e-db chạy thật thiếu «ci-db: 6/6 bước đạt»», «… không nhắc tệp
+      chu-khong-sieu-cap.db.test.ts», «lượt CI trên đầu nhánh <sha> chưa xong (<trạng thái>)».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7t
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --tu-kiem
+    layer: backend-effect
+    paths: ["_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"]
+    expected: >-
+      exit 0, dòng cuối «tu-kiem: 5/5 ca đúng»: dữ liệu CI thật vừa đọc xanh; bốn bản phá trên chính dữ liệu ấy đỏ với
+      đúng thông điệp ghim — e2e-db bị huỷ, dùng lại lượt có mã khác, nhật ký thiếu «ci-db: 6/6 bước đạt», lượt chưa
+      xong.
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E8
     criterion: AC-8
