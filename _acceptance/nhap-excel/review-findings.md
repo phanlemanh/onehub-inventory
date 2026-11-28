@@ -34,6 +34,13 @@
   severity: medium
   Đề xuất: new-contract
 
+- **The import screen's address and state codes are Vietnamese, against the owner's English-names decision of 23/11 (VP11 r1)**
+  Người dùng thấy gì: Địa chỉ màn Nạp tệp là «/nhap-tep», và 12 mã trạng thái của màn (ST-nhap-tep-…) cũng viết tiếng Việt, trong khi các màn khác đã đổi sang tiếng Anh theo quyết định của anh ngày 23/11. Người dùng vẫn vào và dùng bình thường; chỉ là địa chỉ không đồng nhất.
+  Căn cứ: Hàng 11 được duyệt Phạm vi ngày 17/11, trước quyết định 23/11, nên màn đã dựng với tên tiếng Việt. Đổi tên chạm khoảng 15 tệp, sổ màn, bảng Vai × Màn × Nút, các bài kiểm và ảnh bằng chứng của màn, và phải chấm lại phần màn. Khuyến nghị của giám sát: gộp hàng 11 như đang có, đổi địa chỉ ở một hàng riêng ngay sau, tên gợi ý «Địa chỉ màn Nạp tệp bằng tiếng Anh», trước khi bản thật có người dùng.
+  file: `src/app/(app)/nhap-tep/page.tsx`
+  severity: medium
+  Đề xuất: new-contract
+
 - **Numbers and states the screen shows (gồm #30, #38, #50, #51)**
   Người dùng thấy gì: Có lúc màn báo con số lệch với thật: số ô giữ chữ gốc lớn hơn số được lưu, số mục ngừng dùng sau hoàn tác có thể cao hơn thực tế, và cách viết được nhớ có thể hiện bằng chữ thường không dấu. Khi danh sách Đầu chủ tải lỗi, Trưởng nhóm thấy ô chọn trống mà không có lời giải thích.
   Căn cứ: Không mất tin rao nào. Dữ liệu chính vẫn đúng, chỉ phần tóm tắt và cách hiển thị lệch nhẹ, người dùng tải lại hay sửa tay được.
@@ -69,11 +76,25 @@
   severity: low
   Đề xuất: known-limits
 
-- **The import screen's address is Vietnamese while the rule says English (VP11 r1)**
-  Người dùng thấy gì: Địa chỉ màn Nạp tệp là «/nhap-tep», trong khi các màn khác đã đổi địa chỉ sang tiếng Anh. Người dùng vẫn vào và dùng bình thường; chỉ là địa chỉ không đồng nhất.
-  Căn cứ: Đổi địa chỉ chạm khoảng 15 tệp, sổ màn và ảnh bằng chứng của màn, nên làm thành một việc riêng như lần đổi địa chỉ trước, tên gợi ý «Địa chỉ màn Nạp tệp bằng tiếng Anh»; không mất dữ liệu, đổi sau vẫn rẻ.
-  file: `src/app/(app)/nhap-tep/page.tsx`
-  severity: medium
+- **The check that every write passes the person's choice reads the source text, not what is written (S4-r7)**
+  Người dùng thấy gì: Hôm nay người dùng không bị ảnh hưởng. Một bài kiểm chỉ tìm chữ «choice:» trong mã của bước ghi, nên nếu sau này bước ghi truyền nhầm một lựa chọn khác thì bài ấy vẫn xanh.
+  Căn cứ: Điều người dùng cần — giá trị đã chọn được ghi đúng ô, đúng dòng — đã được đo thật ở bài cơ sở dữ liệu so «xem trước hứa gì» với «đã ghi gì» từng dòng; bài tìm chữ chỉ là lưới nhanh thêm.
+  file: `tests/nhap-excel-noi-ghi.test.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Some answers are not remembered for the next import (matrix of G-2811-71)**
+  Người dùng thấy gì: Khi anh trả lời một cách viết lạ ở cột phí, nội thất, người ở, loại căn hay giá, giá trị vẫn được ghi (hay giữ chữ gốc) đúng như màn xem trước hứa, nhưng lần nhập sau gặp lại cách viết ấy máy vẫn hỏi lại. Chỉ trạng thái, lý do ngừng, hướng và các cột lựa chọn của sàn là được nhớ.
+  Căn cứ: Không mất dữ liệu; màn không hứa sẽ nhớ. Lớp riêng của sàn (hàng 7e) chỉ giữ cách viết cho các tập giá trị nó có; muốn nhớ thêm phải mở rộng hàng 7e thành một việc riêng, tên gợi ý «Sàn nhớ cách viết cho phí, nội thất, người ở».
+  file: `src/modules/company-config/rules.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **The word check lets a label through when it is written in lower case or by another name (S4-r8)**
+  Người dùng thấy gì: Hôm nay không ảnh hưởng màn Nạp tệp — chữ của màn đã lấy từ danh sách chữ. Nhưng bài kiểm chữ của kho chỉ bắt nhãn viết đúng như trong danh sách, nên một màn viết «căn» thường giữa câu hay «lần nhập» thay «Lần nạp tệp» vẫn qua; vài màn khác đang có dáng ấy (hồ sơ căn, sửa ô, lớp riêng của sàn với «chủ nhà», «lần nhập»).
+  Căn cứ: Không mất dữ liệu; chỉ là chữ có thể lệch giữa các màn. Siết bài kiểm và sửa các màn khác là một việc riêng của kho, giám sát đã ghi thành hàng riêng.
+  file: `tests/language.test.ts`
+  severity: low
   Đề xuất: known-limits
 
 - **The import screen's 'fixed' mark has the same colour as the 'Đã bán' status (VP11 r1)**
@@ -89,6 +110,11 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Đã sửa trên nhánh:
 
+- S4-r8 t3 · Product language: concept words hard-coded in the import screen — chữ của màn dựng bằng label() từ danh sách chữ (81219c6d)
+- S4-r8 t7 · an answer typed for a column kept as written is not stored — bản ghi lần nhập giữ thêm giá trị màn đã hiện (kept.value), bảng viết trước so ở mọi ô giữ chữ gốc (81219c6d)
+- S4-r7 t4 · Building text of a row whose unit already exists is dropped on write: not written and not kept — chữ toà nay giữ nguyên trong bản ghi lần nhập (lý do unit-attribute) khi không vào căn chờ mới của dòng; cả khi chữ dài quá 80 ký tự căn chờ giữ được (f072a264)
+- S4-r7 t6 · lostCells skips the 'unit' places — bài so nay đo mã căn (lần chào gắn đúng căn danh mục, đúng căn chờ) và chữ toà, trên một dòng căn danh mục và một dòng căn chờ mới, kèm hai ca phá (f072a264)
+- S4-r7 t8 · chosen values compared as a set — so theo từng dòng của tệp (f072a264)
 - VP11 r1 · A value the person chose for a cell of a new single-choice field is silently not written — giá trị đã chọn nay được ghi lên căn cả khi không bấm «nhớ»; ca DB đỏ trước khi sửa (25311d32)
 - VP11 r1 · Close price and close date columns are accepted but their values are dropped with no trace — hai cột giữ nguyên chữ trong bản ghi lần nhập (lý do close-field); mỗi cột đích có một chỗ ở khai sẵn, bài quét tests/nhap-excel-noi-ghi.test.ts (25311d32)
 - VP11 r1 · Shape 1: ImportRun columns are read by regex over migration SQL, not from the table in Postgres — thêm ca DB đọc cột của import_runs từ Postgres, kèm ca phá (25311d32)
@@ -104,6 +130,15 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
+- S4-r8 t1 · Design / module boundaries: imports reads and writes tables owned by other modules → #19
+- S4-r8 t2 · Records: new module dependencies without a decision page → #20
+- S4-r8 t4 · Personal data: owner phone and name are caught only by the column header → #21
+- S4-r8 t5 · Domain: ListingPendingUnit ontology does not match the schema → #23
+- S4-r8 t8 · the sweep for «every markValue call passes the person's choice» only looks for text → mục «The check that every write passes the person's choice reads the source text»
+- S4-r8 t9 · the break for a listed row that got a listing only checks that a fault appears, not which one → nhóm «Weak test shapes»
+- S4-r7 t1 · AGENTS.md Architecture: never reach into another module's tables (imports module) → #19
+- S4-r7 t2 · AGENTS.md Architecture: listings reads company-config's table without a declared dependency → #26
+- S4-r7 t3 · AGENTS.md: a new module dependency needs a decision page → #20
 - #1 Design / module boundaries: the imports and listings modules read and write other modules' tables directly → #19
 - #2 Design / modules.yaml: the new imports dependencies have no decision page → #20
 - #7 Module boundaries: reaching into another module's tables (AGENTS.md 'never reach into another module's tables or internal files') (r5) → #19
@@ -118,6 +153,8 @@ Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
 Thuộc hồ sơ khác, nhánh này không viết dòng nào của tệp:
 
+- S4-r8 t6, t10 · the «Khớp» column and the author's kit path in _acceptance/khung-luoi-va-ngan-chi-tiet/rang/dung-lai-mang-sang.mjs — công cụ của hồ sơ VP10
+- S4-r7 t5, t9, t10 · the «Khớp» column and the author's kit path in _acceptance/khung-luoi-va-ngan-chi-tiet/rang/dung-lai-mang-sang.mjs — công cụ của hồ sơ VP10, hàng 11 không viết dòng nào của tệp
 - #13 Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): Đã gửi «có bóng» đọc kiểu CSS khai báo, không đọc điểm ảnh (r5) — tests/e2e/khung-luoi-nut.spec.ts — tệp của khung lưới (VP10), nhánh này không viết dòng nào
 - #15 Hình dạng 5 (tuyên cả lớp nhưng chỉ đo vài điểm): «28 px on a computer» chỉ đo nút ở đầu ngăn (r5) — tests/e2e/ho-so-can.spec.ts — tệp của khung lưới (VP10), nhánh này không viết dòng nào
 - #18 Hình dạng 6 (đo bản chụp cố định thay vì cây đang kiểm): thước đổi bài kiểm 2e ghim hai commit, lệch với lời hứa trong evals (r5) — thước đổi bài kiểm của bo-o-tim-cua-vung — commit của dãy H (ec70d782) được chọn sang

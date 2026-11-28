@@ -41,6 +41,10 @@ nhiêu căn, sàn học được gì từ lựa chọn của người, ô nào g
   chung: chữ gốc giữ nguyên văn trong bản ghi lần nhập (`kept`, lý do `unit-attribute`) cho hàng 3h đọc lại (G-2711-4).
 - Cột giá bán và ngày bán được đọc (để hỏi khi thiếu) nhưng không ghi lên căn, vì lần chào do nhập tạo ra không ở «Đã
   bán»: chữ gốc giữ trong bản ghi lần nhập (`kept`, lý do `close-field`).
+- Chữ toà chỉ ghi lên căn chờ mới mà dòng tạo ra; dòng của căn đã có giữ chữ toà nguyên văn trong bản ghi lần nhập
+  (`kept`, lý do `unit-attribute`).
+- Mỗi ô giữ chữ gốc (`kept`) mang `row`, `header`, `raw` (chữ như trong tệp), `why` (lý do giữ) và, khi màn xem trước
+  đã hiện một giá trị cho ô ấy, `value` (giá trị máy đọc ra hay đáp án người gõ), để không mất điều màn đã hứa.
 - Giá trị người chọn cho một ô của trường chọn-một mới tạo khi nhập được ghi lên căn dù người không bấm «nhớ».
 - Không AI.
 

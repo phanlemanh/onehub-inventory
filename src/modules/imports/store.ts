@@ -46,11 +46,25 @@ export interface ImportTable {
   rows: string[][];
 }
 
+/**
+ * A cell kept as written on the import: its place in the file, its text as written and why it was kept. `value` is
+ * what the preview showed for it when it showed one (read by the machine, or the person's answer), so nothing the
+ * preview promised is lost even where the cell has no place on the listing (ruling G-2811-78, after VP11 S4-r8 t7).
+ * An asked cell has none. Added beside `raw`, never instead of it.
+ */
 export interface Kept {
   row: number;
   header: string;
   raw: string;
   why: string;
+  value?: string | number | boolean;
+}
+
+/** A kept cell, with the preview's value when the cell has one. */
+function keptCell(row: number, header: string, raw: string, why: string, cell: CellMark): Kept {
+  return cell.value === null
+    ? { row, header, raw, why }
+    : { row, header, raw, why, value: cell.value };
 }
 
 export interface StoredLearned extends LearnedIds {
@@ -280,7 +294,7 @@ export type Destination =
  */
 export const DESTINATION: Record<StandardTarget, Destination> = {
   unitCode: { unit: "code" },
-  "Unit.buildingName": { unit: "building" },
+  "Unit.buildingName": { unit: "building" }, // on a pending unit the row creates; otherwise kept as unit-attribute
   "Unit.livingArea": { kept: "unit-attribute" },
   "Unit.bedroomsTotal": { kept: "unit-attribute" },
   "Unit.directionFaces": { kept: "unit-attribute" },
@@ -376,24 +390,51 @@ export async function writeBatch(
         (cell.mark === "ask" && !(place && "unit" in place && place.unit === "code")) ||
         (keptAs && raw.trim() !== "")
       )
-        kept.push({ row: input.rowOffset + r, header: col.header, raw, why: keptAs ?? cell.why });
+        kept.push(keptCell(input.rowOffset + r, col.header, raw, keptAs ?? cell.why, cell));
     });
-    if (outcome.fate !== "create" || !outcome.unit) continue;
+    // The tower text has a place only on a pending unit this row creates; any other row keeps it as written, like the
+    // unit attributes (VP11 S4-r7 t4: a unit that already exists took nothing of it, and the cell was lost).
+    const buildingRaw = buildingAt === undefined ? "" : (input.rows[r]![buildingAt] ?? "");
+    const keepBuilding = () => {
+      if (
+        buildingAt !== undefined &&
+        buildingRaw.trim() !== "" &&
+        cells[buildingAt]!.mark !== "ask"
+      )
+        kept.push(
+          keptCell(
+            input.rowOffset + r,
+            marked.columns[buildingAt]!.header,
+            buildingRaw,
+            "unit-attribute",
+            cells[buildingAt]!,
+          ),
+        );
+    };
+    if (outcome.fate !== "create" || !outcome.unit) {
+      keepBuilding();
+      continue;
+    }
     let unit: NewListing["unit"];
     if ("unitKey" in outcome.unit) {
+      keepBuilding();
       const u = (
         await c.query(`select upi from catalog_units where unit_key = $1`, [outcome.unit.unitKey])
       ).rows[0] as { upi: string };
       unit = { upi: u.upi };
-    } else if ("pendingUnitId" in outcome.unit)
+    } else if ("pendingUnitId" in outcome.unit) {
+      keepBuilding();
       unit = { pendingUnitId: outcome.unit.pendingUnitId };
-    else {
+    } else {
       const code = outcome.unit.newPending;
       const known = learned.pendingUnits.find((p) => fold(p.rawCode) === fold(code));
-      if (known) unit = { pendingUnitId: known.id };
-      else {
-        const building =
-          buildingAt === undefined ? "" : (input.rows[r]![buildingAt] ?? "").trim().slice(0, 80);
+      if (known) {
+        keepBuilding();
+        unit = { pendingUnitId: known.id };
+      } else {
+        const building = buildingRaw.trim().slice(0, 80);
+        // A tower text longer than the pending unit holds is also kept whole, as written.
+        if (building !== buildingRaw.trim()) keepBuilding();
         const w = await learnFromImport(
           runAs,
           {

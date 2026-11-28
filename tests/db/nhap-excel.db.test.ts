@@ -21,6 +21,7 @@ import {
   matchColumns,
   NO_CHOICES,
   readTable,
+  STANDARD_TARGETS,
   type Choices,
   type ColumnMatch,
   type LearnedItem,
@@ -356,12 +357,16 @@ describe("ap (E9)", () => {
         [r.id],
       )
     ).rows[0]!.kept.filter((k) => k.why === "unit-attribute");
+    // The two catalog units also keep their tower text as written (S4-r7 t4); the new pending unit SA5-99.99 holds its
+    // own tower text, so its row keeps none.
     expect(kept.map((k) => [k.header, k.raw])).toEqual([
       ["Tầng", "Tầng 07"],
       ["Loại căn", label("SubTypeCondominium")],
       ["Diện tích", "72"],
+      ["Block", "[MAU] Toà"],
       ["Tầng", "15a"],
       ["Loại căn", "2PN"],
+      ["Block", "[MAU] Toà"],
     ]);
     expect((await e.w.db.owner.query<{ n: string }>(catalog)).rows[0]!.n).toBe(before);
   });
@@ -1395,7 +1400,7 @@ describe("hoan tac (E14) — audit", () => {
 // ---- Two findings of VP11's round 1 (chuan-hoa-he-design, out of contract), fixed on row 11 ---------------------------
 
 describe("gia tri khong mat (VP11 r1)", () => {
-  it("what the preview promised is what was written, for every kind of cell of one row (ruling G-2811-65, break pinned)", async () => {
+  it("what the preview promised is what was written, for every kind of cell, on a catalog unit and a new pending unit (ruling G-2811-65, break pinned)", async () => {
     const e = await importWorld("moi_loai_o");
     await e.w.db.owner.query(
       `insert into company_fields (company_id, code, name, kind, position, options)
@@ -1429,7 +1434,12 @@ describe("gia tri khong mat (VP11 r1)", () => {
       ],
     ];
     const headers = cells.map((c) => c[0]);
-    const rows = [cells.map((c) => c[1])];
+    // Row 0 is a unit of the catalog (its tower text has no place on it and is kept); row 1 is a new pending unit (its
+    // tower text goes onto it). Both rows fill every other column the same way.
+    const rows = [
+      cells.map((c) => c[1]),
+      cells.map((c, j) => (j === 0 ? "SA5-99.98" : j === 1 ? "Sapphire 9" : c[1])),
+    ];
     const OWN = 18;
     const NEW = 19;
     const choices: Choices = {
@@ -1441,14 +1451,17 @@ describe("gia tri khong mat (VP11 r1)", () => {
         [`${OWN}|${fold("hướng ra biển")}`]: { value: "Biển", remember: false },
         [`${NEW}|${fold("nhìn phố")}`]: { value: "Phố", remember: false },
       },
+      units: { "sa5-99.98": { pending: true } },
     };
     const p = await preview(e, "LA", rows, choices, headers);
     expect(p.status).toBe(200);
     const promised = marked(p);
-    // Every cell of this row reads: the sweep below has something to compare in every column.
-    expect(
-      promised.cells[0]!.map((c) => c.mark).filter((m) => m === "ask" || m === "block"),
-    ).toEqual([]);
+    // Every cell of both rows reads: the sweep below has something to compare in every column.
+    for (const r of [0, 1])
+      expect(
+        promised.cells[r]!.map((c) => c.mark).filter((m) => m === "ask" || m === "block"),
+      ).toEqual([]);
+    expect(promised.rows.map((x) => x.fate)).toEqual(["create", "create"]);
     const open = await e.h.open(
       req(
         URL_,
@@ -1477,23 +1490,13 @@ describe("gia tri khong mat (VP11 r1)", () => {
           batchNo: 0,
           rowOffset: 0,
           last: true,
-          allNewFieldCells: { [`0:${NEW}`]: rows[0]![NEW]! },
+          allNewFieldCells: Object.fromEntries(rows.map((row, r) => [`${r}:${NEW}`, row[NEW]!])),
         },
         await e.cookie("LA"),
       ),
       id,
     );
     expect(res.status).toBe(200);
-    const listing = (
-      await e.w.db.owner.query<Record<string, unknown>>(
-        `select list_price::text as "listPrice", fee_inclusion as "feeInclusion", standard_status as "standardStatus",
-                withdrawn_reason as "withdrawnReason", furnished, occupant_type as "occupantType",
-                legal_status as "legalStatus", financing, last_confirmed_at::date::text as "lastConfirmedAt",
-                custom_fields
-           from listings where id = $1`,
-        [listingIdOf(id, 0)],
-      )
-    ).rows[0]!;
     const run = (
       await e.w.db.owner.query<{
         kept: { row: number; header: string; raw: string; why: string }[];
@@ -1505,17 +1508,78 @@ describe("gia tri khong mat (VP11 r1)", () => {
         [e.w.A],
       )
     ).rows[0]!.code;
-    const written = { listing, kept: run.kept, newCode };
-    expect(lostCells(promised, headers, rows[0]!, written)).toEqual([]);
-    // Each kind of place took part: 9 listing columns, 7 kept as written, 2 custom fields.
+    const catalogUpi = (
+      await e.w.db.owner.query<{ upi: string }>(
+        `select u.upi from catalog_aliases a join catalog_units u on u.unit_key = a.object_key
+          where a.kind = 'ma_goc' and a.value = $1`,
+        [e.codes[0]],
+      )
+    ).rows[0]!.upi;
+    const writtenOf = async (r: number) => {
+      const listing = (
+        await e.w.db.owner.query<Record<string, unknown>>(
+          `select list_price::text as "listPrice", fee_inclusion as "feeInclusion", standard_status as "standardStatus",
+                  withdrawn_reason as "withdrawnReason", furnished, occupant_type as "occupantType",
+                  legal_status as "legalStatus", financing, last_confirmed_at::date::text as "lastConfirmedAt",
+                  custom_fields
+             from listings where id = $1`,
+          [listingIdOf(id, r)],
+        )
+      ).rows[0]!;
+      const link = (
+        await e.w.db.owner.query<{
+          upi: string | null;
+          code: string | null;
+          building: string | null;
+        }>(
+          `select u.upi, cpu.raw_code as code, cpu.building_text as building
+             from listings l
+             left join listing_units u on u.listing_id = l.id
+             left join listing_pending_units lp on lp.listing_id = l.id
+             left join company_pending_units cpu on cpu.id = lp.pending_unit_id
+            where l.id = $1`,
+          [listingIdOf(id, r)],
+        )
+      ).rows[0]!;
+      const unitOk = r === 0 ? link.upi === catalogUpi : link.code === rows[r]![0];
+      return { listing, kept: run.kept, newCode, unitOk, pendingBuilding: link.building };
+    };
+    const w0 = await writtenOf(0);
+    const w1 = await writtenOf(1);
+    expect(lostCells(promised, headers, 0, rows[0]!, w0)).toEqual([]);
+    expect(lostCells(promised, headers, 1, rows[1]!, w1)).toEqual([]);
+    // Where each kind went: row 0 keeps 5 unit attributes, 2 close cells and its tower text (8); row 1 keeps the same
+    // less its tower text, which is on its new pending unit (7).
+    const keptAs = (r: number) =>
+      run.kept
+        .filter((k) => k.row === r && (k.why === "unit-attribute" || k.why === "close-field"))
+        .map((k) => k.header);
+    expect([keptAs(0).length, keptAs(1).length]).toEqual([8, 7]);
+    expect([keptAs(0).includes("Block"), keptAs(1).includes("Block")]).toEqual([true, false]);
+    expect(w1.pendingBuilding).toBe("Sapphire 9");
+    // Breaks: a value the preview promised and the write lost is named by its column.
     expect(
-      run.kept.filter((k) => k.why === "unit-attribute" || k.why === "close-field"),
-    ).toHaveLength(7);
-    // Break: a value the preview promised and the write lost is named by its column.
-    const lost = { ...written, listing: { ...listing, furnished: null } };
-    expect(lostCells(promised, headers, rows[0]!, lost)).toEqual(["Nội thất"]);
-    const lostNew = { ...written, listing: { ...listing, custom_fields: { huong_nhin: "Biển" } } };
-    expect(lostCells(promised, headers, rows[0]!, lostNew)).toEqual(["View"]);
+      lostCells(promised, headers, 0, rows[0]!, {
+        ...w0,
+        listing: { ...w0.listing, furnished: null },
+      }),
+    ).toEqual(["Nội thất"]);
+    expect(
+      lostCells(promised, headers, 0, rows[0]!, {
+        ...w0,
+        listing: { ...w0.listing, custom_fields: { huong_nhin: "Biển" } },
+      }),
+    ).toEqual(["View"]);
+    expect(
+      lostCells(promised, headers, 0, rows[0]!, {
+        ...w0,
+        kept: run.kept.filter((k) => !(k.row === 0 && k.header === "Block")),
+      }),
+    ).toEqual(["Block"]);
+    expect(lostCells(promised, headers, 1, rows[1]!, { ...w1, pendingBuilding: null })).toEqual([
+      "Block",
+    ]);
+    expect(lostCells(promised, headers, 0, rows[0]!, { ...w0, unitOk: false })).toEqual(["Mã căn"]);
   });
 
   it("a value the person chose for a new single choice field, without «remember», is written onto the listing", async () => {
@@ -1573,15 +1637,19 @@ describe("gia tri khong mat (VP11 r1)", () => {
       id,
     );
     expect(res.status).toBe(200);
-    const written = (
-      await e.w.db.owner.query<{ v: string | null }>(
-        `select (select value #>> '{}' from jsonb_each(custom_fields) limit 1) as v
-           from listings where import_run_id = $1 order by id`,
-        [id],
-      )
-    ).rows.map((r) => r.v);
-    // Rows 0 and 1 by their id order are not the file's order; compare as a set, and nothing chosen is lost.
-    expect(written.filter((v) => v !== null).sort()).toEqual(["Biển", "Phố"]);
+    // Row by row in the file's order (S4-r7 t8): each row keeps its own value, not just the set of values.
+    const written = await Promise.all(
+      rows.map(
+        async (_, r) =>
+          (
+            await e.w.db.owner.query<{ v: string | null }>(
+              `select (select value #>> '{}' from jsonb_each(custom_fields) limit 1) as v from listings where id = $1`,
+              [listingIdOf(id, r)],
+            )
+          ).rows[0]?.v ?? null,
+      ),
+    );
+    expect(written).toEqual(["Biển", "Phố", null]);
   });
 
   it("close price and close date cells are kept as written on the import, never dropped in silence", async () => {
@@ -1618,29 +1686,41 @@ describe("gia tri khong mat (VP11 r1)", () => {
   });
 });
 
-/** The columns of row 0 whose value the preview promised and the write did not keep, by header (G-2811-65). */
+/** The columns of row r whose value the preview promised and the write did not keep, by header (G-2811-65). */
 function lostCells(
   promised: MarkedTable,
   headers: readonly string[],
+  r: number,
   raw: readonly string[],
   written: {
     listing: Record<string, unknown>;
-    kept: { row: number; header: string; raw: string }[];
+    kept: { row: number; header: string; raw: string; value?: unknown }[];
     newCode: string;
+    unitOk: boolean;
+    pendingBuilding: string | null;
   },
 ): string[] {
   const same = (a: unknown, b: unknown) => String(a) === String(b);
   const custom = (written.listing.custom_fields ?? {}) as Record<string, unknown>;
+  const keptHere = (j: number) =>
+    written.kept.some(
+      (k) =>
+        k.row === r &&
+        k.header === headers[j] &&
+        k.raw === raw[j] &&
+        String(k.value) === String(promised.cells[r]![j]!.value),
+    );
   return promised.columns.flatMap((col, j) => {
-    const cell = promised.cells[0]![j]!;
+    const cell = promised.cells[r]!.at(j)!;
     if (!col.target || cell.value === null) return [];
     const t = col.target;
     let ok = true;
     if ("standard" in t) {
       const place = DESTINATION[t.standard];
       if ("listing" in place) ok = same(written.listing[place.listing], cell.value);
-      else if ("kept" in place)
-        ok = written.kept.some((k) => k.row === 0 && k.header === headers[j] && k.raw === raw[j]);
+      else if ("kept" in place) ok = keptHere(j);
+      else if (place.unit === "code") ok = written.unitOk;
+      else ok = keptHere(j) || written.pendingBuilding === String(raw[j]).trim();
     } else if ("custom" in t) ok = same(custom[t.custom], cell.value);
     else if ("newField" in t) ok = same(custom[written.newCode], cell.value);
     return ok ? [] : [headers[j]!];
@@ -1697,3 +1777,581 @@ function tableFaults(properties: readonly string[], columns: ReadonlySet<string>
       .map((c) => `column without ontology property: ${c}`),
   ];
 }
+
+// ---- Ruling G-2811-71: the whole space, written before. Three bugs of one shape («the preview takes it, the write drops
+// it») were found after six rounds, each where the earlier comparison skipped. The matrix below names every column
+// target × situation of the row × mark of the cell, each with one declared outcome or «not applicable» and its reason;
+// the comparison runs over all of it and fails when a cell has no outcome or the matrix is empty.
+
+type Situation = "catalog" | "pending-existing" | "pending-new" | "listed";
+type Mark =
+  "keep" | "fixed" | "chosen-remember" | "chosen-no-remember" | "chosen-as-written" | "ask";
+const SITUATIONS: Situation[] = ["catalog", "pending-existing", "pending-new", "listed"];
+const MARKS: Mark[] = [
+  "keep",
+  "fixed",
+  "chosen-remember",
+  "chosen-no-remember",
+  "chosen-as-written",
+  "ask",
+];
+
+/** A column of the matrix: its target, and for each mark the text that gives it (with the person's answer), or why
+ * the mark cannot happen in that column. */
+interface MatrixColumn {
+  header: string;
+  target: Choices["columns"][number]["target"] | "unit";
+  input: Partial<Record<Mark, { raw: string; answer?: string | null }>>;
+  notApplicable: Partial<Record<Mark, string>>;
+  /** For an answered cell whose answer the reading ignores (numbers, floors, dates): it keeps asking. */
+  answerIgnored?: boolean;
+}
+
+const closed = (
+  keep: string,
+  fixed: string,
+  answer: string,
+  header: string,
+  target: MatrixColumn["target"],
+) => ({
+  header,
+  target,
+  input: {
+    keep: { raw: keep },
+    fixed: { raw: fixed },
+    "chosen-remember": { raw: `${header} nhớ`, answer },
+    "chosen-no-remember": { raw: `${header} không nhớ`, answer },
+    "chosen-as-written": { raw: `${header} giữ chữ`, answer: null },
+    ask: { raw: `${header} lạ` },
+  },
+  notApplicable: {},
+});
+const reading = (
+  keep: string,
+  fixed: string,
+  unread: string,
+  header: string,
+  target: MatrixColumn["target"],
+) => ({
+  header,
+  target,
+  input: {
+    keep: { raw: keep },
+    fixed: { raw: fixed },
+    "chosen-remember": { raw: `${unread} 1`, answer: keep },
+    "chosen-no-remember": { raw: `${unread} 2`, answer: keep },
+    "chosen-as-written": { raw: `${unread} 3`, answer: null },
+    ask: { raw: unread },
+  },
+  notApplicable: {},
+  answerIgnored: true,
+});
+const freeText = (keep: string, header: string, target: MatrixColumn["target"]) => ({
+  header,
+  target,
+  input: { keep: { raw: keep } },
+  notApplicable: Object.fromEntries(
+    MARKS.filter((m) => m !== "keep").map((m) => [
+      m,
+      "free text: a cell with words is kept as it is, never fixed or asked",
+    ]),
+  ),
+});
+
+const MATRIX: MatrixColumn[] = [
+  {
+    header: "Mã căn",
+    target: "unit",
+    input: { keep: { raw: "" } },
+    notApplicable: Object.fromEntries(
+      MARKS.filter((m) => m !== "keep").map((m) => [
+        m,
+        "the unit code's mark is the row's situation, measured on that axis",
+      ]),
+    ),
+  },
+  freeText("[MAU] Toà", "Block", { standard: "Unit.buildingName" }),
+  reading("72", "75,2 m²", "rộng", "Diện tích", { standard: "Unit.livingArea" }),
+  reading("2", "2,0", "nhiều phòng", "PN", { standard: "Unit.bedroomsTotal" }),
+  closed("Đông Nam", "đông nam", "Đông Nam", "Hướng", { standard: "Unit.directionFaces" }),
+  reading("15", "Tầng 07", "trệt", "Tầng", { standard: "Unit.floor" }),
+  closed(
+    label("SubTypeCondominium"),
+    label("SubTypeCondominium").toUpperCase(),
+    "Condominium",
+    "Loại căn",
+    {
+      standard: "Unit.propertySubType",
+    },
+  ),
+  {
+    ...reading("4650000000", "4,65 tỷ", "thoả thuận", "Giá chào", {
+      standard: "Listing.listPrice",
+    }),
+    input: {
+      keep: { raw: "4650000000" },
+      fixed: { raw: "4,65 tỷ" },
+      "chosen-remember": { raw: "thoả thuận 1", answer: "4100000000" },
+      "chosen-no-remember": { raw: "thoả thuận 2", answer: "4200000000" },
+      "chosen-as-written": { raw: "thoả thuận 3", answer: null },
+      ask: { raw: "thoả thuận" },
+    },
+    answerIgnored: false,
+  },
+  closed(label("FeeIncluded"), "KBP", "Included", "Phí", { standard: "Listing.feeInclusion" }),
+  closed(label("StatusActive"), "dang ban", "Hold", "Trạng thái", {
+    standard: "Listing.standardStatus",
+  }),
+  closed(
+    label("WithdrawnUnreachable"),
+    label("WithdrawnUnreachable").toUpperCase(),
+    "owner_changed_mind",
+    "Lý do ngừng",
+    {
+      standard: "Listing.withdrawnReason",
+    },
+  ),
+  {
+    ...reading("4200000000", "4,2 tỷ", "chưa bán", "Giá bán", { standard: "Listing.closePrice" }),
+    input: {
+      keep: { raw: "4200000000" },
+      fixed: { raw: "4,2 tỷ" },
+      "chosen-remember": { raw: "chưa bán 1", answer: "4100000000" },
+      "chosen-no-remember": { raw: "chưa bán 2", answer: "4000000000" },
+      "chosen-as-written": { raw: "chưa bán 3", answer: null },
+      ask: { raw: "chưa bán" },
+    },
+    answerIgnored: false,
+  },
+  reading("2026-11-10", "10/11/2026", "32/11/2026", "Ngày bán", { standard: "Listing.closeDate" }),
+  closed(label("FurnishedFull"), label("FurnishedNone").toLowerCase(), "Partially", "Nội thất", {
+    standard: "Listing.furnished",
+  }),
+  closed(label("OccupantVacant"), label("OccupantVacant").toUpperCase(), "Owner", "Người ở", {
+    standard: "Listing.occupantType",
+  }),
+  freeText("Sổ hồng", "Pháp lý", { standard: "Listing.legalStatus" }),
+  freeText("Vay 70%", "Vay", { standard: "Listing.financing" }),
+  reading("2026-11-15", "15/11/2026", "33/11/2026", "Ngày check", {
+    standard: "Listing.lastConfirmedAt",
+  }),
+  closed("Biển", "bien", "Phố", "Hướng nhìn", { custom: "huong_nhin" }),
+  closed("Biển", "bien", "Phố", "View", {
+    newField: { name: "View", kind: "single_select", options: ["Biển", "Phố"] },
+  }),
+];
+
+/** The declared outcome of one cell of the matrix, from where its target goes, the row's situation and the mark the
+ * cell really has. `na` is the reason it cannot happen. */
+type Outcome =
+  | { write: "listing"; column: string }
+  | { write: "custom" | "new-field" | "unit-link" | "pending-building" }
+  | { kept: string }
+  | { none: string }
+  | { na: string };
+
+function outcomeOf(
+  col: MatrixColumn,
+  situation: Situation,
+  mark: Mark,
+  askWhy: string | null,
+): Outcome {
+  if (!col.input[mark]) {
+    const why = col.notApplicable[mark];
+    return why ? { na: why } : { na: "" };
+  }
+  const t = col.target;
+  const created = situation !== "listed";
+  // A unit that already has an open listing makes no listing: every cell of the row asks «already listed» and is kept
+  // as written on the import; the unit code has nothing more to say.
+  if (!created) {
+    if (t === "unit") return { none: "row-listed" };
+    if ("standard" in t) {
+      const place = DESTINATION[t.standard];
+      if ("kept" in place) return { kept: place.kept };
+    }
+    return { kept: askWhy ?? "?" };
+  }
+  const asks =
+    mark === "ask" ||
+    mark === "chosen-as-written" ||
+    (col.answerIgnored && mark.startsWith("chosen"));
+  if (t === "unit") return created ? { write: "unit-link" } : { none: "row-listed" };
+  if ("standard" in t) {
+    const place = DESTINATION[t.standard];
+    if ("kept" in place) return { kept: place.kept };
+    if ("unit" in place)
+      return situation === "pending-new"
+        ? { write: "pending-building" }
+        : { kept: "unit-attribute" };
+    if (asks) return { kept: askWhy ?? "?" };
+    return created ? { write: "listing", column: place.listing } : { none: "row-listed" };
+  }
+  if (asks) return { kept: askWhy ?? "?" };
+  if (!created) return { none: "row-listed" };
+  return "custom" in t ? { write: "custom" } : { write: "new-field" };
+}
+
+interface Written {
+  listing: Record<string, unknown> | null;
+  kept: { row: number; header: string; raw: string; why: string; value?: unknown }[];
+  unitOk: boolean;
+  pendingBuilding: string | null;
+  newCode: string;
+}
+
+/** Each cell whose declared outcome is not what was written, as «row:header:what». */
+function matrixFaults(
+  promised: MarkedTable,
+  rows: { situation: Situation; mark: Mark; raw: string[] }[],
+  written: Written[],
+): string[] {
+  const out: string[] = [];
+  rows.forEach((row, r) => {
+    MATRIX.forEach((col, j) => {
+      const effective: Mark = col.input[row.mark] ? row.mark : "keep";
+      const cell = promised.cells[r]![j]!;
+      const o = outcomeOf(col, row.situation, effective, cell.mark === "ask" ? cell.why : null);
+      const w = written[r]!;
+      const raw = row.raw[j]!;
+      const name = `${r}:${col.header}`;
+      // Kept as written AND with the value the preview showed, when it showed one (G-2811-78).
+      const keptHere = (why: string) =>
+        w.kept.some(
+          (k) =>
+            k.row === r &&
+            k.header === col.header &&
+            k.raw === raw &&
+            k.why === why &&
+            (cell.value === null ? k.value === undefined : String(k.value) === String(cell.value)),
+        );
+      if ("na" in o) out.push(`${name}: no outcome`);
+      else if ("kept" in o) {
+        if (!keptHere(o.kept)) out.push(`${name}: not kept with its value (${o.kept})`);
+      } else if ("none" in o) {
+        if (w.listing !== null) out.push(`${name}: a listing exists for a ${o.none} row`);
+      } else if (o.write === "listing") {
+        if (String(w.listing?.[o.column]) !== String(cell.value))
+          out.push(`${name}: listing ${o.column} not written`);
+      } else if (o.write === "custom") {
+        const cf = (w.listing?.custom_fields ?? {}) as Record<string, unknown>;
+        const code = (col.target as { custom: string }).custom;
+        if (String(cf[code]) !== String(cell.value)) out.push(`${name}: custom field not written`);
+      } else if (o.write === "new-field") {
+        const cf = (w.listing?.custom_fields ?? {}) as Record<string, unknown>;
+        if (String(cf[w.newCode]) !== String(cell.value))
+          out.push(`${name}: new field not written`);
+      } else if (o.write === "unit-link") {
+        if (!w.unitOk) out.push(`${name}: listing not on its unit`);
+      } else if (o.write === "pending-building") {
+        if (w.pendingBuilding !== raw.trim())
+          out.push(`${name}: tower text not on the new pending unit`);
+      }
+    });
+  });
+  return out;
+}
+
+describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
+  it("the matrix is written before: 20 targets × 4 situations × 6 marks, every cell with one outcome or a named reason", () => {
+    expect(MATRIX).toHaveLength(20);
+    // The 18 standard targets and the two kinds of the company's own fields, each once.
+    const standard = MATRIX.flatMap((c) =>
+      c.target !== "unit" && "standard" in c.target ? [c.target.standard] : [],
+    );
+    expect([...standard, "unitCode"].sort()).toEqual([...STANDARD_TARGETS].sort());
+    const cells = MATRIX.flatMap((col) =>
+      SITUATIONS.flatMap((s) => MARKS.map((m) => ({ col, s, m, o: outcomeOf(col, s, m, "why") }))),
+    );
+    expect(cells).toHaveLength(480);
+    const unnamed = cells
+      .filter((x) => "na" in x.o && !x.o.na)
+      .map((x) => `${x.col.header}×${x.s}×${x.m}`);
+    expect(unnamed).toEqual([]);
+    // Break: a column with a mark neither given an input nor a reason is named.
+    const broken: MatrixColumn = {
+      ...MATRIX[2]!,
+      input: { keep: { raw: "72" } },
+      notApplicable: {},
+    };
+    expect(
+      "na" in outcomeOf(broken, "catalog", "fixed", null) &&
+        outcomeOf(broken, "catalog", "fixed", null),
+    ).toEqual({ na: "" });
+  });
+
+  it("what the preview promised is what was written, over the whole matrix (break pinned)", async () => {
+    const e = await importWorld("ma_tran");
+    await e.w.db.owner.query(
+      `insert into company_fields (company_id, code, name, kind, position, options)
+         values ($1, 'huong_nhin', 'Hướng nhìn', 'single_select', 0, '["Biển", "Phố"]')`,
+      [e.w.A],
+    );
+    const catalog = await catalogCodes(e, 6, 3);
+    const listedCodes = await catalogCodes(e, 6, 9);
+    const pendingIds: string[] = [];
+    for (let k = 0; k < 6; k += 1)
+      pendingIds.push(
+        (
+          await e.w.db.owner.query<{ id: string }>(
+            `insert into company_pending_units (company_id, raw_code) values ($1, $2) returning id::text`,
+            [e.w.A, `SA5-90.0${k}`],
+          )
+        ).rows[0]!.id,
+      );
+    // The listed units: an open listing first, from a plain import.
+    const first = await applyAll(
+      e,
+      "LA",
+      listedCodes.map((c) => [c, "", "", "", ""]),
+      NO_CHOICES,
+    );
+    expect([first.status, first.body?.created]).toEqual([200, 6]);
+    const codeOf = (s: Situation, k: number) =>
+      s === "catalog"
+        ? catalog[k]!
+        : s === "listed"
+          ? listedCodes[k]!
+          : s === "pending-existing"
+            ? `SA5-90.0${k}`
+            : `SA5-91.0${k}`;
+    const rows = SITUATIONS.flatMap((situation) =>
+      MARKS.map((mark, k) => ({
+        situation,
+        mark,
+        raw: MATRIX.map((col, j) =>
+          j === 0 ? codeOf(situation, k) : (col.input[mark] ?? col.input.keep)!.raw,
+        ),
+      })),
+    );
+    const choices: Choices = {
+      ...NO_CHOICES,
+      columns: Object.fromEntries(
+        MATRIX.flatMap((c, j) => (c.target !== "unit" ? [[j, { target: c.target }]] : [])),
+      ) as Choices["columns"],
+      values: Object.fromEntries(
+        MATRIX.flatMap((col, j) =>
+          (["chosen-remember", "chosen-no-remember", "chosen-as-written"] as Mark[]).flatMap(
+            (m) => {
+              const i = col.input[m];
+              return i && i.answer !== undefined
+                ? [[`${j}|${fold(i.raw)}`, { value: i.answer, remember: m === "chosen-remember" }]]
+                : [];
+            },
+          ),
+        ),
+      ),
+      units: Object.fromEntries(
+        MARKS.map((_, k) => [fold(`SA5-91.0${k}`), { pending: true as const }]),
+      ),
+    };
+    const headers = MATRIX.map((c) => c.header);
+    const p = await preview(
+      e,
+      "LA",
+      rows.map((r) => r.raw),
+      choices,
+      headers,
+    );
+    expect(p.status).toBe(200);
+    const promised = marked(p);
+    expect(promised.counts.block).toBe(0);
+    // The matrix's own inputs give the marks it says, so no cell is measured on the wrong mark.
+    const wrongMark = rows.flatMap((row, r) =>
+      MATRIX.flatMap((col, j) => {
+        if (j === 0 || !col.input[row.mark]) return [];
+        const cell = promised.cells[r]![j]!;
+        const want =
+          row.situation === "listed"
+            ? "ask"
+            : row.mark === "keep"
+              ? "keep"
+              : row.mark === "fixed"
+                ? "fixed"
+                : row.mark === "ask" || row.mark === "chosen-as-written" || col.answerIgnored
+                  ? "ask"
+                  : "fixed";
+        return cell.mark === want
+          ? []
+          : [`${r}:${col.header}: ${row.mark} gave ${cell.mark} (${cell.why})`];
+      }),
+    );
+    expect(wrongMark).toEqual([]);
+    expect(promised.rows.map((x) => x.fate)).toEqual(
+      rows.map((r) => (r.situation === "listed" ? "listed" : "create")),
+    );
+    const open = await e.h.open(
+      req(
+        URL_,
+        "POST",
+        {
+          headers,
+          rows: rows.map((r) => r.raw),
+          choices,
+          fileName: "ma-tran.xlsx",
+          sheetName: "Sheet1",
+          expected: { ...p.body.counts, createCount: p.body.createCount },
+        },
+        await e.cookie("LA"),
+      ),
+    );
+    expect(open.status).toBe(201);
+    const { id } = (await open.json()) as { id: string };
+    const NEW = MATRIX.findIndex((c) => c.target !== "unit" && "newField" in c.target);
+    const res = await e.h.batch(
+      req(
+        `${URL_}/${id}/batches`,
+        "POST",
+        {
+          headers,
+          rows: rows.map((r) => r.raw),
+          choices,
+          batchNo: 0,
+          rowOffset: 0,
+          last: true,
+          allNewFieldCells: Object.fromEntries(
+            rows.map((row, r) => [`${r}:${NEW}`, row.raw[NEW]!]),
+          ),
+        },
+        await e.cookie("LA"),
+      ),
+      id,
+    );
+    expect(res.status).toBe(200);
+    const kept = (
+      await e.w.db.owner.query<{ kept: Written["kept"] }>(
+        `select kept from import_runs where id = $1`,
+        [id],
+      )
+    ).rows[0]!.kept;
+    const newCode = (
+      await e.w.db.owner.query<{ code: string }>(
+        `select code from company_fields where company_id = $1 and name = 'View'`,
+        [e.w.A],
+      )
+    ).rows[0]!.code;
+    const written: Written[] = [];
+    for (let r = 0; r < rows.length; r += 1) {
+      const listing =
+        (
+          await e.w.db.owner.query<Record<string, unknown>>(
+            `select list_price::text as "listPrice", fee_inclusion as "feeInclusion",
+                    standard_status as "standardStatus", withdrawn_reason as "withdrawnReason", furnished,
+                    occupant_type as "occupantType", legal_status as "legalStatus", financing,
+                    last_confirmed_at::date::text as "lastConfirmedAt", custom_fields
+               from listings where id = $1`,
+            [listingIdOf(id, r)],
+          )
+        ).rows[0] ?? null;
+      const link = (
+        await e.w.db.owner.query<{
+          upi: string | null;
+          pid: string | null;
+          code: string | null;
+          building: string | null;
+        }>(
+          `select u.upi, lp.pending_unit_id::text as pid, cpu.raw_code as code, cpu.building_text as building
+             from (select $1::uuid as id) l
+             left join listing_units u on u.listing_id = l.id
+             left join listing_pending_units lp on lp.listing_id = l.id
+             left join company_pending_units cpu on cpu.id = lp.pending_unit_id`,
+          [listingIdOf(id, r)],
+        )
+      ).rows[0]!;
+      const row = rows[r]!;
+      const k = MARKS.indexOf(row.mark);
+      let unitOk = false;
+      if (row.situation === "catalog") {
+        const upi = (
+          await e.w.db.owner.query<{ upi: string }>(
+            `select u.upi from catalog_aliases a join catalog_units u on u.unit_key = a.object_key
+              where a.kind = 'ma_goc' and a.value = $1`,
+            [catalog[k]],
+          )
+        ).rows[0]!.upi;
+        unitOk = link.upi === upi;
+      } else if (row.situation === "pending-existing") unitOk = link.pid === pendingIds[k];
+      else if (row.situation === "pending-new") unitOk = link.code === `SA5-91.0${k}`;
+      written.push({ listing, kept, unitOk, pendingBuilding: link.building, newCode });
+    }
+    expect(matrixFaults(promised, rows, written)).toEqual([]);
+    // What the person asked to remember: the company layer (row 7e) keeps a spelling for a closed set it holds — status,
+    // withdrawal reason, direction and its own choice fields. For the other columns the value is written or kept as
+    // above and the spelling is not learned, as declared here; the screen promises no more.
+    const REMEMBERED = ["Hướng", "Trạng thái", "Lý do ngừng", "Hướng nhìn", "View"];
+    const NOT_REMEMBERED: Record<string, string> = {
+      "Loại căn":
+        "a unit attribute other than direction: kept as written, no company spelling (G-2711-4)",
+      "Giá chào": "a price is read, not a closed set: the answer is written, no spelling",
+      "Giá bán": "a price is read, not a closed set: the answer is kept, no spelling",
+      Phí: "not a closed set of the company layer (row 7e): the answer is written, no spelling",
+      "Nội thất":
+        "not a closed set of the company layer (row 7e): the answer is written, no spelling",
+      "Người ở":
+        "not a closed set of the company layer (row 7e): the answer is written, no spelling",
+    };
+    const answered = MATRIX.filter((c) => !c.answerIgnored && c.input["chosen-remember"]).map(
+      (c) => c.header,
+    );
+    expect([...REMEMBERED, ...Object.keys(NOT_REMEMBERED)].sort()).toEqual([...answered].sort());
+    const learnedNames = ((await res.json()) as { learned?: LearnedItem[] }).learned!.map((x) =>
+      fold(x.name),
+    );
+    for (const h of REMEMBERED)
+      expect(learnedNames).toContain(
+        fold(`«${MATRIX.find((c) => c.header === h)!.input["chosen-remember"]!.raw}»`),
+      );
+    for (const h of Object.keys(NOT_REMEMBERED))
+      expect(learnedNames).not.toContain(
+        fold(`«${MATRIX.find((c) => c.header === h)!.input["chosen-remember"]!.raw}»`),
+      );
+    // Breaks: a lost listing value, a dropped kept cell, a listing on the wrong unit, a listed row that got a listing.
+    const r0 = written[0]!;
+    expect(
+      matrixFaults(promised, rows, [
+        { ...r0, listing: { ...r0.listing!, furnished: null } },
+        ...written.slice(1),
+      ]),
+    ).toEqual(["0:Nội thất: listing furnished not written"]);
+    expect(
+      matrixFaults(
+        promised,
+        rows,
+        written.map((w) => ({
+          ...w,
+          kept: w.kept.filter((x) => !(x.row === 0 && x.header === "Block")),
+        })),
+      ),
+    ).toEqual(["0:Block: not kept with its value (unit-attribute)"]);
+    expect(matrixFaults(promised, rows, [{ ...r0, unitOk: false }, ...written.slice(1)])).toEqual([
+      "0:Mã căn: listing not on its unit",
+    ]);
+    // A listed row that got a listing is named on its unit code (S4-r8 t9: the message is pinned, not just counted).
+    const lastListed = rows.length - 1;
+    expect(
+      matrixFaults(promised, rows, [
+        ...written.slice(0, lastListed),
+        { ...written[lastListed]!, listing: r0.listing },
+      ]),
+    ).toEqual([`${lastListed}:Mã căn: a listing exists for a row-listed row`]);
+    // An answer the person typed for a column kept as written, lost from the record, is named (G-2811-78): the cell
+    // «chưa bán 2» of the catalog row answered without «remember» shows 4000000000 on the preview.
+    const answeredRow = rows.findIndex(
+      (x) => x.situation === "catalog" && x.mark === "chosen-no-remember",
+    );
+    const SALE = MATRIX.findIndex((c) => c.header === "Giá bán");
+    expect(promised.cells[answeredRow]![SALE]!.value).toBe(4000000000);
+    const lostAnswer = kept.map((k) =>
+      k.row === answeredRow && k.header === "Giá bán"
+        ? { row: k.row, header: k.header, raw: k.raw, why: k.why }
+        : k,
+    );
+    expect(
+      matrixFaults(
+        promised,
+        rows,
+        written.map((w) => ({ ...w, kept: lostAnswer })),
+      ),
+    ).toEqual([`${answeredRow}:Giá bán: not kept with its value (close-field)`]);
+  });
+});
