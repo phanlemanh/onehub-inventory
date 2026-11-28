@@ -28,7 +28,6 @@ export const GRID_COPY = {
   },
   /** The grid as a list of cards below 768 px (row 2b): toolbar, filter sheet, sort. */
   phone: {
-    more: "Thêm",
     sortBy: "Sắp theo",
     removeFilter: (header: string) => `Bỏ lọc ${header}`,
   },

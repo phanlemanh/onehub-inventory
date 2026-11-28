@@ -1,0 +1,97 @@
+schema_version: 1
+feature_slug: dua-deploy-yml-len-main
+# Kế hoạch đo, viết trước khi chấm. Mọi phép đo của E1–E4 sống trong rang/kiem.py, mỗi phép đo một hàm thuần trên văn
+# bản; `--tu-kiem` chạy từng hàm trên vật lành (phải xanh) và trên bản sao đã phá một chỗ (phải đỏ với thông điệp ghim).
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E1
+    layer: backend-effect
+    paths: [".github/workflows/deploy.yml", "docs/van-hanh/README.md", "_acceptance/dua-deploy-yml-len-main/rang/**"]
+    expected: >-
+      exit 0, in «E1 ok: deploy.yml bằng khối sổ tay việc 9 (<n> dòng)» và «E1 ok: khối sổ tay ở HEAD bằng khối lúc ký
+      dat-khoa-mot-lenh (182ca5b3)». Chiều đỏ (ca --tu-kiem): sửa một dòng hay thêm một dòng cuối → «deploy.yml lệch khối
+      sổ tay ở dòng <n>»; khối đổi so với lúc ký → «khối sổ tay đã đổi sau khi ký»; khoảng trắng cuối dòng không làm đỏ.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E2
+    layer: backend-effect
+    paths: [".github/workflows/deploy.yml", ".github/workflows/release.yml", "_acceptance/dua-deploy-yml-len-main/rang/**"]
+    expected: >-
+      exit 0, in «E2 ok: …». Chiều đỏ: bỏ chặn DEPLOY_ENABLED → «staging không chặn bằng vars.DEPLOY_ENABLED»; bỏ needs →
+      «production không chờ staging»; đổi môi trường → «production không chạy trong môi trường production»; thêm việc →
+      «việc phải đúng staging và production»; nới quyền → «quyền phải đúng contents: read»; bỏ cò → «cò kích hoạt phải
+      đúng workflow_call và workflow_dispatch»; staging sai môi trường → «staging không chạy trong môi trường staging»;
+      bước cuối sai → «bước cuối của production không phải make deploy ENV=production»; release.yml gọi 0 hay 2 lần →
+      «release.yml gọi deploy.yml <n> lần».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E3
+    layer: backend-effect
+    paths: [".github/workflows/deploy.yml", "docs/van-hanh/README.md", "_acceptance/dua-deploy-yml-len-main/rang/**"]
+    expected: >-
+      exit 0, in «E3 ok: <n> tên đều có trong bảng biến, mỗi tên đặt ở đúng môi trường của việc đọc nó». Đo theo từng
+      việc. Chiều đỏ: tên lạ → «<tên> không có trong bảng biến»; khoá đặt ở kho → «<tên> không phải khoá của môi trường»;
+      biến chỉ của production đọc ở staging → «STAGING_APP_URL không đặt ở môi trường staging».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3b
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.dk_so_tay
+    layer: backend-effect
+    paths: ["docs/van-hanh/**", "tools/deploy/**"]
+    expected: "exit 0: mọi ca «E8 ·» của bài kiểm sổ tay hồ sơ dat-khoa-mot-lenh pass."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E4 --base 1f4e7d368335a569760cbb9029c2b722987e5094 --head c55415fe3cd8cba215c31b56d5794600fd41093b
+    layer: backend-effect
+    expected: >-
+      exit 0, in «E4 ok: ngoài hồ sơ chỉ đổi deploy.yml (<n> tệp)». Chiều đỏ: chạm src/app/page.tsx → «PR chạm tệp ngoài
+      phạm vi: src/app/page.tsx»; không chạm deploy.yml → «PR không chạm .github/workflows/deploy.yml».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-1
+    executor: script
+    cmd: python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py --tu-kiem
+    layer: backend-effect
+    paths: [".github/workflows/**", "docs/van-hanh/README.md", "_acceptance/dua-deploy-yml-len-main/rang/**"]
+    expected: "exit 0, in «tu-kiem: 27/27 ca đúng» — mỗi phép đo E1–E4 và E7 xanh trên vật lành, đỏ với thông điệp ghim trên bản phá."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E7
+    layer: backend-effect
+    expected: >-
+      exit 0, in «E7 ok: môi trường production có người duyệt bắt buộc (phanlemanh)» — đọc bằng gh api, chỉ đọc. Chiều đỏ
+      (ca --tu-kiem, cùng hàm trên bản trả lời đã phá): không có luật người duyệt hay người duyệt khác chủ kho →
+      «production không có người duyệt bắt buộc».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.check
+    layer: backend-effect
+    expected: "exit 0: make check xanh."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6b
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.build
+    layer: backend-effect
+    expected: "exit 0: npm run build xanh."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6c
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.e2e
+    layer: backend-effect
+    expected: "exit 0: make e2e xanh ở bốn khổ màn."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

@@ -207,9 +207,13 @@ test("o-rieng-that: on a real company each own column opens its kind's editor, a
       page.locator(`[data-custom-kind="${kind}"]`),
       `o-rieng-that: ${kind}`,
     ).toBeVisible();
-    // The frames the record's look check (E6-ui) reads: one editor of each kind at 1440.
+    // The frames the record's look check (E6-ui) reads: one editor of each kind at 1440. A run that grades that record
+    // asks for them in its evidence (SUA_CAN_CHUP=1); any other run, the whole suite among them, keeps them in the run
+    // directory, since a command that runs more than once never writes under _acceptance/.
     if (info.project.name === "1440")
-      await chupAnh(page, { path: `_acceptance/sua-thong-tin-can/evidence/E6-${kind}-1440.png` });
+      await chupAnh(page, {
+        path: `${process.env.SUA_CAN_CHUP === "1" ? "_acceptance" : ".acceptance-runs"}/sua-thong-tin-can/evidence/E6-${kind}-1440.png`,
+      });
     await page.keyboard.press("Escape");
   }
   const cell = page.locator(`[id$="${w.listing}-custom_so_cho_xe"]`).first();

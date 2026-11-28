@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 15aff9138a493692a6e05ad9142fe128684a8819
+verified_commit: 808af8c561772a5926a525f82fd346a9b9200303
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -278,3 +278,15 @@ sha: f83bd3cc5f5f433e952a51c93a4f53933871e6c4 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-14, do ghim lại bằng làn eval
 run_id: repin-20261114T111817Z-91760
 sha: 15aff9138a493692a6e05ad9142fe128684a8819 · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E3, E12 (E12 không khai paths), E15 (E15 không khai paths) · diff chạm vật đo ngoài làn máy: E3 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 3 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi kỳ vọng bài của các hồ sơ đã ký; thước 2e sửa ở ec70d782 (G-2711-36); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T185306Z-85596
+sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E3, E12 (E12 không khai paths), E15 (E15 không khai paths) · diff chạm vật đo ngoài làn máy: E3 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 4 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi bài của các hồ sơ đã ký: thước viền Q3, open-cell-truncate (G-2811-6), bài 44 px và các bài xanh rỗng (G-2811-11); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T222637Z-53064
+sha: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E3, E12 (E12 không khai paths), E15 (E15 không khai paths) · diff chạm vật đo ngoài làn máy: E3 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 5 — 2026-11-28, do gộp main c55415fe (PR #133) vào nhánh VP10; thước E4 hồ sơ deploy (2efc5370); bài 3g chụp ra thư mục chạy (1cb3073b) — G-2811-45/51
+run_id: repin-20261128T015659Z-62110
+sha: 808af8c561772a5926a525f82fd346a9b9200303 · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E3, E12 (E12 không khai paths), E15 (E15 không khai paths)
