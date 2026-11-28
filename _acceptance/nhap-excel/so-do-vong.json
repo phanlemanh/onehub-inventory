@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "nhap-excel",
-  "ghi_luc": "2026-11-27T23:53:15Z",
-  "vong_cham": 6,
+  "ghi_luc": "2026-11-28T05:40:55Z",
+  "vong_cham": 8,
   "luot": [
     {
       "vong": 1,
@@ -41,6 +41,16 @@
       "vong": 6,
       "verdict": "PASS",
       "tang": []
+    },
+    {
+      "vong": 7,
+      "verdict": "PASS",
+      "tang": []
+    },
+    {
+      "vong": 8,
+      "verdict": "PASS",
+      "tang": []
     }
   ],
   "lam_lai": [
@@ -71,10 +81,18 @@
     {
       "nguon": "repin-do:repin-20261127T204232Z-73797",
       "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "repin-do:repin-20261127T235601Z-77491",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "repin-do:repin-20261128T041032Z-13731",
+      "tang": "bai-kiem-ha-tang"
     }
   ],
   "theo_tang": {
-    "bai-kiem-ha-tang": 1,
+    "bai-kiem-ha-tang": 3,
     "trang-thai-hanh-vi": 2,
     "du-lieu-api": 1,
     "nghiep-vu": 2,
@@ -89,18 +107,18 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      2614,
-      217
+      3720,
+      249
     ],
     "thuoc": [
-      44,
-      15
+      47,
+      16
     ],
-    "nhat": 3
+    "nhat": 4
   },
   "gio_may": {
-    "gio_may": 61.13,
-    "gio_cho": 247.97,
-    "phan_tram_tuan": 70.34
+    "gio_may": 66.54,
+    "gio_cho": 248.35,
+    "phan_tram_tuan": 83.2
   }
 }

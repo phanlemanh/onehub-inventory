@@ -90,6 +90,20 @@
   severity: low
   Đề xuất: known-limits
 
+- **An answer typed for a column that is only kept as written is not stored (S4-r8)**
+  Người dùng thấy gì: Ở các cột chỉ được giữ chữ gốc trong bản ghi lần nhập (hướng, loại căn, giá bán), nếu anh gõ đáp án cho một ô lạ thì màn xem trước hiện đáp án như đã sửa, nhưng bản ghi lần nhập chỉ lưu chữ gốc, không lưu đáp án. Căn không bị ghi sai; chỉ đáp án anh gõ không còn ở đâu.
+  Căn cứ: Cùng dáng «màn xem trước nhận, bước ghi bỏ» với ba lỗi đã sửa, nhưng ở phần chỉ giữ chữ gốc; bảng viết trước kiểm chữ gốc mà chưa kiểm giá trị màn đã hứa. Sửa rẻ: bản ghi lần nhập lưu thêm giá trị màn xem trước đã hiện, kèm ca trong bảng viết trước.
+  file: `src/modules/imports/store.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Some words of the import screen are written in the screen, not taken from the product's word list (S4-r8)**
+  Người dùng thấy gì: Màn Nạp tệp gọi một số khái niệm bằng chữ riêng, ví dụ «lần nhập» trong khi danh sách chữ của sản phẩm gọi là «Lần nạp tệp», và «căn», «chủ nhà», «mẫu nhập» viết thẳng trong màn. Người dùng có thể thấy cùng một việc mang hai tên ở hai chỗ.
+  Căn cứ: Không mất dữ liệu, không sai thao tác; đổi chữ sau rẻ. Tiêu chí AC-12 cho phép chữ của tệp chữ riêng của mô-đun, nên không phạm tiêu chí; chọn một tên chung cho «lần nhập» là việc của danh sách chữ.
+  file: `src/modules/imports/ui/copy.ts`
+  severity: medium
+  Đề xuất: known-limits
+
 - **The import screen's 'fixed' mark has the same colour as the 'Đã bán' status (VP11 r1)**
   Người dùng thấy gì: Dấu «máy sửa» trên màn Nạp tệp cùng màu với nhãn «Đã bán» ở Bảng hàng, nên thoáng nhìn có thể nhầm là một trạng thái. Chữ trên dấu vẫn phân biệt được.
   Căn cứ: Chỉ là màu, không mất dữ liệu; đổi màu sau rất rẻ.
@@ -121,6 +135,12 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
+- S4-r8 t1 · Design / module boundaries: imports reads and writes tables owned by other modules → #19
+- S4-r8 t2 · Records: new module dependencies without a decision page → #20
+- S4-r8 t4 · Personal data: owner phone and name are caught only by the column header → #21
+- S4-r8 t5 · Domain: ListingPendingUnit ontology does not match the schema → #23
+- S4-r8 t8 · the sweep for «every markValue call passes the person's choice» only looks for text → mục «The check that every write passes the person's choice reads the source text»
+- S4-r8 t9 · the break for a listed row that got a listing only checks that a fault appears, not which one → nhóm «Weak test shapes»
 - S4-r7 t1 · AGENTS.md Architecture: never reach into another module's tables (imports module) → #19
 - S4-r7 t2 · AGENTS.md Architecture: listings reads company-config's table without a declared dependency → #26
 - S4-r7 t3 · AGENTS.md: a new module dependency needs a decision page → #20
@@ -138,6 +158,7 @@ Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
 Thuộc hồ sơ khác, nhánh này không viết dòng nào của tệp:
 
+- S4-r8 t6, t10 · the «Khớp» column and the author's kit path in _acceptance/khung-luoi-va-ngan-chi-tiet/rang/dung-lai-mang-sang.mjs — công cụ của hồ sơ VP10
 - S4-r7 t5, t9, t10 · the «Khớp» column and the author's kit path in _acceptance/khung-luoi-va-ngan-chi-tiet/rang/dung-lai-mang-sang.mjs — công cụ của hồ sơ VP10, hàng 11 không viết dòng nào của tệp
 - #13 Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): Đã gửi «có bóng» đọc kiểu CSS khai báo, không đọc điểm ảnh (r5) — tests/e2e/khung-luoi-nut.spec.ts — tệp của khung lưới (VP10), nhánh này không viết dòng nào
 - #15 Hình dạng 5 (tuyên cả lớp nhưng chỉ đo vài điểm): «28 px on a computer» chỉ đo nút ở đầu ngăn (r5) — tests/e2e/ho-so-can.spec.ts — tệp của khung lưới (VP10), nhánh này không viết dòng nào
