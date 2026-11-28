@@ -91,6 +91,7 @@ import {
   RegionPartial,
   RegionPartialEmpty,
 } from "./region-state";
+import { gridKeyAction } from "./grid-keys";
 import { TypedCell } from "./typed-cell";
 import { useChange } from "./use-change";
 
@@ -893,6 +894,13 @@ export function DataRegion({
                 transaction={row.transaction}
                 lockedReason={row.locked?.[column.field]}
                 editMode={editable ? editModeFor(column.kind) : undefined}
+                pencil={
+                  canEdit(row as GridRow, column.field)
+                    ? "shown"
+                    : editRule.split("|")[1]?.split(",").includes(column.field)
+                      ? "room"
+                      : undefined
+                }
               />
             );
             if (index !== 0 || !opensRecord) return cell;
@@ -983,6 +991,7 @@ export function DataRegion({
       rowActions,
       removing.run,
       firstField,
+      editRule,
       columns,
       chPx,
       editable,
@@ -1068,15 +1077,20 @@ export function DataRegion({
     }
   });
 
-  // Enter on a selected cell opens its row, the region's one «open row» door (the record panel of row 3); on a row's
-  // «…» cell it opens that row's menu instead (row 9e).
+  // The keys of a selected cell: one rule, src/components/candidate/grid-keys.ts. «edit» is left to the grid, which
+  // opens the editor through onCellEditRequest as F2 does; an editor's own keys never come here (it is outside the body).
   const onGridKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Enter" || event.shiftKey || event.altKey || event.metaKey || event.ctrlKey)
-      return;
+    if (event.shiftKey || event.altKey || event.metaKey || event.ctrlKey) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
     const focused = table.getFocusedCell?.();
     const id = focused?.row.id;
-    if (!id || id.startsWith(GROUP_ID_PREFIX)) return;
-    if (focused?.column.id === ROW_ACTIONS_ID) {
+    if (!focused || !id || id.startsWith(GROUP_ID_PREFIX)) return;
+    const action = gridKeyAction(event.key, {
+      editable: canEdit(focused.row.original as GridRow, focused.column.id as FieldKey),
+      rowActions: focused.column.id === ROW_ACTIONS_ID,
+      opensRecord,
+    });
+    if (action === "menu") {
       const trigger = document.querySelector<HTMLElement>(
         `[data-row-actions-for="${CSS.escape(id)}"] [data-slot="row-actions"]`,
       );
@@ -1086,11 +1100,27 @@ export function DataRegion({
       trigger.click();
       return;
     }
-    if (!opensRecord) return;
+    if (action !== "record") return;
     event.preventDefault();
     event.stopPropagation();
     openRef.current?.(id);
   };
+
+  // Closing the editor gives the keyboard back to the grid: the edited cell is still the selected cell, so arrows carry
+  // on from it; `next` moves on as Tab does.
+  const closeEditor = useCallback((move?: "next") => {
+    setEditing(null);
+    requestAnimationFrame(() => {
+      const viewport = document.querySelector<HTMLElement>(
+        `[data-slot="data-region-scroll-content"] [tabindex="0"]`,
+      );
+      viewport?.focus();
+      if (move === "next")
+        viewport?.dispatchEvent(
+          new globalThis.KeyboardEvent("keydown", { key: "Tab", bubbles: true }),
+        );
+    });
+  }, []);
 
   const onSelection = useCallback((snapshot: DataGridCellSelectionSnapshot) => {
     setSelectedCells(snapshot.visibleCellCount);
@@ -1385,20 +1415,6 @@ export function DataRegion({
           ? (() => {
               const row = rows.find((r) => r.id === editing.rowId);
               if (!row) return null;
-              const close = (move?: "next") => {
-                setEditing(null);
-                // Back to the grid: the edited cell is still the selected cell, so arrows carry on from it.
-                requestAnimationFrame(() => {
-                  const viewport = document.querySelector<HTMLElement>(
-                    `[data-slot="data-region-scroll-content"] [tabindex="0"]`,
-                  );
-                  viewport?.focus();
-                  if (move === "next")
-                    viewport?.dispatchEvent(
-                      new globalThis.KeyboardEvent("keydown", { key: "Tab", bubbles: true }),
-                    );
-                });
-              };
               return (
                 <CellEditor
                   anchor={editing.anchor}
@@ -1408,13 +1424,13 @@ export function DataRegion({
                     )
                   }
                   label={cellEdit.label(row, editing.field)}
-                  onClose={() => close()}
+                  onClose={() => closeEditor()}
                 >
                   {cellEdit.render({
                     row,
                     field: editing.field,
                     initialText: editing.initialText,
-                    close,
+                    close: closeEditor,
                   })}
                 </CellEditor>
               );

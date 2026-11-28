@@ -267,9 +267,15 @@ test.describe("sua-tren-o", () => {
     wideOnly();
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await openInventory(page);
-    // Enter on a selected price cell opens the record, not the editor.
+    // VP11 (owner 2026-11-28, Hỏi-1; sửa sau ký of this record): Enter on a selected price cell opens the editor, and
+    // Space opens the record.
     await select(page, "1101", PRICE);
     await page.keyboard.press("Enter");
+    await expect(editor(page)).toBeVisible();
+    await expect(page.locator('[data-slot="record-panel"]')).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(editor(page)).toHaveCount(0);
+    await page.keyboard.press(" ");
     await expect(page.locator('[data-slot="record-panel"]')).toBeVisible();
     await expect(editor(page)).toHaveCount(0);
     await page.keyboard.press("Escape");
