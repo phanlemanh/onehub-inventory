@@ -1,0 +1,33 @@
+{
+  "feature_plain": "Khi chủ kho chạy lệnh đặt khoá và dán từng khoá, mỗi câu hỏi «đang hỏi khoá nào» giờ ở lại trên màn thay vì bị xoá mất như hôm 28/11.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ chứng trên một terminal thật: chạy chính lệnh đặt khoá, dán như người, thì lúc xong màn còn đủ năm câu hỏi, mỗi câu một dòng, đúng thứ tự — kể cả khi kéo cửa sổ hẹp lại giữa lúc dán."},
+    {"id": "AC-2", "p": "Sẽ chứng mỗi khoá đã dán tới đúng chỗ (mật khẩu được điền và mã hoá vào chuỗi kết nối), hai khoá tự sinh đúng khuôn, và không chữ nào đã dán hiện ra màn."},
+    {"id": "AC-3", "p": "Sẽ chứng khi câu trả lời đến từ một ống dẫn (bài kiểm, kịch bản) lệnh vẫn đọc từng dòng như trước và đặt đúng khoá."},
+    {"id": "AC-4", "p": "Sẽ chứng đối chứng: bản trước PR trên cùng terminal mất cả năm câu hỏi — đúng lỗi hôm 28/11 — và thứ tự cũ làm đỏ bài kiểm của PR đúng chỗ."},
+    {"id": "AC-5", "p": "Sẽ chứng PR chỉ đổi cách hỏi: ngoài bài kiểm mới và một dòng nhật ký, chỉ hàm hỏi khoá đổi; cách kiểm và cách gửi khoá lên GitHub giữ nguyên."},
+    {"id": "AC-6", "p": "Sẽ chứng mọi bài kiểm của bộ lệnh đưa bản lên và các lệnh kiểm chung của kho đều xanh trên đầu nhánh."},
+    {"id": "AC-7", "p": "Sẽ đọc (chỉ đọc) CI trên GitHub ở đầu nhánh: ba việc kiểm nhanh, kiểm trình duyệt, kiểm có cơ sở dữ liệu đã xong và xanh."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Sẽ KHÔNG đặt khoá thật hay gọi GitHub thật: máy không cầm khoá, và chủ kho đã tự làm việc ấy hôm 28/11."},
+    {"id": "OOS-2", "p": "Sẽ KHÔNG đo trên bảng Terminal của ứng dụng Claude; phép đo dùng terminal của hệ điều hành, gồm cả lúc đổi cỡ."},
+    {"id": "OOS-3", "p": "Sẽ KHÔNG chạy riêng cho bản thật hay cả hai môi trường: cùng một hàm hỏi, chỉ thêm câu theo môi trường."},
+    {"id": "OOS-4", "p": "Sẽ KHÔNG đổi chữ câu hỏi hay cách kiểm khoá dán vào."}
+  ],
+  "scope_plain": "Bốn việc để ngoài vòng này:",
+  "coverage_plain": [
+    {"i": 1, "p": "Ba kiểu nhận câu trả lời đều có phép đo: terminal thật (AC-1, AC-2), terminal thật bị kéo cỡ giữa lúc dán (AC-1), ống dẫn (AC-3), terminal giả của bài kiểm (AC-4)."},
+    {"i": 2, "p": "Đủ năm câu lệnh hỏi một môi trường chưa có khoá, gồm câu hỏi mật khẩu (AC-1, AC-3)."},
+    {"i": 3, "p": "Ba điều người thấy: câu hỏi còn trên màn (AC-1), chữ dán không hiện (AC-2), lệnh báo xong (AC-2)."},
+    {"i": 4, "p": "Ba điều lệnh làm: khoá dán tới đúng chỗ, mật khẩu được mã hoá, hai khoá tự sinh (AC-2, AC-3)."},
+    {"i": 5, "p": "Hai đối chứng: thứ tự cũ trên bài kiểm, và bản trước PR trên terminal thật (AC-4)."},
+    {"i": 6, "p": "Luật kho: PR gọn (AC-5), kho xanh (AC-6), CI xanh (AC-7)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Màn «người thấy» được dựng lại bằng một mô hình nhỏ tự viết, có thể bỏ qua lặng lẽ một mã điều khiển lạ. Đã sửa: mô hình nay từ chối mọi mã nó không hiểu (phép đo dừng thay vì xanh oan), có ca phá chứng điều đó; lý do không dùng trình giả lập terminal đầy đủ (kho không có, thêm là đổi phụ thuộc) ghi ở sổ và ở hạn chế đã biết."},
+    {"i": 1, "p": "Lúc kéo cỡ cửa sổ là đường thứ hai có thể xoá câu hỏi mà chưa ai đo. Đã sửa: thêm ca 80 cột kéo xuống 60 cột giữa lúc dán, ca đòi thấy terminal thật sự vẽ lại; câu hỏi vẫn còn, và bản thứ tự cũ thì mất."},
+    {"i": 2, "p": "Chưa có ca phá chứng phép đo bắt được lỗi mã hoá mật khẩu và khoá tự sinh sai. Đã thêm hai ca phá, đều đỏ đúng chỗ."},
+    {"i": 3, "p": "Thứ tự câu hỏi và việc câu hỏi ra đúng luồng khi dùng ống dẫn chưa có báo lỗi riêng. Đã thêm báo lỗi và ca phá cho cả hai."}
+  ]
+}
