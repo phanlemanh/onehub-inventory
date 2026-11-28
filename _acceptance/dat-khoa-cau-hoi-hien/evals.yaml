@@ -54,13 +54,14 @@ evals:
     layer: backend-effect
     paths: ["tools/deploy/dat-khoa.mjs", "mk/deploy.mk", "_acceptance/dat-khoa-cau-hoi-hien/rang/**"]
     expected: >-
-      exit 0, dòng cuối «tu-kiem: 12/12 ca đúng (…)»: «ok vat-lanh — vật lành xanh» và mười một dòng «ok <bản phá> — đỏ
+      exit 0, dòng cuối «tu-kiem: 13/13 ca đúng (…)»: «ok vat-lanh — vật lành xanh» và mười hai dòng «ok <bản phá> — đỏ
       đúng: <thông điệp>»: pha-sai-thu-tu (câu hỏi sai thứ tự: MIGRATE_DATABASE_URL — màn lành vừa đọc, đổi chỗ hai câu),
       pha-thu-tu-cu (câu hỏi không còn trên màn: VERCEL_TOKEN), pha-hien-chu (chữ đã dán hiện ra màn: VERCEL_TOKEN),
       pha-nhan-sai (khoá nhận sai: VERCEL_TOKEN), pha-bo-ma-hoa (khoá nhận sai: MIGRATE_DATABASE_URL), pha-sinh-sai (khoá
       sinh sai: AUTH_SECRET), pha-khong-doi-co (đổi cỡ không làm readline vẽ lại dòng nhập — ca không đo gì),
       pha-thu-tu-cu-doi-co (câu hỏi không còn trên màn: VERCEL_TOKEN), pha-thieu-dong (khoá nhận sai: VERCEL_TOKEN),
-      pha-hoi-ra-luong-ra (câu hỏi ra luồng ra: VERCEL_TOKEN), pha-chuoi-la (màn dựng lại gặp chuỗi điều khiển lạ).
+      pha-hoi-ra-luong-ra (câu hỏi ra luồng ra: VERCEL_TOKEN), pha-chuoi-la (màn dựng lại gặp chuỗi điều khiển lạ),
+      pha-ban-cu-khong-chay (bản trước PR không chạy trọn — bản ở điểm rẽ dừng trước khi hỏi, màn cũng trống câu hỏi).
       Mỗi bản phá của mã là bản sao mã của PR đổi đúng một chỗ trong thư mục lượt đo; chỗ cần đổi không còn trong mã → «kiem: không
       chạy được — bản phá <ca> không áp được» (exit 2). Một bản phá không đỏ đúng thông điệp → «DO <ca>: …» và exit 1.
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

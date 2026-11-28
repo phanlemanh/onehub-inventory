@@ -5,7 +5,9 @@ slug: dat-khoa-cau-hoi-hien
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
-status: draft
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-28
 design_doc: _acceptance/dat-khoa-cau-hoi-hien/design.md
 ---
 
@@ -44,12 +46,13 @@ cùng giá trị mỗi khoá được đặt vào sổ của lượt đo, không
   mã của PR thì xanh; (b) cả năm câu hỏi bị xoá khỏi màn — đúng lỗi chủ kho gặp.
 - AC-5: Given PR #134, When liệt kê tệp đổi so với điểm rẽ của nhánh với `origin/main`, Then ngoài hồ sơ này, một tệp
   `wiki/log/` và hai trang máy vẽ lại khi cổng đóng (`PRODUCT-MAP.md`, `LO-TRINH.html`) chỉ có `tools/deploy/dat-khoa.mjs`
-  và bài kiểm mới; mọi dòng đổi của `dat-khoa.mjs` nằm trong hàm hỏi
-  `terminalAsk` (cách kiểm, câu hỏi và đường đưa giá trị vào `gh secret set` không đổi).
+  và bài kiểm mới; mọi dòng đổi của `dat-khoa.mjs` nằm trong hàm hỏi `terminalAsk` (cách kiểm, câu hỏi và đường đưa giá trị
+  vào `gh secret set` không đổi). (Sửa sau Cổng Phạm vi, G-2811-103, chờ chủ kho phê ở Cổng Bằng chứng.)
 - AC-6: Given nhánh ở HEAD, When chạy mọi bài kiểm của `tools/deploy/` rồi các lệnh chung của kho (`make check`,
   `npm run build`, `make e2e`), Then tất cả thoát 0.
-- AC-7 (cross-layer): Given PR #134 trên GitHub, When đọc CI ở đầu nhánh (chỉ đọc), và đầu nhánh ấy đúng là bản đang chấm, Then các việc quick, e2e, e2e-db đã
-  xong và xanh.
+- AC-7 (cross-layer): Given PR #134 trên GitHub, When đọc CI ở đầu nhánh (chỉ đọc), Then đầu nhánh ấy đúng là bản đang
+  chấm, và các việc quick, e2e, e2e-db đã xong và xanh. (Sửa sau Cổng Phạm vi, G-2811-103, chờ chủ kho phê ở Cổng Bằng
+  chứng.)
 
 ## Coverage
 
@@ -73,6 +76,16 @@ và mười một bản phá của phép đo đỏ đúng thông điệp.
   terminal ấy.
 - Môi trường `production` và `ENV=all`: cùng hàm hỏi, chỉ thêm câu hỏi theo môi trường.
 - Đổi chữ của câu hỏi hay cách kiểm giá trị dán.
+
+## Sửa sau Cổng Phạm vi
+
+Hai dòng chữ đổi sau khi chủ kho duyệt Cổng Phạm vi (28/11), theo lời điều phối G-2811-103. Cả hai nêu cho đúng sự thật
+hoặc siết chặt hơn, không nới phép đo; chủ kho phê hay không phê ở Cổng Bằng chứng.
+
+- AC-5 kể thêm hai trang máy vẽ lại khi cổng đóng (`PRODUCT-MAP.md`, `LO-TRINH.html`). Lệnh duyệt nào cũng vẽ lại hai trang
+  ấy và CI đòi chúng khớp, nên chúng luôn nằm trong PR; phép đo E5 đã nhận chúng từ trước, chữ cũ không kể (bước soi lượt 1
+  bắt chỗ lệch). Hợp đồng PR #135 viết như vậy.
+- AC-7 đòi đầu nhánh trên GitHub đúng là bản đang chấm, để CI xanh không thể là CI của một commit khác (bước soi lượt 1).
 
 ## Notes
 

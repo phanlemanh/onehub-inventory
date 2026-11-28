@@ -258,21 +258,26 @@ function main() {
   const p = onPipe("khong-tty", ANSWERS);
   report("khong-tty", checkPipe(p), `ống dẫn: ${QUESTIONS.length} câu hỏi, đọc từng dòng, khoá nhận đúng`);
   const old = onTerminal("ban-cu-mat-cau-hoi", viaNode(oldSource()));
-  const oldErrs = checkTerminal(old);
-  const lost = oldErrs.filter((l) => l.startsWith("câu hỏi không còn trên màn"));
-  // The old code must have really run to the end (every answer taken, keys right, exit 0): a run that broke before
-  // asking anything also leaves no question on the screen.
-  const notRun = oldErrs.filter((l) => !l.startsWith("câu hỏi không còn trên màn") && !l.startsWith("câu hỏi sai thứ tự"));
+  const { red: oldRed, lost } = judgeOld(checkTerminal(old));
   report(
     "ban-cu-mat-cau-hoi",
-    notRun.length
-      ? [`bản trước PR không chạy trọn: ${notRun[0]}`]
-      : lost.length === QUESTIONS.length
-        ? []
-        : [`bản trước PR không mất câu hỏi như lúc hỏng (mất ${lost.length}/${QUESTIONS.length})`],
+    oldRed,
     `bản trước PR (${baseRef().slice(0, 8)}) trên cùng terminal: ${lost.length}/${QUESTIONS.length} câu hỏi bị xoá khỏi màn`,
   );
   report("gh-gia", [], "gh trên PATH là bản giả của phép đo; không lệnh nào chạm GitHub");
+}
+
+/**
+ * Control case (AC-4 b): the old code must lose every question AND have really run to the end (every answer taken,
+ * keys right, exit 0) — a run that broke before asking anything also leaves no question on the screen.
+ */
+function judgeOld(errs) {
+  const lost = errs.filter((l) => l.startsWith("câu hỏi không còn trên màn"));
+  const notRun = errs.filter((l) => !l.startsWith("câu hỏi không còn trên màn") && !l.startsWith("câu hỏi sai thứ tự"));
+  if (notRun.length) return { red: [`bản trước PR không chạy trọn: ${notRun[0]}`], lost };
+  if (lost.length !== QUESTIONS.length)
+    return { red: [`bản trước PR không mất câu hỏi như lúc hỏng (mất ${lost.length}/${QUESTIONS.length})`], lost };
+  return { red: [], lost };
 }
 
 /** Each break of the source must turn a check red with its pinned message. */
@@ -340,6 +345,15 @@ function selfTest() {
       ),
     ),
     "khoá sinh sai: AUTH_SECRET",
+  );
+  // The old code made to stop before asking anything: no question on screen either, but it did not run.
+  const stopped = join(RUN, "pha-ban-cu-khong-chay", "dat-khoa.mjs");
+  mkdirSync(dirname(stopped), { recursive: true });
+  writeFileSync(stopped, `process.exit(3);\n${readFileSync(oldSource(), "utf8")}`);
+  expect(
+    "pha-ban-cu-khong-chay",
+    judgeOld(checkTerminal(onTerminal("pha-ban-cu-khong-chay", viaNode(stopped)))).red,
+    "bản trước PR không chạy trọn",
   );
   expect(
     "pha-khong-doi-co",
