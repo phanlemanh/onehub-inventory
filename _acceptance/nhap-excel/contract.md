@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config, ui]
 screens: [nhap-tep, inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-17
 design_doc: docs/superpowers/specs/2026-11-17-nhap-excel-design.md
@@ -160,4 +160,15 @@ Hỏi-7 (khuyên): Đầu chủ và Trưởng nhóm có cả hai; Đầu khách,
   (bốn lệnh chấm của hàng), `package.json` + `package-lock.json` (thư viện đọc `.xlsx`, Hỏi-4), `tests/**` (tệp mới).
 - Tệp thử: máy dựng không có Excel hay LibreOffice, nên các tệp `.xlsx` do một thư viện ghi khác thư viện đọc tạo ra, có ô
   ngày dạng số ngày của Excel và chuỗi dùng chung; nguồn từng tệp ở `tests/fixtures/nhap-excel/NGUON.md` (gap-probe P1).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-28:
+  - Ngoài-1: Phần nạp tệp và Bảng hàng còn đọc ghi thẳng dữ liệu của phần khác; đổi luật một chỗ thì chỗ kia có thể lệch mà không ai báo.
+  - Ngoài-2: Mô tả nghiệp vụ chưa ghi lần chào thuộc lần nhập nào, và mô tả mối nối với căn chờ khớp lệch vài trường so với cơ sở dữ liệu.
+  - Ngoài-6: Màn có lúc báo số lệch với thật (ô giữ chữ gốc, mục ngừng dùng sau hoàn tác, cách viết được nhớ), và danh sách Đầu chủ tải lỗi thì ô chọn trống không lời giải thích.
+  - Ngoài-7: Nhiều bài kiểm chỉ xem một phía hay thử trên dữ liệu dựng tay, nên một lỗi thật sau này có thể vẫn xanh.
+  - Ngoài-8: Phép thử không mất ô chạy 4 trong 6 lượt đã hứa, và chưa phép kiểm nào đếm đủ mọi trạng thái của màn Nạp tệp ở mọi khổ.
+  - Ngoài-10: Tệp Excel mẫu do công cụ kiểm tự viết, không phải tệp lưu từ Excel hay Google Sheets; tệp thật của sàn có thể khác.
+  - Ngoài-11: Bài kiểm «mọi lần ghi truyền lựa chọn của người» chỉ đọc chữ trong mã, không đọc cái đã ghi.
+  - Ngoài-12: Câu trả lời cho cách viết lạ ở cột phí, nội thất, người ở, loại căn hay giá được ghi đúng nhưng chưa được nhớ cho lần nhập sau.
+  - Ngoài-13: Bài kiểm chữ chỉ bắt nhãn viết đúng như danh sách chữ; chữ viết thường giữa câu hay tên khác vẫn qua.
+  - Ngoài-14: Dấu «máy sửa» trên màn Nạp tệp cùng màu với nhãn «Đã bán» ở Bảng hàng; chữ trên dấu vẫn phân biệt được.
   Chủ kho thả một tệp Excel thật (đã thay tên, số bằng `[Tên]`, `0900 000 0xx`) vào thư mục ấy thì bài E1 đọc thêm.
