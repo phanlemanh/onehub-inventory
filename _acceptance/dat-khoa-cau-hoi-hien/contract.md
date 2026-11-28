@@ -5,7 +5,7 @@ slug: dat-khoa-cau-hoi-hien
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
-status: verified
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-28
 design_doc: _acceptance/dat-khoa-cau-hoi-hien/design.md
@@ -86,6 +86,8 @@ hoặc siết chặt hơn, không nới phép đo; chủ kho phê hay không ph�
   ấy và CI đòi chúng khớp, nên chúng luôn nằm trong PR; phép đo E5 đã nhận chúng từ trước, chữ cũ không kể (bước soi lượt 1
   bắt chỗ lệch). Hợp đồng PR #135 viết như vậy.
 - AC-7 đòi đầu nhánh trên GitHub đúng là bản đang chấm, để CI xanh không thể là CI của một commit khác (bước soi lượt 1).
+- Thước, không phải điều đo: phép đo terminal thôi ghi môi trường của máy chấm ra tệp kế hoạch trên đĩa (môi trường đi
+  thẳng vào tiến trình đo trong bộ nhớ), có ca tự kiểm bằng biến mồi; điều E1–E4b đo không đổi (bước soi lượt 2, G-2811-111).
 
 ## Notes
 

@@ -9,8 +9,8 @@
 // Each case prints `ok <case> — …` or `DO <case>: …`; the last line is `kiem: <n>/<m> ca đạt` (exit 0 only when all
 // pass). Exit 2 when the measure cannot run here.
 import { execFileSync, spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { screenOf } from "./man-hinh.mjs";
@@ -102,6 +102,9 @@ const resizeAnswers = () => {
   return a;
 };
 
+// Break of the self-test only: puts the environment back into the plan file, as the measure did before round 3.
+let planCarriesEnv = false;
+
 /** Runs a command on a real pseudo-terminal, answering each question; returns what the terminal showed. */
 function onTerminal(name, cmd, { cols = 200, answers = plainAnswers() } = {}) {
   const log = join(RUN, `${name}.gh.log`);
@@ -112,13 +115,14 @@ function onTerminal(name, cmd, { cols = 200, answers = plainAnswers() } = {}) {
     JSON.stringify({
       cmd,
       cwd: ROOT,
-      env: envFor(log),
+      ...(planCarriesEnv ? { env: envFor(log) } : {}),
       timeout: 60,
       cols,
       answers,
     }),
   );
-  const r = spawnSync("python3", ["-I", join(HERE, "pty.py"), plan, raw], { encoding: "utf8" });
+  // The environment goes to pty.py in memory, never through the plan file (no secret of the grader on disk).
+  const r = spawnSync("python3", ["-I", join(HERE, "pty.py"), plan, raw], { encoding: "utf8", env: envFor(log) });
   if (r.status !== 0) cannot(`pty.py thoát ${r.status}: ${(r.stderr || "").trim().split("\n").pop()}`);
   const meta = JSON.parse(r.stdout.trim().split("\n").pop());
   const buf = readFileSync(raw);
@@ -280,6 +284,20 @@ function judgeOld(errs) {
   return { red: [], lost };
 }
 
+const BAIT = "moi-thu-khong-phai-khoa-0007";
+
+/** Files under a folder whose bytes contain a string. */
+function filesHolding(dir, text) {
+  const hits = [];
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) hits.push(...filesHolding(p, text));
+    else if (readFileSync(p).includes(text)) hits.push(p);
+  }
+  return hits;
+}
+const baitLine = (p) => `biến mồi ra đĩa: ${relative(RUN, p)}`;
+
 /** Each break of the source must turn a check red with its pinned message. */
 function selfTest() {
   const cases = [];
@@ -288,10 +306,23 @@ function selfTest() {
     cases.push(hit);
     console.log(hit ? `ok ${name} — đỏ đúng: ${pinned}` : `DO ${name}: không đỏ «${pinned}» (${bad.join(" · ") || "xanh"})`);
   };
+  // A made-up bait variable (not a key) in the environment of every run: no file under the run folder may hold it.
+  process.env.KIEM_MOI_THU = BAIT;
   const lanh = onTerminal("vat-lanh", viaMake);
   const healthy = checkTerminal(lanh);
   cases.push(healthy.length === 0);
   console.log(healthy.length ? `DO vat-lanh: ${healthy.join(" · ")}` : "ok vat-lanh — vật lành xanh");
+  const baitHealthy = filesHolding(RUN, BAIT);
+  cases.push(baitHealthy.length === 0);
+  console.log(
+    baitHealthy.length ? `DO moi-khong-ra-dia: ${baitHealthy.map(baitLine).join(" · ")}` : "ok moi-khong-ra-dia — biến mồi không ra tệp nào",
+  );
+  planCarriesEnv = true;
+  onTerminal("pha-plan-mang-env", viaMake);
+  planCarriesEnv = false;
+  expect("pha-plan-mang-env", filesHolding(RUN, BAIT).map(baitLine), "biến mồi ra đĩa: pha-plan-mang-env.plan.json");
+  // That break wrote the whole environment of the grader into its plan: remove it at once, it must not stay on disk.
+  rmSync(join(RUN, "pha-plan-mang-env.plan.json"), { force: true });
   // Round trip: the healthy screen just read, with the first two questions swapped.
   const swapped = [...lanh.screen];
   const i0 = swapped.indexOf(QUESTIONS[0][1].trimEnd());

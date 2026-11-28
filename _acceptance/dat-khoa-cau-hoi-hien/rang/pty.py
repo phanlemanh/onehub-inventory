@@ -1,7 +1,9 @@
 """Runs one command on a real pseudo-terminal of the operating system and answers its questions like a person pasting.
 
 python3 -I pty.py <plan.json> <raw-output-path>
-plan.json: {"cmd": [...], "cwd": "...", "env": {...}, "answers": [{"after": "<text of the question>", "send": "<answer>"}]}
+plan.json: {"cmd": [...], "cwd": "...", "answers": [{"after": "<text of the question>", "send": "<answer>"}]}
+The command runs with this process's own environment (the caller passes it); the plan never carries one, so no
+value of the grader's environment is written to disk.
 Each answer is sent once the question has appeared in the output since the previous answer ("after": "" = at once),
 followed by a carriage return as the Enter key sends it, unless "enter": false. An answer with "resize": [rows, cols]
 changes the terminal size right after it is sent, as a person dragging the window (the command gets SIGWINCH). The
@@ -14,7 +16,7 @@ plan = json.load(open(sys.argv[1], encoding="utf-8"))
 raw_path = sys.argv[2]
 master, slave = os.openpty()
 fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 50, int(plan.get("cols", 200)), 0, 0))
-proc = subprocess.Popen(plan["cmd"], cwd=plan["cwd"], env=plan["env"], stdin=slave, stdout=slave, stderr=slave,
+proc = subprocess.Popen(plan["cmd"], cwd=plan["cwd"], stdin=slave, stdout=slave, stderr=slave,
                         start_new_session=True, close_fds=True)
 os.close(slave)
 raw = b""
