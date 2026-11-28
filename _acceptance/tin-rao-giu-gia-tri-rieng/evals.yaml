@@ -168,7 +168,7 @@ evals:
   - id: E13
     criterion: AC-2
     executor: test
-    cmd: config:executors.test.tin_rao_sua_tren_o
+    cmd: "bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E13"
     paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/components/candidate/**, src/modules/listings/ui/attribute-cell-edit.test.tsx, src/modules/listings/ui/use-listing-cell-edit.tsx]
     expected: "exit 0; bộ bài của hàng 4 chạy lại không đổi một ca (giá, trạng thái, ô máy tính ra không sửa); cộng ca mới trong src/components/candidate/data-region-cell-edit.test.tsx: dưới 768 px ô Diện tích, Phòng ngủ không mở sửa (mọi lối mở sửa của luật sửa trên ô hiện hành đều không mở khung), từ 768 px mở; ca đối chứng mở sửa ở 360 cho 'phone cell opened for edit'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
@@ -214,3 +214,21 @@ evals:
       - "Open evidence/E15b-320-light.png, E15b-320-dark.png, E15b-360-light.png, E15b-360-dark.png, E15b-1440-light.png and E15b-1440-dark.png: status and price on one line, the label column narrow, each listing of the unit on two even lines at 320, the amber dot and the «Quá 14 ngày» line."
     expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 320, 360 và 1440, sáng và tối: dòng trạng thái và giá nằm trên một dòng (hai hộp bao cùng hàng); cột nhãn rộng 120±8px ở 1440 và 104±8px ở 360 (getBoundingClientRect); ở 320 mỗi lần chào đúng hai dòng (chiều cao các mục bằng nhau); bấm một tên trong «Còn thiếu» thì khối ấy mở Sửa và cuộn tới dòng; chấm và dòng quá 14 ngày dùng màu cảnh báo của bảng màu VP11 (không mã màu viết tay); axe không có lỗi; ảnh evidence/E15b-<khổ>-<nền>.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  # The screen-shape check of the kit (G-2811-85, s4-args): row 3h touches the grid group (the two cells, the mark) and
+  # the multi-step flow group (the import preview's mark); each group has one eval of the check, silent means held.
+  - id: E16
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luong-nhieu-buoc.md", "src/app/(app)/nhap-tep/**/*.tsx", "src/modules/imports/ui/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luong-nhieu-buoc"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
