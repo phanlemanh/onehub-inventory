@@ -359,14 +359,15 @@ describe("ap (E9)", () => {
     ).rows[0]!.kept.filter((k) => k.why === "unit-attribute");
     // The two catalog units also keep their tower text as written (S4-r7 t4); the new pending unit SA5-99.99 holds its
     // own tower text, so its row keeps none.
+    // In the file's order, row by row, column by column (one rule for preview and write, G-2811-84).
     expect(kept.map((k) => [k.header, k.raw])).toEqual([
+      ["Block", "[MAU] Toà"],
       ["Tầng", "Tầng 07"],
       ["Loại căn", label("SubTypeCondominium")],
       ["Diện tích", "72"],
       ["Block", "[MAU] Toà"],
       ["Tầng", "15a"],
       ["Loại căn", "2PN"],
-      ["Block", "[MAU] Toà"],
     ]);
     expect((await e.w.db.owner.query<{ n: string }>(catalog)).rows[0]!.n).toBe(before);
   });
@@ -502,7 +503,7 @@ describe("ap (E9)", () => {
     expect(written.rows.map((x) => x.raw_code)).toEqual(["ZZ-203"]);
   });
 
-  it("a team lead reads the list agents to import for: ids and names only; a list agent reads none; a buyer agent is 403 (S4-r1 t9)", async () => {
+  it("whom each role may import for, four roles: a team lead every list agent, a list agent only themself, a buyer agent and a company admin 403 (S4-r1 t9, G-2811-86)", async () => {
     const e = await importWorld("dau_chu");
     const read = async (who: Person) => {
       const res = await e.h.agents(
@@ -514,8 +515,11 @@ describe("ap (E9)", () => {
     expect(tl.status).toBe(200);
     expect(new Set(tl.body.map((a) => a.userId))).toEqual(new Set([e.w.id.LA, e.w.id.X]));
     expect(tl.body.every((a) => Object.keys(a).sort().join() === "name,userId")).toBe(true);
-    expect((await read("LA")).body).toEqual([]);
+    // The list agent reads exactly one row, themself: the HTTP door and the database function say the same (d-…-88).
+    const la = await read("LA");
+    expect([la.status, la.body.map((a) => a.userId)]).toEqual([200, [e.w.id.LA]]);
     expect((await read("BA")).status).toBe(403);
+    expect((await read("CA")).status).toBe(403);
   });
 
   it("who imports for whom: 4 cases written before", async () => {
@@ -1186,8 +1190,8 @@ describe("ap (E9) — audit", () => {
     ];
     expect(scanned.length).toBeGreaterThan(5);
     const SPEC = /(?:from\s+|import\s*\(\s*|import\s+)["']([^"']+)["']/g;
-    const reaches = scanned.flatMap((file) =>
-      [...readFileSync(file, "utf8").matchAll(SPEC)]
+    const reachesOf = (file: string, text: string) =>
+      [...text.matchAll(SPEC)]
         .map((m) => m[1]!)
         .filter((s) => {
           const target = s.startsWith("@/")
@@ -1201,9 +1205,25 @@ describe("ap (E9) — audit", () => {
             /llm/.test(s)
           );
         })
-        .map((s) => `${file.slice(root.length + 1)} → ${s}`),
-    );
+        .map((s) => `${file.slice(root.length + 1)} → ${s}`);
+    const reaches = scanned.flatMap((file) => reachesOf(file, readFileSync(file, "utf8")));
     expect(reaches).toEqual([]);
+    // Positive control (VP11 S4-r2 item 14): the scan finds each way in, planted in a file of the imports module.
+    const planted = join(root, "src/modules/imports/ui/planted.ts");
+    expect(
+      reachesOf(
+        planted,
+        [
+          'import { ask } from "@/ai/client";',
+          'import Anthropic from "@anthropic-ai/sdk";',
+          'const m = await import("../../../ai/client");',
+        ].join("\n"),
+      ),
+    ).toEqual([
+      "src/modules/imports/ui/planted.ts → @/ai/client",
+      "src/modules/imports/ui/planted.ts → @anthropic-ai/sdk",
+      "src/modules/imports/ui/planted.ts → ../../../ai/client",
+    ]);
   });
 });
 
@@ -1784,10 +1804,17 @@ function tableFaults(properties: readonly string[], columns: ReadonlySet<string>
 // target × situation of the row × mark of the cell, each with one declared outcome or «not applicable» and its reason;
 // the comparison runs over all of it and fails when a cell has no outcome or the matrix is empty.
 
-type Situation = "catalog" | "pending-existing" | "pending-new" | "listed";
+type Situation = "catalog" | "pending-existing" | "pending-new" | "listed" | "many-units";
 type Mark =
   "keep" | "fixed" | "chosen-remember" | "chosen-no-remember" | "chosen-as-written" | "ask";
-const SITUATIONS: Situation[] = ["catalog", "pending-existing", "pending-new", "listed"];
+// «many-units»: a code naming several units that nobody chose one for (VP11 S4-r2 item 9, ruling G-2811-84).
+const SITUATIONS: Situation[] = [
+  "catalog",
+  "pending-existing",
+  "pending-new",
+  "listed",
+  "many-units",
+];
 const MARKS: Mark[] = [
   "keep",
   "fixed",
@@ -1940,6 +1967,30 @@ const MATRIX: MatrixColumn[] = [
   closed("Biển", "bien", "Phố", "View", {
     newField: { name: "View", kind: "single_select", options: ["Biển", "Phố"] },
   }),
+  // Two columns the person dropped: the owner's phone (it can only be dropped, Hỏi-12) and a note. Never kept, on any
+  // kind of row (S4-r10 t5).
+  {
+    header: "SĐT chủ nhà",
+    target: { skip: true },
+    input: { keep: { raw: "0900 000 001" } },
+    notApplicable: Object.fromEntries(
+      MARKS.filter((m) => m !== "keep").map((m) => [
+        m,
+        "a dropped column is not read: no mark but its own",
+      ]),
+    ),
+  },
+  {
+    header: "Ghi chú",
+    target: { skip: true },
+    input: { keep: { raw: "[Tên] hẹn gọi lại" } },
+    notApplicable: Object.fromEntries(
+      MARKS.filter((m) => m !== "keep").map((m) => [
+        m,
+        "a dropped column is not read: no mark but its own",
+      ]),
+    ),
+  },
 ];
 
 /** The declared outcome of one cell of the matrix, from where its target goes, the row's situation and the mark the
@@ -1949,6 +2000,7 @@ type Outcome =
   | { write: "custom" | "new-field" | "unit-link" | "pending-building" }
   | { kept: string }
   | { none: string }
+  | { dropped: true }
   | { na: string };
 
 function outcomeOf(
@@ -1962,6 +2014,10 @@ function outcomeOf(
     return why ? { na: why } : { na: "" };
   }
   const t = col.target;
+  if (t !== "unit" && "skip" in t) return { dropped: true };
+  // A row whose unit is unresolved makes no listing and keeps every cell with text, its unit code too.
+  if (situation === "many-units")
+    return { kept: t === "unit" ? "many-units" : (askWhy ?? "row-not-created") };
   const created = situation !== "listed";
   // A unit that already has an open listing makes no listing: every cell of the row asks «already listed» and is kept
   // as written on the import; the unit code has nothing more to say.
@@ -2027,7 +2083,10 @@ function matrixFaults(
             (cell.value === null ? k.value === undefined : String(k.value) === String(cell.value)),
         );
       if ("na" in o) out.push(`${name}: no outcome`);
-      else if ("kept" in o) {
+      else if ("dropped" in o) {
+        if (w.kept.some((k) => k.row === r && k.header === col.header))
+          out.push(`${name}: a dropped column was kept`);
+      } else if ("kept" in o) {
         if (!keptHere(o.kept)) out.push(`${name}: not kept with its value (${o.kept})`);
       } else if ("none" in o) {
         if (w.listing !== null) out.push(`${name}: a listing exists for a ${o.none} row`);
@@ -2054,8 +2113,8 @@ function matrixFaults(
 }
 
 describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
-  it("the matrix is written before: 20 targets × 4 situations × 6 marks, every cell with one outcome or a named reason", () => {
-    expect(MATRIX).toHaveLength(20);
+  it("the matrix is written before: 20 targets and 2 dropped columns × 5 situations × 6 marks, every cell with one outcome or a named reason", () => {
+    expect(MATRIX).toHaveLength(22);
     // The 18 standard targets and the two kinds of the company's own fields, each once.
     const standard = MATRIX.flatMap((c) =>
       c.target !== "unit" && "standard" in c.target ? [c.target.standard] : [],
@@ -2064,7 +2123,7 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
     const cells = MATRIX.flatMap((col) =>
       SITUATIONS.flatMap((s) => MARKS.map((m) => ({ col, s, m, o: outcomeOf(col, s, m, "why") }))),
     );
-    expect(cells).toHaveLength(480);
+    expect(cells).toHaveLength(660);
     const unnamed = cells
       .filter((x) => "na" in x.o && !x.o.na)
       .map((x) => `${x.col.header}×${x.s}×${x.m}`);
@@ -2090,6 +2149,19 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
     );
     const catalog = await catalogCodes(e, 6, 3);
     const listedCodes = await catalogCodes(e, 6, 9);
+    // Six codes each naming two units of the catalog, as the reader of row 7e reads «DOI-0k».
+    const twoUnits = await catalogCodes(e, 12, 30);
+    for (let k = 0; k < 6; k += 1)
+      await e.w.db.owner.query(
+        `insert into catalog_aliases (object_key, kind, value, source)
+         values ($1, 'ma_goc', $3, 'THU'), ($2, 'ma_goc', $4, 'THU')`,
+        [
+          await unitKeyOf(e, twoUnits[2 * k]!),
+          await unitKeyOf(e, twoUnits[2 * k + 1]!),
+          `op3/DOI-0${k}`,
+          `op2/DOI-0${k}`,
+        ],
+      );
     const pendingIds: string[] = [];
     for (let k = 0; k < 6; k += 1)
       pendingIds.push(
@@ -2115,7 +2187,9 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
           ? listedCodes[k]!
           : s === "pending-existing"
             ? `SA5-90.0${k}`
-            : `SA5-91.0${k}`;
+            : s === "many-units"
+              ? `DOI-0${k}`
+              : `SA5-91.0${k}`;
     const rows = SITUATIONS.flatMap((situation) =>
       MARKS.map((mark, k) => ({
         situation,
@@ -2179,7 +2253,9 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
     );
     expect(wrongMark).toEqual([]);
     expect(promised.rows.map((x) => x.fate)).toEqual(
-      rows.map((r) => (r.situation === "listed" ? "listed" : "create")),
+      rows.map((r) =>
+        r.situation === "listed" ? "listed" : r.situation === "many-units" ? "blocked" : "create",
+      ),
     );
     const open = await e.h.open(
       req(
@@ -2276,6 +2352,15 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
       written.push({ listing, kept, unitOk, pendingBuilding: link.building, newCode });
     }
     expect(matrixFaults(promised, rows, written)).toEqual([]);
+    // The screen's two counts are the record's: «N ô giữ chữ gốc» is the record's kept cells, and the rows left out
+    // because their unit code names several units are said by number (G-2811-84).
+    expect(promised.keptCount).toBe(kept.length);
+    expect(promised.notCreatedCount).toBe(MARKS.length);
+    expect(
+      rows.flatMap((x, r) =>
+        x.situation === "many-units" && written[r]!.listing !== null ? [r] : [],
+      ),
+    ).toEqual([]);
     // What the person asked to remember: the company layer (row 7e) keeps a spelling for a closed set it holds — status,
     // withdrawal reason, direction and its own choice fields. For the other columns the value is written or kept as
     // above and the spelling is not learned, as declared here; the screen promises no more.
@@ -2328,13 +2413,46 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
       "0:Mã căn: listing not on its unit",
     ]);
     // A listed row that got a listing is named on its unit code (S4-r8 t9: the message is pinned, not just counted).
-    const lastListed = rows.length - 1;
+    const lastListed = rows.map((x) => x.situation).lastIndexOf("listed");
     expect(
       matrixFaults(promised, rows, [
         ...written.slice(0, lastListed),
         { ...written[lastListed]!, listing: r0.listing },
+        ...written.slice(lastListed + 1),
       ]),
     ).toEqual([`${lastListed}:Mã căn: a listing exists for a row-listed row`]);
+    // A direct sweep of the record (ruling G-2811-92): after a file with the owner's phone column, no text shaped like a
+    // phone number is anywhere in kept, raw or value; and kept is not empty, so the sweep has something to read.
+    // A number of its own (no digit before or after), not the digits inside a price such as 4000000000.
+    const PHONE_SHAPE = /(?<!\d)0\d{2,3}[ .]?\d{3}[ .]?\d{3,4}(?!\d)/;
+    const phones = (cells: { raw: string; value?: unknown }[]) =>
+      cells.filter((k) => PHONE_SHAPE.test(k.raw) || PHONE_SHAPE.test(String(k.value ?? "")));
+    expect(kept.length).toBeGreaterThan(100);
+    expect(phones(kept)).toEqual([]);
+    // Break: the same sweep finds the owner's number when it is planted in the record.
+    expect(phones([...kept, { raw: "0900 000 001" }])).toHaveLength(1);
+    expect(phones([{ raw: "x", value: 4000000000 }, { raw: "0900000001" }])).toHaveLength(1);
+    // The owner's phone kept on a row left out is named (S4-r10 t5): a dropped column is never on the record.
+    const manyRow = rows.findIndex((x) => x.situation === "many-units");
+    const PHONE = MATRIX.findIndex((c) => c.header === "SĐT chủ nhà");
+    expect(
+      matrixFaults(
+        promised,
+        rows,
+        written.map((w) => ({
+          ...w,
+          kept: [
+            ...kept,
+            {
+              row: manyRow,
+              header: "SĐT chủ nhà",
+              raw: rows[manyRow]!.raw[PHONE]!,
+              why: "row-not-created",
+            },
+          ],
+        })),
+      ),
+    ).toEqual([`${manyRow}:SĐT chủ nhà: a dropped column was kept`]);
     // An answer the person typed for a column kept as written, lost from the record, is named (G-2811-78): the cell
     // «chưa bán 2» of the catalog row answered without «remember» shows 4000000000 on the preview.
     const answeredRow = rows.findIndex(
@@ -2355,4 +2473,193 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
       ),
     ).toEqual([`${answeredRow}:Giá bán: not kept with its value (close-field)`]);
   });
+});
+
+// ---- S4-r11 t5 (AC-8): the last batch waits for every earlier batch ------------------------------------------------
+
+describe("goi cuoi doi cac goi truoc (S4-r11)", () => {
+  it("a last batch sent before the earlier ones is 409 batches-missing: nothing written, nothing learned, the import open; in order it finishes (break pinned)", async () => {
+    const e = await importWorld("goi_cuoi");
+    const codes = Array.from({ length: 450 }, (_, i) => `YY-${String(i).padStart(3, "0")}`);
+    const rows = codes.map((code) => [code, "[MAU] Toà", "1 tỷ", label("StatusActive"), ""]);
+    const choices: Choices = {
+      ...CHOICES,
+      columns: { 1: { target: { standard: "Unit.buildingName" }, learnLabel: true } },
+      units: Object.fromEntries(codes.map((code) => [fold(code), { pending: true as const }])),
+    };
+    const id = await openOnly(e, "LA", rows, choices);
+    const batch = (b: number) =>
+      sendBatch(e, "LA", id, {
+        headers: HEADERS,
+        rows: rows.slice(b * 200, (b + 1) * 200),
+        choices,
+        batchNo: b,
+        rowOffset: b * 200,
+        last: b === 2,
+      });
+    const state = async () =>
+      (
+        await e.w.db.owner.query<{ status: string; done: number[] }>(
+          "select status, batches_done as done from import_runs where id = $1",
+          [id],
+        )
+      ).rows[0]!;
+    const learned = async () =>
+      (await count(e, "select count(*) as n from company_labels")) +
+      (await count(e, "select count(*) as n from company_import_templates"));
+    // The last batch first, then after batch 0 only: refused each time, nothing written, nothing learned.
+    expect(await batch(2)).toMatchObject({ status: 409, error: "batches-missing" });
+    expect(await batch(0)).toMatchObject({ status: 200, created: 200 });
+    expect(await batch(2)).toMatchObject({ status: 409, error: "batches-missing" });
+    expect(await count(e, "select count(*) as n from listings")).toBe(200);
+    expect(await learned()).toBe(0);
+    expect(await state()).toEqual({ status: "open", done: [0] });
+    // In order, the import finishes and learns once.
+    expect(await batch(1)).toMatchObject({ status: 200, created: 200 });
+    expect(await batch(2)).toMatchObject({ status: 200, created: 50 });
+    expect(await count(e, "select count(*) as n from listings")).toBe(450);
+    expect(await state()).toEqual({ status: "done", done: [0, 1, 2] });
+    expect(await learned()).toBeGreaterThan(0);
+    // Break: the rule the server holds, given a done list missing an earlier batch, refuses the last one.
+    const waits = (done: number[], batchNo: number) =>
+      Array.from({ length: batchNo }, (_, b) => b).some((b) => !done.includes(b));
+    expect([waits([0, 1], 2), waits([1], 2), waits([], 0)]).toEqual([false, true, false]);
+  });
+});
+
+// ---- Ruling G-2811-96: every order a batch can come in, written before, with its outcome (AC-8: «an import with a
+// batch not written has learned nothing») ---------------------------------------------------------------------------
+
+describe("ma tran thu tu goi (G-2811-96)", () => {
+  it("each way a batch can arrive has one declared outcome: status, what is written, what is learned", async () => {
+    const e = await importWorld("thu_tu_goi");
+    await e.w.db.owner.query(
+      `insert into company_fields (company_id, code, name, kind, position) values ($1, 'ghi_chu', 'Ghi chú', 'text', 0)`,
+      [e.w.A],
+    );
+    const headers = [...HEADERS, "Ghi chú"];
+    let n = 0;
+    /** One import of `size` rows (401: three batches of 200, 200, 1) on its own unit codes. */
+    const fresh = async (size = 401) => {
+      n += 1;
+      const codes = Array.from({ length: size }, (_, i) => `T${n}-${String(i).padStart(3, "0")}`);
+      const lastBatch = Math.ceil(size / 200) - 1;
+      const rows = codes.map((c) => [c, "[MAU] Toà", "1 tỷ", label("StatusActive"), "", "gọi lại"]);
+      const choices: Choices = {
+        ...CHOICES,
+        columns: {
+          1: { target: { standard: "Unit.buildingName" }, learnLabel: true },
+          5: { target: { custom: "ghi_chu" } },
+        },
+        units: Object.fromEntries(codes.map((c) => [fold(c), { pending: true as const }])),
+      };
+      const p = await preview(e, "LA", rows, choices, headers);
+      const open = await e.h.open(
+        req(
+          URL_,
+          "POST",
+          {
+            headers,
+            rows,
+            choices,
+            fileName: `thu-tu-${n}.xlsx`,
+            sheetName: "Sheet1",
+            expected: { ...p.body.counts, createCount: p.body.createCount },
+          },
+          await e.cookie("LA"),
+        ),
+      );
+      expect(open.status).toBe(201);
+      const { id } = (await open.json()) as { id: string };
+      const send = (b: number, over: Record<string, unknown> = {}) =>
+        sendBatch(e, "LA", id, {
+          headers,
+          rows: rows.slice(b * 200, (b + 1) * 200),
+          choices,
+          batchNo: b,
+          rowOffset: b * 200,
+          last: b === lastBatch,
+          ...over,
+        });
+      const state = async () => {
+        const r = (
+          await e.w.db.owner.query<{ status: string; done: number[]; kept: { why: string }[] }>(
+            "select status, batches_done as done, kept from import_runs where id = $1",
+            [id],
+          )
+        ).rows[0]!;
+        return {
+          status: r.status,
+          done: [...r.done].sort(),
+          listings: await count(e, "select count(*) as n from listings where import_run_id = $1", [
+            id,
+          ]),
+          keptRetired: r.kept.filter((k) => k.why === "field-retired").length,
+        };
+      };
+      return { id, send, state };
+    };
+    const learned = async () =>
+      (await count(e, "select count(*) as n from company_labels where retired_at is null")) +
+      (await count(
+        e,
+        "select count(*) as n from company_import_templates where retired_at is null",
+      ));
+
+    // Two imports carry every case, so the test writes about 600 pending units, not 1,800. Import A (three batches):
+    const a = await fresh();
+    const before = await learned();
+    // 1. The last batch first: refused, nothing written, nothing learned, the import open.
+    expect(await a.send(2)).toMatchObject({ status: 409, error: "batches-missing" });
+    expect(await a.state()).toEqual({ status: "open", done: [], listings: 0, keptRetired: 0 });
+    // 2. A batch at the wrong place, or past the end: refused as a table that changed, nothing written.
+    expect(await a.send(1, { rowOffset: 0 })).toMatchObject({
+      status: 409,
+      error: "table-changed",
+    });
+    expect(await a.send(1, { batchNo: 5, rowOffset: 1000 })).toMatchObject({
+      status: 409,
+      error: "table-changed",
+    });
+    // 3. A middle batch before the first: written, nothing learned yet.
+    expect(await a.send(1)).toMatchObject({ status: 200, created: 200 });
+    // 4. The first batch still missing: the last one waits.
+    expect(await a.send(2)).toMatchObject({ status: 409, error: "batches-missing" });
+    expect(await a.state()).toEqual({ status: "open", done: [1], listings: 200, keptRetired: 0 });
+    expect(await learned()).toBe(before);
+    // 5. A written batch sent again: the same answer, nothing written twice.
+    expect(await a.send(1)).toMatchObject({ status: 200, created: 200 });
+    expect((await a.state()).listings).toBe(200);
+    expect(await a.send(0)).toMatchObject({ status: 200, created: 200 });
+    // 6. The company's own fields change between batches: each batch is marked again (AC-7); the cell of the field
+    // retired in between asks «field-retired» and is kept as written, never lost.
+    await e.w.db.owner.query(
+      "update company_fields set retired_at = now() where company_id = $1 and code = 'ghi_chu'",
+      [e.w.A],
+    );
+    // 7. Every batch written, the last one finishes the import and learns once.
+    expect(await a.send(2)).toMatchObject({ status: 200, created: 1 });
+    expect(await a.state()).toEqual({
+      status: "done",
+      done: [0, 1, 2],
+      listings: 401,
+      keptRetired: 1,
+    });
+    const after = await learned();
+    expect(after).toBeGreaterThan(before);
+    // 8. The last batch sent again after the import finished: the same answer, nothing written or learned twice.
+    expect(await a.send(2)).toMatchObject({ status: 200, created: 1 });
+    expect((await a.state()).listings).toBe(401);
+    expect(await learned()).toBe(after);
+    // Import B (two batches, one written): 9. a batch of an import that was undone is closed, nothing written.
+    const b = await fresh(201);
+    expect((await b.send(0)).status).toBe(200);
+    const undo = await e.h.undo(
+      req(`${URL_}/${b.id}/undo`, "POST", {}, await e.cookie("LA")),
+      b.id,
+    );
+    expect(undo.status).toBe(200);
+    expect(await b.send(1)).toMatchObject({ status: 409, error: "closed" });
+    expect((await b.state()).listings).toBe(0);
+  }, 300_000);
 });

@@ -46,6 +46,7 @@ type Code =
   | "table-changed"
   | "bad-agent"
   | "closed"
+  | "batches-missing"
   | "already-undone";
 const STATUS: Record<Code, number> = {
   unauthenticated: 401,
@@ -58,6 +59,7 @@ const STATUS: Record<Code, number> = {
   "counts-changed": 409,
   "table-changed": 409,
   closed: 409,
+  "batches-missing": 409,
   "already-undone": 409,
 };
 const error = (code: Code) => Response.json({ error: code }, { status: STATUS[code] });
@@ -210,9 +212,9 @@ export function createImportsHandlers(deps: ImportsDeps): ImportsHandlers {
       }),
     recent: (req) =>
       guarded(req, "viewImports", async (_d, c) => Response.json(await recentImports(c))),
+    // Whom the caller may import for, as the database function answers (migration 019): every list agent for a
+    // company-wide importer, the caller alone for «own». One answer in both layers (G-2811-86, decision d-…-88).
     agents: (req) =>
-      guarded(req, "importListings", async (door, c) =>
-        Response.json(door.scope === "company" ? await listAgents(c) : []),
-      ),
+      guarded(req, "importListings", async (_door, c) => Response.json(await listAgents(c))),
   };
 }

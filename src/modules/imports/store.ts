@@ -30,11 +30,13 @@ import {
 import { markCatalogDiffers } from "./catalog-differs";
 import type { LearnedConcept, LearnedItem } from "./learned";
 import { markValue, valueKey, type CellMark, type Choices, type UnitFound } from "./mark";
-import { markTable, type MarkedTable } from "./table";
+import { keptCellsOf, markTable, type MarkedTable } from "./table";
 import {
   FILE_VALUE_OF,
+  DESTINATION,
   STANDARD_HEADER_CONCEPTS,
   TEMPLATE_FIELD,
+  type ListingColumn,
   type StandardTarget,
   type Target,
 } from "./targets";
@@ -279,43 +281,19 @@ async function lockRun(c: Queryable, id: string): Promise<RunRow | null> {
   return (rows[0] as RunRow | undefined) ?? null;
 }
 
-/** Where the value of a standard target goes when an import writes (ruling G-2811-65, after VP11's S4-r1). */
-export type Destination =
-  | { listing: keyof NewListing }
-  | { kept: "unit-attribute" | "close-field" }
-  | { unit: "code" | "building" };
+export { DESTINATION, type Destination } from "./targets";
 
-/**
- * Every standard target has exactly one place: a column of the listing, kept as written on the import with its reason,
- * or the unit itself (its code, and the tower text of a new pending unit). A target with no place would be read on the
- * preview and lost on write; the Record makes the type check fail first, tests/nhap-excel-noi-ghi.test.ts second.
- * A listing an import makes is never Closed (row 4: Incomplete does not move to Closed), so close price and close date
- * have no place on it, and unit attributes never change the unit or the catalog (G-2711-4).
- */
-export const DESTINATION: Record<StandardTarget, Destination> = {
-  unitCode: { unit: "code" },
-  "Unit.buildingName": { unit: "building" }, // on a pending unit the row creates; otherwise kept as unit-attribute
-  "Unit.livingArea": { kept: "unit-attribute" },
-  "Unit.bedroomsTotal": { kept: "unit-attribute" },
-  "Unit.directionFaces": { kept: "unit-attribute" },
-  "Unit.floor": { kept: "unit-attribute" },
-  "Unit.propertySubType": { kept: "unit-attribute" },
-  "Listing.listPrice": { listing: "listPrice" },
-  "Listing.feeInclusion": { listing: "feeInclusion" },
-  "Listing.standardStatus": { listing: "standardStatus" },
-  "Listing.withdrawnReason": { listing: "withdrawnReason" },
-  "Listing.closePrice": { kept: "close-field" },
-  "Listing.closeDate": { kept: "close-field" },
-  "Listing.furnished": { listing: "furnished" },
-  "Listing.occupantType": { listing: "occupantType" },
-  "Listing.legalStatus": { listing: "legalStatus" },
-  "Listing.financing": { listing: "financing" },
-  "Listing.lastConfirmedAt": { listing: "lastConfirmedAt" },
-};
+// Every listing column a destination names is a column of the listing the listings module creates.
+type ListingColumnsExist = ListingColumn extends keyof NewListing ? true : never;
+const listingColumnsExist: ListingColumnsExist = true;
+void listingColumnsExist;
 
 export type BatchResult =
   | { ok: true; created: number; done: boolean; learned?: LearnedItem[] }
-  | { ok: false; problem: "not-found" | "closed" | "blocked-cells" | "table-changed" };
+  | {
+      ok: false;
+      problem: "not-found" | "closed" | "blocked-cells" | "table-changed" | "batches-missing";
+    };
 
 /**
  * Write one batch of an open import: the rows that become listings (new pending units first), the cells kept as
@@ -362,6 +340,13 @@ export async function writeBatch(
     };
   }
   if (run.status !== "open") return { ok: false, problem: "closed" };
+  // The last batch closes the import and runs what it teaches, so it waits for every earlier batch (AC-8, S4-r11 t5):
+  // sent before them, it is refused and writes nothing; the import stays open and has learned nothing.
+  if (
+    input.last &&
+    Array.from({ length: input.batchNo }, (_, b) => b).some((b) => !run.batches_done.includes(b))
+  )
+    return { ok: false, problem: "batches-missing" };
   const runAs = savepointRun(c);
   // Rows the person left out are counted in the whole file; this batch reads them at its own place (S4-r1 t8).
   const skipRows = (input.choices.skipRows ?? [])
@@ -377,29 +362,28 @@ export async function writeBatch(
   const buildingAt = marked.columns.find(
     (x) => x.target && "standard" in x.target && x.target.standard === "Unit.buildingName",
   )?.index;
+  // What the record keeps as written: the same rule the preview counted (table.ts keptCellsOf, G-2811-84).
+  const keptHere = keptCellsOf(marked, input.rows);
+  for (const k of keptHere)
+    kept.push(
+      keptCell(
+        input.rowOffset + k.row,
+        marked.columns[k.col]!.header,
+        input.rows[k.row]![k.col] ?? "",
+        k.why,
+        marked.cells[k.row]![k.col]!,
+      ),
+    );
   for (let r = 0; r < marked.rows.length; r += 1) {
     const outcome = marked.rows[r]!;
     const cells = marked.cells[r]!;
-    marked.columns.forEach((col, j) => {
-      const cell = cells[j]!;
-      const raw = input.rows[r]![j] ?? "";
-      const place =
-        col.target && "standard" in col.target ? DESTINATION[col.target.standard] : null;
-      const keptAs = place && "kept" in place ? place.kept : null;
-      if (
-        (cell.mark === "ask" && !(place && "unit" in place && place.unit === "code")) ||
-        (keptAs && raw.trim() !== "")
-      )
-        kept.push(keptCell(input.rowOffset + r, col.header, raw, keptAs ?? cell.why, cell));
-    });
-    // The tower text has a place only on a pending unit this row creates; any other row keeps it as written, like the
-    // unit attributes (VP11 S4-r7 t4: a unit that already exists took nothing of it, and the cell was lost).
     const buildingRaw = buildingAt === undefined ? "" : (input.rows[r]![buildingAt] ?? "");
+    /** A tower text the rule counted as going onto a new pending unit, kept after all when that unit already exists. */
     const keepBuilding = () => {
       if (
         buildingAt !== undefined &&
         buildingRaw.trim() !== "" &&
-        cells[buildingAt]!.mark !== "ask"
+        !keptHere.some((k) => k.row === r && k.col === buildingAt)
       )
         kept.push(
           keptCell(
@@ -411,30 +395,25 @@ export async function writeBatch(
           ),
         );
     };
-    if (outcome.fate !== "create" || !outcome.unit) {
-      keepBuilding();
-      continue;
-    }
+    if (outcome.fate !== "create" || !outcome.unit) continue;
     let unit: NewListing["unit"];
     if ("unitKey" in outcome.unit) {
-      keepBuilding();
       const u = (
         await c.query(`select upi from catalog_units where unit_key = $1`, [outcome.unit.unitKey])
       ).rows[0] as { upi: string };
       unit = { upi: u.upi };
     } else if ("pendingUnitId" in outcome.unit) {
-      keepBuilding();
       unit = { pendingUnitId: outcome.unit.pendingUnitId };
     } else {
       const code = outcome.unit.newPending;
       const known = learned.pendingUnits.find((p) => fold(p.rawCode) === fold(code));
       if (known) {
+        // Not reachable for a file the preview passed (a repeated code blocks it); kept for safety, as written.
         keepBuilding();
         unit = { pendingUnitId: known.id };
       } else {
+        // A tower text longer than the pending unit holds is kept whole by the rule as well.
         const building = buildingRaw.trim().slice(0, 80);
-        // A tower text longer than the pending unit holds is also kept whole, as written.
-        if (building !== buildingRaw.trim()) keepBuilding();
         const w = await learnFromImport(
           runAs,
           {

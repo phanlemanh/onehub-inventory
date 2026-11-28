@@ -15,7 +15,7 @@ import {
   type Mark,
   type UnitFound,
 } from "./mark";
-import type { Target } from "./targets";
+import { DESTINATION, type Target } from "./targets";
 
 export type Question =
   | { kind: "column"; column: number; header: string; why: string }
@@ -35,7 +35,10 @@ export interface MarkedTable {
   rows: RowOutcome[];
   counts: Record<Mark, number>;
   createCount: number;
+  /** Cells kept as written on the import's record: exactly keptCellsOf, the rule the write stores. */
   keptCount: number;
+  /** Rows that make no listing because their unit code names several units and nobody chose one. */
+  notCreatedCount: number;
   canApply: boolean;
   questions: Question[];
 }
@@ -133,12 +136,7 @@ export function markTable(table: TableInput, ctx: TableContext, choices: Choices
   });
   const counts: Record<Mark, number> = { keep: 0, fixed: 0, ask: 0, block: 0 };
   for (const r of cells) for (const c of r) counts[c.mark] += 1;
-  const keptCount = cells.reduce(
-    (n, r, i) =>
-      n +
-      r.filter((c, j) => c.mark === "ask" && !(j === unitAt && rows[i]!.fate === "create")).length,
-    0,
-  );
+  const keptCount = keptCellsOf({ columns, cells, rows }, table.rows).length;
   return {
     columns,
     cells,
@@ -146,9 +144,62 @@ export function markTable(table: TableInput, ctx: TableContext, choices: Choices
     counts,
     createCount: rows.filter((r) => r.fate === "create").length,
     keptCount,
+    notCreatedCount: rows.filter((r, i) => notCreated(r, cells[i]!)).length,
     canApply: counts.block === 0 && rows.some((r) => r.fate === "create"),
     questions: questionsOf(table, columns, cells, unitAt, ctx),
   };
+}
+
+/** A row the write leaves out because its unit is unresolved (a code naming several units, unanswered). */
+const notCreated = (row: RowOutcome, cells: readonly CellMark[]) =>
+  row.fate === "blocked" && !cells.some((c) => c.mark === "block");
+
+/** The tower text a pending unit holds; a longer one is also kept whole as written. */
+const PENDING_BUILDING_LIMIT = 80;
+
+/**
+ * Every cell an import keeps as written on its record, by row and column, with its reason: the one rule the preview
+ * counts («N ô giữ chữ gốc») and the write stores (store.ts writeBatch), so the two cannot drift (VP11 S4-r2 item 9,
+ * ruling G-2811-84). A dropped column is never kept. A row left out because its unit is unresolved keeps every other cell
+ * with text, its unit code too. Any
+ * other row keeps the cells that ask a person (its unit code aside: that is the row's unit), every cell whose target has
+ * no place on the listing (DESTINATION «kept»), and its tower text unless that goes onto the new pending unit it makes.
+ */
+export function keptCellsOf(
+  table: Pick<MarkedTable, "columns" | "cells" | "rows">,
+  raw: readonly (readonly string[])[],
+): { row: number; col: number; why: string }[] {
+  const unitAt = unitColumn(table.columns);
+  const out: { row: number; col: number; why: string }[] = [];
+  table.rows.forEach((row, r) => {
+    const cells = table.cells[r]!;
+    const left = notCreated(row, cells);
+    table.columns.forEach((col, j) => {
+      const text = raw[r]?.[j] ?? "";
+      if (text.trim() === "") return;
+      // A column the person dropped is never kept, on any row: the owner's name and phone can only be dropped
+      // (Hỏi-12), and the personal-data rule keeps them off the record (S4-r10 t5).
+      if (col.target && "skip" in col.target) return;
+      const cell = cells[j]!;
+      const why = (w: string) => out.push({ row: r, col: j, why: w });
+      if (left) return why(cell.mark === "ask" ? cell.why : "row-not-created");
+      if (j === unitAt) return;
+      const t = col.target;
+      const place = t && "standard" in t ? DESTINATION[t.standard] : null;
+      if (place && "kept" in place) return why(place.kept);
+      if (place && "unit" in place && place.unit === "building") {
+        if (cell.mark === "ask") return why(cell.why);
+        const onPending =
+          row.fate === "create" &&
+          row.unit !== null &&
+          "newPending" in row.unit &&
+          text.trim().length <= PENDING_BUILDING_LIMIT;
+        return onPending ? undefined : why("unit-attribute");
+      }
+      if (cell.mark === "ask") why(cell.why);
+    });
+  });
+  return out;
 }
 
 /** Questions grouped: per column, per (column, folded spelling), per code naming several units, one for missing codes. */

@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "nhap-excel",
-  "ghi_luc": "2026-11-28T05:40:55Z",
-  "vong_cham": 8,
+  "ghi_luc": "2026-11-28T06:28:03Z",
+  "vong_cham": 9,
   "luot": [
     {
       "vong": 1,
@@ -49,6 +49,11 @@
     },
     {
       "vong": 8,
+      "verdict": "PASS",
+      "tang": []
+    },
+    {
+      "vong": 9,
       "verdict": "PASS",
       "tang": []
     }
@@ -107,8 +112,8 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      3720,
-      249
+      3803,
+      265
     ],
     "thuoc": [
       47,
@@ -117,8 +122,8 @@
     "nhat": 4
   },
   "gio_may": {
-    "gio_may": 66.54,
+    "gio_may": 67.33,
     "gio_cho": 248.35,
-    "phan_tram_tuan": 83.2
+    "phan_tram_tuan": 85.53
   }
 }

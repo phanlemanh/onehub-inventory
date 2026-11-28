@@ -107,18 +107,26 @@ function openRecord(row: GridRow, roles: readonly Role[] = ["BuyerAgent"]) {
 }
 const askButton = () => document.querySelector<HTMLButtonElement>('[data-slot="ask-list-agent"]');
 
-/** A share sheet that records each call and the order it ran in. */
+/**
+ * A share sheet that records each call and the order it ran in. `settled()` waits until the page has called the share
+ * sheet or the clipboard, until every such call has resolved or thrown, and one tick past it: a case that checks that
+ * nothing was said reads the page only once the whole chain has run (G-2811-86, row 11 round 10 t6).
+ */
 function fakeShare(behaviour: "ok" | "abort" | "absent", clipboard: "ok" | "throws" | "absent") {
   const calls: { text?: string; url?: string }[] = [];
   const copied: string[] = [];
+  const pending: Promise<unknown>[] = [];
+  const track = <T,>(p: Promise<T>): Promise<T> => (pending.push(p), p);
   if (behaviour !== "absent") {
     Object.defineProperty(navigator, "share", {
       configurable: true,
       value: (data: { text?: string; url?: string }) => {
         calls.push(data);
-        return behaviour === "ok"
-          ? Promise.resolve()
-          : Promise.reject(Object.assign(new Error("x"), { name: "AbortError" }));
+        return track(
+          behaviour === "ok"
+            ? Promise.resolve()
+            : Promise.reject(Object.assign(new Error("x"), { name: "AbortError" })),
+        );
       },
     });
   }
@@ -127,13 +135,22 @@ function fakeShare(behaviour: "ok" | "abort" | "absent", clipboard: "ok" | "thro
       configurable: true,
       value: {
         writeText: (t: string) =>
-          clipboard === "ok"
-            ? (copied.push(t), Promise.resolve())
-            : Promise.reject(new Error("no")),
+          track(
+            clipboard === "ok"
+              ? (copied.push(t), Promise.resolve())
+              : Promise.reject(new Error("no")),
+          ),
       },
     });
   }
-  return { calls, copied };
+  const settled = async () => {
+    await waitFor(() =>
+      expect(pending.length, "neither share nor clipboard was called").toBeGreaterThan(0),
+    );
+    await Promise.allSettled(pending);
+    await new Promise((r) => setTimeout(r, 0));
+  };
+  return { calls, copied, settled };
 }
 
 // ---- E2 · the ask message and the share sheet ----------------------------------------------------------------------
@@ -207,10 +224,10 @@ describe("E2 · asking the listing agent", () => {
   });
 
   it("says nothing when the person cancels the share sheet", async () => {
-    fakeShare("abort", "ok");
+    const { settled } = fakeShare("abort", "ok");
     openRecord(rowKept("other"));
     fireEvent.click(askButton()!);
-    await new Promise((r) => setTimeout(r, 0));
+    await settled();
     expect(notifyResult).not.toHaveBeenCalled();
     expect(screen.queryByRole("alert")).toBeNull();
   });
@@ -504,11 +521,16 @@ describe("E7 · the report", () => {
   ];
   for (const o of OUTCOMES) {
     it(`share ${o.share}, clipboard ${o.clip} → ${o.said ?? "nothing"}`, async () => {
-      fakeShare(o.share, o.clip);
+      const { settled } = fakeShare(o.share, o.clip);
       await openReport(rowKept("other"));
       typeRight("72");
       submit();
-      await new Promise((r) => setTimeout(r, 0));
+      // A report that says something is waited for until it shows: share, then the clipboard, each settle a moment
+      // after the press, and one tick was not enough on a busy machine (VP11 round 3, G-2811-86). A report that says
+      // nothing (the person cancelled) is read once the share sheet has answered and the page has had a tick past it.
+      const said = () => document.querySelector('[data-slot="report-result"]')?.textContent ?? null;
+      if (o.said === null) await settled();
+      else await waitFor(() => expect(said()).toBe(o.said));
       const status = document.querySelector('[data-slot="report-result"]');
       expect(status?.textContent ?? null).toBe(o.said);
       const box = screen.queryByLabelText(ASK_COPY.messageLabel) as HTMLTextAreaElement | null;

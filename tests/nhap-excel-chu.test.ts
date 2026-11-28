@@ -8,6 +8,9 @@ describe("chu-man-nap-tep", () => {
     expect(C.blocked(3)).toBe("Còn 3 chỗ chặn");
     expect(C.cells(12)).toBe("12 ô");
     expect(C.keptCells(2)).toBe("2 ô giữ chữ gốc của tệp");
+    expect(C.notCreated(3)).toBe(
+      "3 dòng chưa nhập — mã căn trỏ nhiều căn mà chưa chọn; chữ của các dòng ấy giữ trong bản ghi.",
+    );
     expect(C.learnLabel("Block")).toBe("Gọi cột này là «Block» trên bảng");
     expect(C.inColumn("ĐN", "Hướng", 37)).toBe("«ĐN» ở cột Hướng · 37 ô");
   });
